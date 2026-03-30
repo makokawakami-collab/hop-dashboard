@@ -1,1 +1,2312 @@
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>+ホップ 人材ダッシュボード</title>
+<style>
+:root {
+  --primary: #1e3a5f;
+  --primary-light: #2d5186;
+  --accent: #e05a4e;
+  --green: #2a9d6e;
+  --warn: #e5900a;
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --border: #d8dfe9;
+  --text: #1a2333;
+  --muted: #7a8aaa;
+  --star: #fff3d4;
+  --header-h: 52px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Hiragino Kaku Gothic Pro','Meiryo','Yu Gothic',sans-serif; background: var(--bg); color: var(--text); font-size: 12px; }
 
+/* ── header ─────────────────────────────── */
+.header { height: var(--header-h); background: var(--primary); color: #fff; display: flex; align-items: center; padding: 0 20px; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.header h1 { font-size: 15px; font-weight: 700; letter-spacing: .03em; }
+.header .badge { background: rgba(255,255,255,.15); padding: 2px 10px; border-radius: 20px; font-size: 10px; }
+
+/* ── controls bar ────────────────────────── */
+.controls { background: var(--surface); border-bottom: 2px solid var(--border); padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn-upload { position: relative; }
+.btn-upload input[type=file] { position: absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+.btn-upload .lbl {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--primary); color: #fff; padding: 6px 14px; border-radius: 5px;
+  font-size: 11px; cursor: pointer; white-space: nowrap; transition: background .2s;
+}
+.btn-upload.loaded .lbl { background: var(--green); }
+.btn-upload .lbl svg { flex-shrink:0; }
+
+.filter-grp { display: flex; align-items: center; gap: 6px; }
+.filter-grp label { font-size: 11px; color: var(--muted); }
+select, input[type=number] { padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; background: #fff; }
+select:focus, input:focus { outline: 2px solid var(--primary-light); outline-offset: 1px; }
+
+.divider { width: 1px; height: 28px; background: var(--border); }
+.stat-chip { font-size: 10px; color: var(--muted); background: var(--bg); padding: 3px 8px; border-radius: 4px; }
+.stat-chip span { color: var(--text); font-weight: 700; }
+
+/* ── adv cost bar ────────────────────────── */
+.adv-bar { background: #f8f9fc; border-bottom: 1px solid var(--border); padding: 8px 20px; }
+.adv-bar summary { font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 6px; }
+.adv-bar summary::marker { display: none; }
+.adv-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.adv-item { display: flex; align-items: center; gap: 4px; }
+.adv-item label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.adv-item input { width: 90px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 3px; font-size: 11px; text-align: right; }
+
+/* ── dashboard table ─────────────────────── */
+.table-outer { padding: 16px 20px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+
+table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+th, td { border: 1px solid var(--border); padding: 3px 7px; text-align: right; min-width: 46px; }
+
+/* office header */
+.th-space { background: #f0f3f8; }
+.th-office { background: var(--primary); color: #fff; text-align: center; font-size: 10px; font-weight: 700; padding: 5px 4px; }
+.th-total { background: #334e7a; color: #fff; text-align: center; font-size: 10px; font-weight: 700; }
+
+/* metric label cells (sticky) */
+.lbl-cell { position: sticky; left: 0; z-index: 2; text-align: left; min-width: 130px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.lbl-main { background: #e8ecf4; font-weight: 700; }
+.lbl-sub  { background: #f4f5f9; color: var(--muted); padding-left: 14px !important; font-weight: normal; }
+.lbl-sub2 { background: #f8f9fc; color: #99a; padding-left: 22px !important; font-size: 10px; font-weight: normal; }
+.lbl-star { background: var(--star); font-weight: 700; }
+
+/* data cells */
+.val-main { background: #fdfdff; }
+.val-sub  { background: #fafbfd; color: var(--muted); font-style: italic; font-size: 10px; }
+.val-sub2 { background: #fcfcfe; font-size: 10px; }
+.val-total { background: #e8ecf4; font-weight: 700; }
+.val-total-sub { background: #eef0f6; color: var(--muted); font-style: italic; font-size: 10px; }
+.val-total-sub2 { background: #f0f2f8; font-size: 10px; }
+
+/* highlights */
+.warn-red { color: var(--accent) !important; font-weight: 700; }
+.warn-yellow { color: var(--warn) !important; font-weight: 700; }
+
+/* section header row */
+.sec-header td { background: var(--primary-light); color: #fff; font-weight: 700; font-size: 10px; text-align: center; padding: 3px 4px; }
+.sec-header .lbl-cell { background: var(--primary-light); color: #fff; }
+
+/* cost row */
+.cost-row td { background: #fff9ee; }
+.cost-row .lbl-cell { background: #fff3d4; font-weight: 700; }
+
+/* empty / loading state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state .ico { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 14px; margin-bottom: 6px; color: var(--text); }
+
+
+/* ── layout ─────────────────────────────── */
+.app-layout { display: flex; height: 100vh; overflow: hidden; }
+.sidebar {
+  width: 200px; min-width: 200px; background: #152a47;
+  display: flex; flex-direction: column; overflow-y: auto;
+  position: fixed; top: 0; left: 0; height: 100vh; z-index: 200;
+}
+.sidebar-logo {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.sidebar-logo h2 { color: #fff; font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+.sidebar-logo p  { color: rgba(255,255,255,.45); font-size: 9px; letter-spacing: .1em; margin-top: 2px; }
+.sidebar-section { padding: 16px 12px 4px; color: rgba(255,255,255,.35); font-size: 9px; letter-spacing: .1em; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; color: rgba(255,255,255,.65); font-size: 12px;
+  cursor: pointer; border-radius: 6px; margin: 1px 8px;
+  transition: background .15s, color .15s; text-decoration: none;
+}
+.sidebar-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.sidebar-item.active { background: #2d5186; color: #fff; font-weight: 700; }
+.sidebar-item .icon { font-size: 14px; width: 18px; text-align: center; }
+.sidebar-item.coming { opacity: .4; cursor: not-allowed; }
+
+.main-content {
+  margin-left: 200px;
+  flex: 1; overflow-y: auto; height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+/* headerはサイドバー分ずらす */
+.header { position: sticky; top: 0; z-index: 100; }
+
+/* bottom note */
+.note { font-size: 10px; color: var(--muted); padding: 8px 20px 20px; }
+</style>
+</head>
+<body>
+
+<!-- サイドバー -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <h2>+ホップ</h2>
+    <p>MATCHING &amp; MANAGEMENT</p>
+  </div>
+
+  <div class="sidebar-section">メイン</div>
+  <div class="sidebar-item active" onclick="showPage('jinzai', this)">
+    <span class="icon">👥</span> 人材DB
+  </div>
+  <div class="sidebar-item" onclick="showPage('shukyaku', this)">
+    <span class="icon">📊</span> 集客DB
+  </div>
+
+  <div class="sidebar-section">分析</div>
+  <div class="sidebar-item coming" title="準備中">
+    <span class="icon">💰</span> 広告費・CPA
+  </div>
+  <div class="sidebar-item coming" title="準備中">
+    <span class="icon">⏱️</span> リードタイム
+  </div>
+  <div class="sidebar-item coming" title="準備中">
+    <span class="icon">📅</span> 期間分析
+  </div>
+  <div class="sidebar-item" onclick="showPage('pref', this)">
+    <span class="icon">🗾</span> 都道府県分析
+  </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="main-content">
+
+<div class="header">
+  <h1 id="page-title">人材ダッシュボード</h1>
+  <div class="badge">フェーズ1 β版</div>
+</div>
+
+<div id="jinzai-page">
+<div class="controls">
+  <!-- CSV uploads -->
+  <div class="btn-upload loaded" id="wrap-med">
+    <input type="file" accept=".csv" id="file-med" onchange="onFileLoad(this,'med')">
+    <span class="lbl">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      統合ツールCSV
+    </span>
+  </div>
+  <div class="btn-upload loaded" id="wrap-mcg">
+    <input type="file" accept=".csv" id="file-mcg" onchange="onFileLoad(this,'mcg')">
+    <span class="lbl">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      マッチングッドCSV
+    </span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Filters -->
+  <div class="filter-grp">
+    <label>年</label>
+    <select id="sel-year" onchange="renderDashboard()"><option value="">---</option><option value="2026">2026年</option></select>
+  </div>
+  <div class="filter-grp">
+    <label>月</label>
+    <select id="sel-month" onchange="renderDashboard()">
+      <option value="">---</option>
+      <option>1</option><option>2</option><option>3</option><option>4</option>
+      <option>5</option><option>6</option><option>7</option><option>8</option>
+      <option>9</option><option>10</option><option>11</option><option>12</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+  <div class="filter-grp">
+    <label>基準日</label>
+    <input type="date" id="sel-date" onchange="renderDashboard()" title="この日時点のファネル状況を表示">
+    <button onclick="document.getElementById('sel-date').value=''; renderDashboard();" style="font-size:10px; padding:4px 8px; border:1px solid var(--border); border-radius:4px; cursor:pointer; background:#fff;">クリア</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="stat-chip" id="stat-med">統合ツール: <span>840行</span></div>
+  <div class="stat-chip" id="stat-mcg">MCG: <span>17,770行</span></div>
+
+  <div class="divider"></div>
+  <button onclick="exportSharedHtml()" style="
+    background: #2a9d6e; color: #fff; border: none; padding: 7px 16px;
+    border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  ">📤 共有HTML出力</button>
+</div>
+
+<!-- 集客費用入力 -->
+<details class="adv-bar" id="adv-details">
+  <summary>▶ 集客費用を入力する（クリックで展開）</summary>
+  <div class="adv-grid" id="adv-grid"><div class="adv-item">
+      <label>青森</label>
+      <input type="text" id="adv-青森" placeholder="0" value="257,400" oninput="localStorage.setItem('adv-青森', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>盛岡</label>
+      <input type="text" id="adv-盛岡" placeholder="0" value="366,056" oninput="localStorage.setItem('adv-盛岡', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>仙台</label>
+      <input type="text" id="adv-仙台" placeholder="0" value="546,512" oninput="localStorage.setItem('adv-仙台', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>千葉</label>
+      <input type="text" id="adv-千葉" placeholder="0" value="370,714" oninput="localStorage.setItem('adv-千葉', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>横浜</label>
+      <input type="text" id="adv-横浜" placeholder="0" value="561,429" oninput="localStorage.setItem('adv-横浜', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>新宿</label>
+      <input type="text" id="adv-新宿" placeholder="0" value="834,286" oninput="localStorage.setItem('adv-新宿', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>新潟</label>
+      <input type="text" id="adv-新潟" placeholder="0" value="315,714" oninput="localStorage.setItem('adv-新潟', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>金沢</label>
+      <input type="text" id="adv-金沢" placeholder="0" value="431,714" oninput="localStorage.setItem('adv-金沢', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>名古屋</label>
+      <input type="text" id="adv-名古屋" placeholder="0" value="588,114" oninput="localStorage.setItem('adv-名古屋', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>京都</label>
+      <input type="text" id="adv-京都" placeholder="0" value="355,714" oninput="localStorage.setItem('adv-京都', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>梅田</label>
+      <input type="text" id="adv-梅田" placeholder="0" value="911,114" oninput="localStorage.setItem('adv-梅田', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>神戸</label>
+      <input type="text" id="adv-神戸" placeholder="0" value="365,714" oninput="localStorage.setItem('adv-神戸', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>福岡</label>
+      <input type="text" id="adv-福岡" placeholder="0" value="567,543" oninput="localStorage.setItem('adv-福岡', this.value); renderDashboard()">
+    </div><div class="adv-item">
+      <label>鹿児島</label>
+      <input type="text" id="adv-鹿児島" placeholder="0" value="352,114" oninput="localStorage.setItem('adv-鹿児島', this.value); renderDashboard()">
+    </div></div>
+</details>
+
+<!-- Debug Panel -->
+<div id="debug-panel" style="display:none; background:#fff3cd; border:1px solid #ffc107; margin:10px 20px; padding:12px; border-radius:6px; font-size:11px; font-family:monospace;">
+  <strong>🔍 デバッグ情報（確認後は非表示にできます）</strong>
+  <div id="debug-content" style="margin-top:8px; white-space:pre-wrap; max-height:250px; overflow-y:auto; line-height:1.6;">MCG CSV 行数: 17770
+MCG 列名 (35列): 応募日 |  | フリガナ | 電話番号 | 年齢 | 性別 | 都道府県 | 住所 | 応募媒体 | 接触ステータス | 登録日 | 登録ステータス | 案件番号 | 人材番号 | 所属 | 自社人材担当者 | 福祉資格 | 介護経験 | ★ホップ就業ステータス | 勤務日数 | 夜勤専従 | 設定日 | 実施日 | 決定日 | 開始日 | 人選ｽﾃｰﾀｽ | 更新日 | 有効応募 | 無し無し | 3日以上 | 決定 | 媒体一覧からの媒体 | 人選 | 60判定 | 市区町村
+電話番号候補列: 電話番号
+登録関連列: 接触ステータス, 登録日, 登録ステータス, ★ホップ就業ステータス
+登録ステータス の値一覧: 登録済 / 呼込み中（仮登録） / Z（約外終了） / 登録辞退 / 対象外 / Z（その他） / 未対応
+勤務日数 の値サンプル: LT / LT
+LT / LT
+週2日 / 週2日 / LT
+LT
+LT / 週1日 / 週2日
+週1日 / LT
+週2日
+週1日 / LT
+LT
+週2日
+週1日 / LT
+LT
+週2日
+夜勤専従 の値サンプル: YA / YA
+YA / YA
+YA
+YA
+最初の行サンプル: {"応募日":"2023/2/16","":"","フリガナ":"ヤマモト　ナオキ","電話番号":"8012574417","年齢":"35","性別":"","都道府県":"","住所":"渋谷区本町1-25-9","応募媒体":"不明","接触ステータス":"0","登録日":"2023/2/16","登録ステータス":"登録済","案件番号":"","人材番号":"1","所属":"不明","自社人材担当者":"山本　直生","福祉資格":"0","介護経験":"1","★ホップ就業ステータス":"","勤務日数":"LT","夜勤専従":"","設定日":"","実施日":"","決
+
+統合ツール対象行数: 840
+MCG電話番号登録数: 17069
+電話番号マッチ数: 795 / 840
+統合TELサンプル: "8063268026" → normalize:"8063268026", "9051829809" → normalize:"9051829809", "8063268026" → normalize:"8063268026"
+MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
+
+有効応募件数(再計算): 649 / 840
+オフィス名サンプル: 京都, 仙台, 金沢, 鹿児島, 新潟</div>
+</div>
+
+<!-- Dashboard -->
+<div class="table-outer">
+  <div class="table-wrap" id="table-wrap"><table>
+<thead>
+<tr>
+  <th class="lbl-cell th-space">2026年3月</th>
+  <th class="th-office">青森</th><th class="th-office">盛岡</th><th class="th-office">仙台</th><th class="th-office">千葉</th><th class="th-office">横浜</th><th class="th-office">新宿</th><th class="th-office">新潟</th><th class="th-office">金沢</th><th class="th-office">名古屋</th><th class="th-office">京都</th><th class="th-office">梅田</th><th class="th-office">神戸</th><th class="th-office">福岡</th><th class="th-office">鹿児島</th>
+  <th class="th-total">合計</th>
+</tr>
+</thead>
+<tbody><tr class="cost-row"><td class="lbl-cell lbl-main" style="background:#fff3d4">集客費用</td><td class="val-main">¥257,400</td><td class="val-main">¥366,056</td><td class="val-main">¥546,512</td><td class="val-main">¥370,714</td><td class="val-main">¥561,429</td><td class="val-main">¥834,286</td><td class="val-main">¥315,714</td><td class="val-main">¥431,714</td><td class="val-main">¥588,114</td><td class="val-main">¥355,714</td><td class="val-main">¥911,114</td><td class="val-main">¥365,714</td><td class="val-main">¥567,543</td><td class="val-main">¥352,114</td><td class="val-total">¥6,824,138</td></tr><tr><td class="lbl-cell lbl-main">総応募</td><td class="val-main">24</td><td class="val-main">40</td><td class="val-main">69</td><td class="val-main">45</td><td class="val-main">62</td><td class="val-main">101</td><td class="val-main">50</td><td class="val-main">29</td><td class="val-main">113</td><td class="val-main">30</td><td class="val-main">108</td><td class="val-main">48</td><td class="val-main">67</td><td class="val-main">51</td><td class="val-total">837</td></tr><tr><td class="lbl-cell lbl-main lbl-star">有効応募</td><td class="val-main">21</td><td class="val-main">24</td><td class="val-main">39</td><td class="val-main">36</td><td class="val-main">39</td><td class="val-main">41</td><td class="val-main">19</td><td class="val-main">19</td><td class="val-main">48</td><td class="val-main">12</td><td class="val-main">68</td><td class="val-main">21</td><td class="val-main">46</td><td class="val-main">25</td><td class="val-total">458</td></tr><tr><td class="lbl-cell lbl-sub">（有効率）70%未満↓</td><td class="val-sub">87.5%</td><td class="val-sub warn-red">60.0%</td><td class="val-sub warn-red">56.5%</td><td class="val-sub">80.0%</td><td class="val-sub warn-red">62.9%</td><td class="val-sub warn-red">40.6%</td><td class="val-sub warn-red">38.0%</td><td class="val-sub warn-red">65.5%</td><td class="val-sub warn-red">42.5%</td><td class="val-sub warn-red">40.0%</td><td class="val-sub warn-red">63.0%</td><td class="val-sub warn-red">43.8%</td><td class="val-sub warn-red">68.7%</td><td class="val-sub warn-red">49.0%</td><td class="val-total-sub warn-red">54.7%</td></tr><tr><td class="lbl-cell lbl-main">接触数</td><td class="val-main">20</td><td class="val-main">18</td><td class="val-main">34</td><td class="val-main">36</td><td class="val-main">35</td><td class="val-main">35</td><td class="val-main">18</td><td class="val-main">14</td><td class="val-main">41</td><td class="val-main">12</td><td class="val-main">62</td><td class="val-main">20</td><td class="val-main">41</td><td class="val-main">22</td><td class="val-total">408</td></tr><tr><td class="lbl-cell lbl-sub">（接触率）90%未満↓</td><td class="val-sub">95.2%</td><td class="val-sub warn-red">75.0%</td><td class="val-sub warn-red">87.2%</td><td class="val-sub">100.0%</td><td class="val-sub warn-red">89.7%</td><td class="val-sub warn-red">85.4%</td><td class="val-sub">94.7%</td><td class="val-sub warn-red">73.7%</td><td class="val-sub warn-red">85.4%</td><td class="val-sub">100.0%</td><td class="val-sub">91.2%</td><td class="val-sub">95.2%</td><td class="val-sub warn-red">89.1%</td><td class="val-sub warn-red">88.0%</td><td class="val-total-sub warn-red">89.1%</td></tr><tr class="sec-header"><td class="lbl-cell">📋 有効応募 属性内訳</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td class="lbl-cell lbl-star">★資格アリ</td><td class="val-main">13</td><td class="val-main">9</td><td class="val-main">17</td><td class="val-main">26</td><td class="val-main">28</td><td class="val-main">28</td><td class="val-main">13</td><td class="val-main">8</td><td class="val-main">28</td><td class="val-main">10</td><td class="val-main">42</td><td class="val-main">14</td><td class="val-main">25</td><td class="val-main">15</td><td class="val-total">276</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">61.9%</td><td class="val-sub">37.5%</td><td class="val-sub">43.6%</td><td class="val-sub">72.2%</td><td class="val-sub">71.8%</td><td class="val-sub">68.3%</td><td class="val-sub">68.4%</td><td class="val-sub">42.1%</td><td class="val-sub">58.3%</td><td class="val-sub">83.3%</td><td class="val-sub">61.8%</td><td class="val-sub">66.7%</td><td class="val-sub">54.3%</td><td class="val-sub">60.0%</td><td class="val-total-sub">60.3%</td></tr><tr><td class="lbl-cell lbl-star">★経験アリ</td><td class="val-main">10</td><td class="val-main">6</td><td class="val-main">16</td><td class="val-main">22</td><td class="val-main">27</td><td class="val-main">20</td><td class="val-main">10</td><td class="val-main">8</td><td class="val-main">28</td><td class="val-main">10</td><td class="val-main">44</td><td class="val-main">15</td><td class="val-main">23</td><td class="val-main">14</td><td class="val-total">253</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">47.6%</td><td class="val-sub">25.0%</td><td class="val-sub">41.0%</td><td class="val-sub">61.1%</td><td class="val-sub">69.2%</td><td class="val-sub">48.8%</td><td class="val-sub">52.6%</td><td class="val-sub">42.1%</td><td class="val-sub">58.3%</td><td class="val-sub">83.3%</td><td class="val-sub">64.7%</td><td class="val-sub">71.4%</td><td class="val-sub">50.0%</td><td class="val-sub">56.0%</td><td class="val-total-sub">55.2%</td></tr><tr><td class="lbl-cell lbl-sub">なしなし</td><td class="val-main">7</td><td class="val-main">15</td><td class="val-main">20</td><td class="val-main">9</td><td class="val-main">7</td><td class="val-main">8</td><td class="val-main">3</td><td class="val-main">10</td><td class="val-main">14</td><td class="val-main">2</td><td class="val-main">19</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">7</td><td class="val-total">143</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">33.3%</td><td class="val-sub">62.5%</td><td class="val-sub">51.3%</td><td class="val-sub">25.0%</td><td class="val-sub">17.9%</td><td class="val-sub">19.5%</td><td class="val-sub">15.8%</td><td class="val-sub">52.6%</td><td class="val-sub">29.2%</td><td class="val-sub">16.7%</td><td class="val-sub">27.9%</td><td class="val-sub">23.8%</td><td class="val-sub">37.0%</td><td class="val-sub">28.0%</td><td class="val-total-sub">31.2%</td></tr><tr><td class="lbl-cell lbl-star">★週3日以上 (LT)</td><td class="val-main">8</td><td class="val-main">12</td><td class="val-main">14</td><td class="val-main">21</td><td class="val-main">25</td><td class="val-main">24</td><td class="val-main">12</td><td class="val-main">10</td><td class="val-main">20</td><td class="val-main">8</td><td class="val-main">34</td><td class="val-main">12</td><td class="val-main">20</td><td class="val-main">9</td><td class="val-total">229</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">38.1%</td><td class="val-sub">50.0%</td><td class="val-sub">35.9%</td><td class="val-sub">58.3%</td><td class="val-sub">64.1%</td><td class="val-sub">58.5%</td><td class="val-sub">63.2%</td><td class="val-sub">52.6%</td><td class="val-sub">41.7%</td><td class="val-sub">66.7%</td><td class="val-sub">50.0%</td><td class="val-sub">57.1%</td><td class="val-sub">43.5%</td><td class="val-sub">36.0%</td><td class="val-total-sub">50.0%</td></tr><tr><td class="lbl-cell lbl-sub">週2日以下</td><td class="val-main">13</td><td class="val-main">12</td><td class="val-main">25</td><td class="val-main">15</td><td class="val-main">14</td><td class="val-main">17</td><td class="val-main">7</td><td class="val-main">9</td><td class="val-main">28</td><td class="val-main">4</td><td class="val-main">34</td><td class="val-main">9</td><td class="val-main">26</td><td class="val-main">16</td><td class="val-total">229</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">61.9%</td><td class="val-sub">50.0%</td><td class="val-sub">64.1%</td><td class="val-sub">41.7%</td><td class="val-sub">35.9%</td><td class="val-sub">41.5%</td><td class="val-sub">36.8%</td><td class="val-sub">47.4%</td><td class="val-sub">58.3%</td><td class="val-sub">33.3%</td><td class="val-sub">50.0%</td><td class="val-sub">42.9%</td><td class="val-sub">56.5%</td><td class="val-sub">64.0%</td><td class="val-total-sub">50.0%</td></tr><tr><td class="lbl-cell lbl-sub">60歳以上</td><td class="val-main">7</td><td class="val-main">7</td><td class="val-main">18</td><td class="val-main">10</td><td class="val-main">12</td><td class="val-main">10</td><td class="val-main">7</td><td class="val-main">8</td><td class="val-main">13</td><td class="val-main">4</td><td class="val-main">25</td><td class="val-main">8</td><td class="val-main">11</td><td class="val-main">4</td><td class="val-total">144</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">33.3%</td><td class="val-sub">29.2%</td><td class="val-sub">46.2%</td><td class="val-sub">27.8%</td><td class="val-sub">30.8%</td><td class="val-sub">24.4%</td><td class="val-sub">36.8%</td><td class="val-sub">42.1%</td><td class="val-sub">27.1%</td><td class="val-sub">33.3%</td><td class="val-sub">36.8%</td><td class="val-sub">38.1%</td><td class="val-sub">23.9%</td><td class="val-sub">16.0%</td><td class="val-total-sub">31.4%</td></tr><tr><td class="lbl-cell lbl-star">★60歳未満</td><td class="val-main">14</td><td class="val-main">17</td><td class="val-main">21</td><td class="val-main">26</td><td class="val-main">27</td><td class="val-main">31</td><td class="val-main">12</td><td class="val-main">11</td><td class="val-main">35</td><td class="val-main">8</td><td class="val-main">43</td><td class="val-main">13</td><td class="val-main">35</td><td class="val-main">21</td><td class="val-total">314</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">66.7%</td><td class="val-sub">70.8%</td><td class="val-sub">53.8%</td><td class="val-sub">72.2%</td><td class="val-sub">69.2%</td><td class="val-sub">75.6%</td><td class="val-sub">63.2%</td><td class="val-sub">57.9%</td><td class="val-sub">72.9%</td><td class="val-sub">66.7%</td><td class="val-sub">63.2%</td><td class="val-sub">61.9%</td><td class="val-sub">76.1%</td><td class="val-sub">84.0%</td><td class="val-total-sub">68.6%</td></tr><tr><td class="lbl-cell lbl-sub">夜勤専従希望</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">22</td><td class="val-main">13</td><td class="val-main">12</td><td class="val-main">5</td><td class="val-main">3</td><td class="val-main">10</td><td class="val-main">3</td><td class="val-main">32</td><td class="val-main">12</td><td class="val-main">19</td><td class="val-main">10</td><td class="val-total">152</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">23.8%</td><td class="val-sub">8.3%</td><td class="val-sub">10.3%</td><td class="val-sub">61.1%</td><td class="val-sub">33.3%</td><td class="val-sub">29.3%</td><td class="val-sub">26.3%</td><td class="val-sub">15.8%</td><td class="val-sub">20.8%</td><td class="val-sub">25.0%</td><td class="val-sub">47.1%</td><td class="val-sub">57.1%</td><td class="val-sub">41.3%</td><td class="val-sub">40.0%</td><td class="val-total-sub">33.2%</td></tr><tr class="sec-header"><td class="lbl-cell">🎯 人選・ファネル</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td class="lbl-cell lbl-main lbl-star">人選対象数</td><td class="val-main">20</td><td class="val-main">18</td><td class="val-main">34</td><td class="val-main">36</td><td class="val-main">35</td><td class="val-main">35</td><td class="val-main">18</td><td class="val-main">14</td><td class="val-main">41</td><td class="val-main">12</td><td class="val-main">62</td><td class="val-main">20</td><td class="val-main">41</td><td class="val-main">22</td><td class="val-total">408</td></tr><tr><td class="lbl-cell lbl-sub">（有効応募からの割合）</td><td class="val-sub">95.2%</td><td class="val-sub">75.0%</td><td class="val-sub">87.2%</td><td class="val-sub">100.0%</td><td class="val-sub">89.7%</td><td class="val-sub">85.4%</td><td class="val-sub">94.7%</td><td class="val-sub">73.7%</td><td class="val-sub">85.4%</td><td class="val-sub">100.0%</td><td class="val-sub">91.2%</td><td class="val-sub">95.2%</td><td class="val-sub">89.1%</td><td class="val-sub">88.0%</td><td class="val-total-sub">89.1%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">4</td><td class="val-sub2">5</td><td class="val-sub2">4</td><td class="val-sub2">11</td><td class="val-sub2">12</td><td class="val-sub2">9</td><td class="val-sub2">4</td><td class="val-sub2">3</td><td class="val-sub2">9</td><td class="val-sub2">5</td><td class="val-sub2">13</td><td class="val-sub2">7</td><td class="val-sub2">11</td><td class="val-sub2">5</td><td class="val-total-sub2">102</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">6</td><td class="val-sub2">3</td><td class="val-sub2">10</td><td class="val-sub2">10</td><td class="val-sub2">14</td><td class="val-sub2">13</td><td class="val-sub2">7</td><td class="val-sub2">4</td><td class="val-sub2">13</td><td class="val-sub2">4</td><td class="val-sub2">22</td><td class="val-sub2">2</td><td class="val-sub2">14</td><td class="val-sub2">8</td><td class="val-total-sub2">130</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">5</td><td class="val-sub2">7</td><td class="val-sub2">6</td><td class="val-sub2">10</td><td class="val-sub2">3</td><td class="val-sub2">3</td><td class="val-sub2">12</td><td class="val-sub2">1</td><td class="val-sub2">17</td><td class="val-sub2">8</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-total-sub2">84</td></tr><tr><td class="lbl-cell lbl-main">設定数</td><td class="val-main">4</td><td class="val-main">2</td><td class="val-main">5</td><td class="val-main">8</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">16</td><td class="val-main">4</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-total">80</td></tr><tr><td class="lbl-cell lbl-sub">（設定率 / 有効応募比）</td><td class="val-sub">19.0%</td><td class="val-sub">8.3%</td><td class="val-sub">12.8%</td><td class="val-sub">22.2%</td><td class="val-sub">20.5%</td><td class="val-sub">12.2%</td><td class="val-sub">26.3%</td><td class="val-sub">26.3%</td><td class="val-sub">4.2%</td><td class="val-sub">25.0%</td><td class="val-sub">23.5%</td><td class="val-sub">19.0%</td><td class="val-sub">17.4%</td><td class="val-sub">20.0%</td><td class="val-total-sub">17.5%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">6</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">6</td><td class="val-sub2">3</td><td class="val-sub2">6</td><td class="val-sub2">2</td><td class="val-total-sub2">38</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">7</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-total-sub2">33</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">4</td></tr><tr><td class="lbl-cell lbl-main">実施数</td><td class="val-main">4</td><td class="val-main">2</td><td class="val-main">5</td><td class="val-main">8</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">15</td><td class="val-main">4</td><td class="val-main">7</td><td class="val-main">5</td><td class="val-total">78</td></tr><tr><td class="lbl-cell lbl-sub">（実施率 / 設定比）</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">93.8%</td><td class="val-sub">100.0%</td><td class="val-sub">87.5%</td><td class="val-sub">100.0%</td><td class="val-total-sub">97.5%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">6</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">5</td><td class="val-sub2">3</td><td class="val-sub2">5</td><td class="val-sub2">2</td><td class="val-total-sub2">36</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">7</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-total-sub2">33</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">4</td></tr><tr><td class="lbl-cell lbl-main">決定数</td><td class="val-main">2</td><td class="val-main">1</td><td class="val-main">3</td><td class="val-main">5</td><td class="val-main">6</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">2</td><td class="val-main">9</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-total">44</td></tr><tr><td class="lbl-cell lbl-sub">（決定率 / 実施比）</td><td class="val-sub">50.0%</td><td class="val-sub">50.0%</td><td class="val-sub">60.0%</td><td class="val-sub">62.5%</td><td class="val-sub">75.0%</td><td class="val-sub">40.0%</td><td class="val-sub">80.0%</td><td class="val-sub">80.0%</td><td class="val-sub">0.0%</td><td class="val-sub">66.7%</td><td class="val-sub">60.0%</td><td class="val-sub">0.0%</td><td class="val-sub">42.9%</td><td class="val-sub">60.0%</td><td class="val-total-sub">56.4%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">5</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-total-sub2">23</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">4</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">15</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">2</td></tr><tr><td class="lbl-cell lbl-main">開始数</td><td class="val-main">2</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">5</td><td class="val-main">6</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">2</td><td class="val-main">9</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-total">42</td></tr><tr><td class="lbl-cell lbl-sub">（開始率 / 決定比）</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">66.7%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">75.0%</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">95.5%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">5</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-total-sub2">23</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">4</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">13</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">2</td></tr><tr class="sec-header"><td class="lbl-cell">💰 単価一覧（集客費用/件数）</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td class="lbl-cell lbl-sub">総応募/単価</td><td class="val-main">¥10,725</td><td class="val-main">¥9,151</td><td class="val-main">¥7,920</td><td class="val-main">¥8,238</td><td class="val-main">¥9,055</td><td class="val-main">¥8,260</td><td class="val-main">¥6,314</td><td class="val-main">¥14,887</td><td class="val-main">¥5,205</td><td class="val-main">¥11,857</td><td class="val-main">¥8,436</td><td class="val-main">¥7,619</td><td class="val-main">¥8,471</td><td class="val-main">¥6,904</td><td class="val-total">¥8,153</td></tr><tr><td class="lbl-cell lbl-sub">有効応募/単価</td><td class="val-main">¥12,257</td><td class="val-main">¥15,252</td><td class="val-main">¥14,013</td><td class="val-main">¥10,298</td><td class="val-main">¥14,396</td><td class="val-main">¥20,348</td><td class="val-main">¥16,617</td><td class="val-main">¥22,722</td><td class="val-main">¥12,252</td><td class="val-main">¥29,643</td><td class="val-main">¥13,399</td><td class="val-main">¥17,415</td><td class="val-main">¥12,338</td><td class="val-main">¥14,085</td><td class="val-total">¥14,900</td></tr><tr><td class="lbl-cell lbl-sub">人選対象/単価</td><td class="val-main">¥12,870</td><td class="val-main">¥20,336</td><td class="val-main">¥16,074</td><td class="val-main">¥10,298</td><td class="val-main">¥16,041</td><td class="val-main">¥23,837</td><td class="val-main">¥17,540</td><td class="val-main">¥30,837</td><td class="val-main">¥14,344</td><td class="val-main">¥29,643</td><td class="val-main">¥14,695</td><td class="val-main">¥18,286</td><td class="val-main">¥13,843</td><td class="val-main">¥16,005</td><td class="val-total">¥16,726</td></tr><tr><td class="lbl-cell lbl-sub">設定/単価</td><td class="val-main">¥64,350</td><td class="val-main">¥183,028</td><td class="val-main">¥109,302</td><td class="val-main">¥46,339</td><td class="val-main">¥70,179</td><td class="val-main">¥166,857</td><td class="val-main">¥63,143</td><td class="val-main">¥86,343</td><td class="val-main">¥294,057</td><td class="val-main">¥118,571</td><td class="val-main">¥56,945</td><td class="val-main">¥91,429</td><td class="val-main">¥70,943</td><td class="val-main">¥70,423</td><td class="val-total">¥85,302</td></tr><tr><td class="lbl-cell lbl-sub">実施/単価</td><td class="val-main">¥64,350</td><td class="val-main">¥183,028</td><td class="val-main">¥109,302</td><td class="val-main">¥46,339</td><td class="val-main">¥70,179</td><td class="val-main">¥166,857</td><td class="val-main">¥63,143</td><td class="val-main">¥86,343</td><td class="val-main">¥294,057</td><td class="val-main">¥118,571</td><td class="val-main">¥60,741</td><td class="val-main">¥91,429</td><td class="val-main">¥81,078</td><td class="val-main">¥70,423</td><td class="val-total">¥87,489</td></tr><tr><td class="lbl-cell lbl-sub">決定/単価</td><td class="val-main">¥128,700</td><td class="val-main">¥366,056</td><td class="val-main">¥182,171</td><td class="val-main">¥74,143</td><td class="val-main">¥93,572</td><td class="val-main">¥417,143</td><td class="val-main">¥78,929</td><td class="val-main">¥107,929</td><td class="val-main"></td><td class="val-main">¥177,857</td><td class="val-main">¥101,235</td><td class="val-main"></td><td class="val-main">¥189,181</td><td class="val-main">¥117,371</td><td class="val-total">¥155,094</td></tr><tr><td class="lbl-cell lbl-sub">開始/単価</td><td class="val-main">¥128,700</td><td class="val-main">¥366,056</td><td class="val-main">¥273,256</td><td class="val-main">¥74,143</td><td class="val-main">¥93,572</td><td class="val-main">¥417,143</td><td class="val-main">¥105,238</td><td class="val-main">¥107,929</td><td class="val-main"></td><td class="val-main">¥177,857</td><td class="val-main">¥101,235</td><td class="val-main"></td><td class="val-main">¥189,181</td><td class="val-main">¥117,371</td><td class="val-total">¥162,479</td></tr></tbody></table></div>
+</div>
+<div class="note" id="bottom-note">※ 有効応募・接触・属性・ファネルはMCGデータを基に集計。総応募は統合ツールCSVベース。MCG未入力＝統合ツールに応募記録があるがMCGに電話番号が見つからない人。</div>
+
+<!-- MCG未入力リスト -->
+<div id="unreg-panel" style="display: block; margin: 0px 20px 24px; border: 2px solid rgb(224, 90, 78); border-radius: 8px; overflow: hidden;">
+  <div style="background:#e05a4e; color:#fff; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+    <strong>⚠️ MCG未入力リスト（MCGに電話番号が見つからない応募者）</strong>
+    <button onclick="downloadUnreg()" style="background:#fff; color:#e05a4e; border:none; padding:4px 12px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:700;">CSVダウンロード</button>
+  </div>
+  <div style="overflow-x:auto; max-height:320px; overflow-y:auto;">
+    <table id="unreg-table" style="border-collapse:collapse; font-size:11px; width:100%; white-space:nowrap;">
+      <thead style="background:#fdf0ef; position:sticky; top:0;">
+        <tr>
+          <th style="padding:6px 12px; border:1px solid #f5c6c2; text-align:left;">応募日</th>
+          <th style="padding:6px 12px; border:1px solid #f5c6c2; text-align:left;">氏名</th>
+          <th style="padding:6px 12px; border:1px solid #f5c6c2; text-align:left;">媒体</th>
+          <th style="padding:6px 12px; border:1px solid #f5c6c2; text-align:left;">オフィス</th>
+          <th style="padding:6px 12px; border:1px solid #f5c6c2; text-align:left;">電話番号</th>
+        </tr>
+      </thead>
+      <tbody id="unreg-body"><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/28</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">古賀　耕作</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7085225783</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/27</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">根来　克吉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091546895</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/27</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">竹内友見子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9051952682</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/27</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">田中圭子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9036243082</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/28</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">増田和則</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">金沢</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9077433910</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/1</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">樋口剛司</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8014388535</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/1</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">平田貴美恵</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8082645144</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">根来克吉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091546895</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">根来克吉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091546895</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">平田貴美恵</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8082645144</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">石坂友裕</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">バイトル</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">鹿児島</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8067187526</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/4</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">安永宗史</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9088396847</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">両角一浩</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8082930049</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">生橋綾</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091168281</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松田千記</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7090966584</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">高倉和美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">バイトル</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9015896374</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/7</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">根来克吉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091546895</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/9</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/9</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">山崎　暁子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">千葉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9017080638</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/10</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">林義孝</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人BOX</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9011303611</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ＳＰ電話応募</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">青森</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">********************</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">**********</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/15</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ＳＰ電話応募</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/17</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/17</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/17</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">本田真由美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">金沢</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7094513770</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/18</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">国本　唯奈</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8039717252</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/19</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">かけ直し応募</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/20</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">石高里実</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新潟</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8025617939</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/20</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">曽我部直美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9023285974</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/21</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">福井　真一</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8077922571</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/22</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">久保麻美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">鹿児島</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7041553122</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/22</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">久保麻美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">鹿児島</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7041553122</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/22</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/23</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">根来 克吉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7091546895</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/23</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/23</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/23</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">桑江　勉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8011905536</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/23</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">桑江　勉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8011905536</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/24</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">長島久恵</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8094560306</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/25</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">田中圭子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9036243082</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/25</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松本　小夜子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9060521518</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/3/26</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ＳＰ電話応募</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const OFFICES = ['青森','盛岡','仙台','千葉','横浜','新宿','新潟','金沢','名古屋','京都','梅田','神戸','福岡','鹿児島'];
+let state = { medRows: null, mcgRows: null };
+
+// ══════════════════════════════════════════
+// CSV PARSER (RFC4180 + Shift-JIS fallback)
+// ══════════════════════════════════════════
+function detectEncoding(buf) {
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length - 1; i++) {
+    const b = bytes[i];
+    if ((b >= 0x81 && b <= 0x9f) || (b >= 0xe0 && b <= 0xfc)) return 'shift-jis';
+  }
+  return 'utf-8';
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let col = '', row = [], inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i+1] === '"') { col += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else col += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(col); col = ''; }
+      else if (c === '\n') {
+        row.push(col); rows.push(row); row = []; col = '';
+      } else if (c === '\r') { /* skip */ }
+      else col += c;
+    }
+  }
+  if (col || row.length) { row.push(col); rows.push(row); }
+  if (rows.length < 2) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).filter(r => r.some(c => c.trim())).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (r[i] || '').trim(); });
+    return obj;
+  });
+}
+
+function readFile(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = e => {
+      const enc = detectEncoding(e.target.result);
+      const fr2 = new FileReader();
+      fr2.onload = e2 => res(parseCsv(e2.target.result));
+      fr2.onerror = rej;
+      fr2.readAsText(file, enc);
+    };
+    fr.onerror = rej;
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+// ══════════════════════════════════════════
+// FILE LOAD
+// ══════════════════════════════════════════
+async function onFileLoad(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const rows = await readFile(file);
+  if (type === 'med') {
+    state.medRows = rows;
+    document.getElementById('wrap-med').classList.add('loaded');
+    document.getElementById('stat-med').innerHTML = `統合ツール: <span>${rows.length.toLocaleString()}行</span>`;
+    updateYearOptions(); syncPrefFiltersIfOpen(); syncSkFiltersIfOpen();
+  } else {
+    state.mcgRows = rows;
+    document.getElementById('wrap-mcg').classList.add('loaded');
+    document.getElementById('stat-mcg').innerHTML = `MCG: <span>${rows.length.toLocaleString()}行</span>`;
+  }
+  renderDashboard();
+}
+
+function syncSkFiltersIfOpen() { if (document.getElementById("page-shukyaku") && document.getElementById("page-shukyaku").style.display !== "none") syncShukyakuFilters(); }
+function syncPrefFiltersIfOpen() { if (document.getElementById("page-pref") && document.getElementById("page-pref").style.display !== "none") syncPrefFilters(); }
+function updateYearOptions() {
+  if (!state.medRows) return;
+  const years = new Set();
+  state.medRows.forEach(r => {
+    const d = parseDate(r['応募日'] || r['（応募内容）応募日']);
+    if (d) years.add(d.getFullYear());
+  });
+  const sel = document.getElementById('sel-year');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">---</option>';
+  [...years].sort((a,b)=>b-a).forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.text = y + '年';
+    if (String(y) === cur) o.selected = true;
+    sel.appendChild(o);
+  });
+  if (!cur && years.size) {
+    sel.value = Math.max(...years);
+    // default month = current
+    const now = new Date();
+    document.getElementById('sel-month').value = now.getMonth() + 1;
+  }
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function parseDate(v) {
+  if (!v || v === '') return null;
+  if (v instanceof Date) return isNaN(v) ? null : v;
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+}
+
+function normalizeOffice(name) {
+  if (!name) return null;
+  return String(name).replace(/オフィス/g,'').trim();
+}
+
+function normalizePhone(tel) {
+  if (!tel) return '';
+  return String(tel).replace(/\D/g,'').replace(/^0+/,'');
+}
+
+function parseRank(v) {
+  if (!v) return null;
+  if (v.includes('A')) return 'A';
+  if (v.includes('B')) return 'B';
+  if (v.includes('C')) return 'C';
+  if (v.includes('その他')) return 'D';
+  return null;
+}
+
+function isContacted(status) {
+  if (!status) return false;
+  return status.includes('接触') && !status.split('\n').every(s => s === '未接触' || s === '');
+}
+
+function hasQualification(v) {
+  if (!v || v === '無' || v === '不明') return false;
+  return v.trim() !== '';
+}
+
+function hasExperience(v) {
+  return v === '有';
+}
+
+function isThreePlus(v) {
+  // LT = Long Term = 週3日以上
+  return v && String(v).includes('LT');
+}
+
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '';
+  return n === 0 ? '0' : n.toLocaleString();
+}
+function fmtCost(n) {
+  if (!n || n === 0) return '¥0';
+  return '¥' + Math.round(n).toLocaleString();
+}
+function fmtRate(num, den) {
+  if (!den || den === 0) return '';
+  return (num / den * 100).toFixed(1) + '%';
+}
+function fmtCpa(cost, count) {
+  if (!count || count === 0 || !cost || cost === 0) return '';
+  return '¥' + Math.round(cost / count).toLocaleString();
+}
+
+// ══════════════════════════════════════════
+// DEDUPLICATION (有効応募)
+// ══════════════════════════════════════════
+function computeValidApps(rows) {
+  const sorted = [...rows].sort((a,b) => {
+    const da = parseDate(a._date) || new Date(0);
+    const db = parseDate(b._date) || new Date(0);
+    return da - db;
+  });
+  // key: phone_media → last valid date ms
+  const seen = new Map();
+  sorted.forEach(r => {
+    const phone = normalizePhone(r._tel);
+    const media = r._media || '';
+    const key = phone + '|||' + media;
+    const d = parseDate(r._date);
+    const dms = d ? d.getTime() : null;
+    const last = seen.get(key);
+    if (!phone || !last || !dms || (dms - last) > 180 * 86400000) {
+      r._valid = true;
+      if (dms) seen.set(key, dms);
+    } else {
+      r._valid = false;
+    }
+  });
+  return sorted;
+}
+
+// ══════════════════════════════════════════
+// DATA PROCESSING
+// ══════════════════════════════════════════
+function createMetrics() {
+  return {
+    cost: 0,
+    total: 0, valid: 0,
+    mcgUnregistered: 0,  // MCGに電話番号マッチなし
+    contacted: 0,
+    qualified: 0, experienced: 0, noneNone: 0,
+    threePlus: 0, twoOrLess: 0,
+    over60: 0, under60: 0,
+    nightShift: 0,
+    selTarget: 0,
+    rA: 0, rB: 0, rC: 0, rD: 0,
+    set: 0, rASet: 0, rBSet: 0, rCSet: 0, rDSet: 0,
+    impl: 0, rAImpl: 0, rBImpl: 0, rCImpl: 0, rDImpl: 0,
+    dec: 0, rADec: 0, rBDec: 0, rCDec: 0, rDDec: 0,
+    start: 0, rAStart: 0, rBStart: 0, rCStart: 0, rDStart: 0,
+  };
+}
+
+function addMetrics(m, other) {
+  for (const k in other) {
+    if (k === 'cost') continue;
+    m[k] = (m[k] || 0) + (other[k] || 0);
+  }
+}
+
+function processData(overrideYear, overrideMonth, overrideBaseDate) {
+  const year = overrideYear !== undefined ? overrideYear : (parseInt(document.getElementById('sel-year').value) || null);
+  const month = overrideMonth !== undefined ? overrideMonth : (parseInt(document.getElementById('sel-month').value) || null);
+  const baseDateVal = document.getElementById('sel-date').value;
+  const baseDate = overrideBaseDate !== undefined ? overrideBaseDate : (baseDateVal ? new Date(baseDateVal + 'T23:59:59') : null);
+
+  // ── prepare 統合ツール rows ──────────────────
+  const medRows = (state.medRows || []).map(r => {
+    const dateRaw = r['応募日'] || r['（応募内容）応募日'] || r['応募日時'] || '';
+    return {
+      _raw: r,
+      _date: dateRaw,
+      _tel: r['連絡先TEL'] || r['電話番号'] || '',
+      _media: r['媒体'] || '',
+      _office: normalizeOffice(r['対応オフィス'] || r['拠点'] || r['オフィス'] || ''),
+      _age: parseFloat(r['年齢']) || null,
+      _night: r['夜勤専従'] === '○' || r['夜勤専従'] === '◯' || r['夜勤専従'] === '1',
+      _valid: false,
+    };
+  });
+
+  // Filter by year/month
+  const filtered = medRows.filter(r => {
+    const d = parseDate(r._date);
+    if (!d) return false;
+    if (year && d.getFullYear() !== year) return false;
+    if (month && d.getMonth() + 1 !== month) return false;
+    return true;
+  });
+
+  // 有効応募を計算：同一媒体×電話番号で180日以内の重複は無効
+  // まず全期間データで重複判定する（月フィルター前のデータで判定が必要）
+  const allMedForDedup = medRows.slice().sort((a,b) => {
+    const da = parseDate(a._date) || new Date(0);
+    const db = parseDate(b._date) || new Date(0);
+    return da - db;
+  });
+  const seenMap = new Map(); // key: phone|||media → 最後の有効応募日ms
+  allMedForDedup.forEach(r => {
+    const phone = normalizePhone(r._tel);
+    const media = r._media || '';
+    const key = phone + '|||' + media;
+    const d = parseDate(r._date);
+    const dms = d ? d.getTime() : null;
+    const last = seenMap.get(key);
+    if (!phone || !dms) {
+      r._valid = false;
+    } else if (!last || (dms - last) > 180 * 86400000) {
+      r._valid = true;
+      seenMap.set(key, dms);
+    } else {
+      r._valid = false;
+    }
+  });
+
+  // ── build MCG lookup ─────────────────────────
+  // phone → list of MCG records
+  const mcgListMap = new Map();
+  const mcgRows = state.mcgRows || [];
+
+  // デバッグ: MCGの列名と最初の数件を表示
+  const dbg = document.getElementById('debug-content');
+  const dbgPanel = document.getElementById('debug-panel');
+  if (mcgRows.length > 0) {
+    // dbgPanel.style.display = 'block'; // デバッグ非表示
+    const cols = Object.keys(mcgRows[0]);
+    const sample = mcgRows[0];
+    const telCandidates = cols.filter(c => c.includes('電話') || c.includes('TEL') || c.includes('tel') || c.includes('phone'));
+    // 登録ステータスの実際の値を確認
+    const statusCols = cols.filter(c => c.includes('登録') || c.includes('ステータス'));
+    const statusValues = [...new Set(mcgRows.map(r => String(r['登録ステータス'] ?? '')).filter(Boolean))];
+    const dayValues = [...new Set(mcgRows.map(r => String(r['勤務日数'] ?? '')).filter(Boolean))].slice(0, 10);
+    const nightValues = [...new Set(mcgRows.map(r => String(r['夜勤専従'] ?? '')).filter(Boolean))].slice(0, 10);
+    dbg.textContent = [
+      `MCG CSV 行数: ${mcgRows.length}`,
+      `MCG 列名 (${cols.length}列): ${cols.join(' | ')}`,
+      `電話番号候補列: ${telCandidates.join(', ') || 'なし！'}`,
+      `登録関連列: ${statusCols.join(', ')}`,
+      `登録ステータス の値一覧: ${statusValues.join(' / ')}`,
+      `勤務日数 の値サンプル: ${dayValues.join(' / ')}`,
+      `夜勤専従 の値サンプル: ${nightValues.join(' / ')}`,
+      `最初の行サンプル: ${JSON.stringify(sample).substring(0, 300)}`,
+    ].join('\n');
+  }
+
+  mcgRows.forEach(r => {
+    // 電話番号列を柔軟に探す
+    const telVal = r['電話番号'] || r['TEL'] || r['tel'] || r['電話'] || r['phone'] || '';
+    const phone = normalizePhone(String(telVal));
+    if (!phone) return;
+    if (!mcgListMap.has(phone)) mcgListMap.set(phone, []);
+    mcgListMap.get(phone).push(r);
+  });
+
+  // デバッグ: マッチング状況
+  if (mcgRows.length > 0) {
+    let matched = 0;
+    filtered.forEach(r => {
+      const p = normalizePhone(r._tel);
+      if (p && mcgListMap.has(p)) matched++;
+    });
+    dbg.textContent += `\n\n統合ツール対象行数: ${filtered.length}`;
+    dbg.textContent += `\nMCG電話番号登録数: ${mcgListMap.size}`;
+    dbg.textContent += `\n電話番号マッチ数: ${matched} / ${filtered.length}`;
+    // 統合ツールの電話番号サンプル
+    const telSamples = filtered.slice(0,3).map(r => `"${r._tel}" → normalize:"${normalizePhone(r._tel)}"`);
+    dbg.textContent += `\n統合TELサンプル: ${telSamples.join(', ')}`;
+    // MCGの電話番号サンプル
+    const mcgTelSamples = [...mcgListMap.keys()].slice(0,3);
+    dbg.textContent += `\nMCG TELサンプル(正規化済): ${mcgTelSamples.join(', ')}`;
+    const validCount = filtered.filter(r => r._valid).length;
+    const officeSamples = [...new Set(filtered.map(r => r._office))].filter(Boolean).slice(0,5);
+    dbg.textContent += `\n\n有効応募件数(再計算): ${validCount} / ${filtered.length}`;
+    dbg.textContent += `\nオフィス名サンプル: ${officeSamples.join(', ')}`;
+  }
+
+  function findMcg(phone, appDate) {
+    const list = mcgListMap.get(normalizePhone(phone));
+    if (!list || list.length === 0) return null;
+    if (list.length === 1) return list[0];
+    // Find record closest in date
+    let best = null, bestDiff = Infinity;
+    list.forEach(mcg => {
+      const d = parseDate(mcg['応募日'] || mcg['応募日.1'] || '');
+      if (d && appDate) {
+        const diff = Math.abs(d - appDate);
+        if (diff < bestDiff) { bestDiff = diff; best = mcg; }
+      }
+    });
+    return best || list[0];
+  }
+
+  // ── compute metrics per office ───────────────
+  const result = {};
+  OFFICES.forEach(o => { result[o] = createMetrics(); });
+  const total = createMetrics();
+
+  // Get ad costs
+  OFFICES.forEach(o => {
+    const el = document.getElementById('adv-' + o);
+    const v = el ? parseFloat(el.value.replace(/,/g,'')) || 0 : 0;
+    result[o].cost = v;
+    total.cost += v;
+  });
+
+  // ── STEP1: 統合ツールで総応募カウント＆MCG未入力リスト ──
+  const mcgUnregisteredList = [];
+  const mcgPhones = new Set((state.mcgRows || []).map(r => normalizePhone(String(r['電話番号'] || ''))));
+
+  filtered.forEach(r => {
+    const office = r._office;
+    if (!OFFICES.includes(office)) return;
+    result[office].total++;
+
+    const phone = normalizePhone(r._tel);
+    if (!phone || !mcgPhones.has(phone)) {
+      result[office].mcgUnregistered++;
+      mcgUnregisteredList.push({
+        name: r._raw['氏名（漢字）'] || r._raw['氏名'] || '',
+        media: r._media || '', office, date: r._date || '', tel: r._tel || '',
+      });
+    }
+  });
+
+  // ── STEP2: MCGのCSVを直接集計 ──
+  const countedPhones = new Set();
+
+  (state.mcgRows || []).forEach(mcg => {
+    // 年月フィルター（応募日で絞る）
+    const appDate = parseDate(mcg['応募日'] || '');
+    if (!appDate) return;
+    if (year && appDate.getFullYear() !== year) return;
+    if (month && appDate.getMonth() + 1 !== month) return;
+    const office = String(mcg['所属'] || '').trim();
+    if (!OFFICES.includes(office)) return;
+
+    // 有効応募：登録ステータス=1のみ
+    // 有効応募：AD列(有効応募)=1のみ
+    const isValid = parseFloat(String(mcg['有効応募'] ?? '').trim()) === 1;
+    if (!isValid) return;
+
+    // 電話番号でユニーク化（同一オフィス内）
+    const phone = normalizePhone(String(mcg['電話番号'] || ''));
+    const dedupKey = office + '|||' + phone;
+    if (phone) {
+      if (countedPhones.has(dedupKey)) return;
+      countedPhones.add(dedupKey);
+    }
+
+    const m = result[office];
+    m.valid++;
+
+    // ── 計算済みフラグ列を直接使う ──
+    const flag = (key) => parseFloat(String(mcg[key] ?? '').trim()) === 1;
+
+    const contact   = flag('接触ステータス');
+    const qual      = flag('福祉資格');
+    const exp       = flag('介護経験');
+    const noneNone  = !qual && !exp;  // 資格なし かつ 経験なし
+    const threePlus = flag('3日以上');
+    const under60   = flag('60判定');
+    const nightRaw  = String(mcg['夜勤専従'] ?? '').trim();
+    const night     = nightRaw.includes('YA');
+    const age       = parseFloat(mcg['年齢']) || null;
+
+    const rankRaw   = String(mcg['人選'] ?? '').trim();
+    const rank      = rankRaw === 'A' ? 'A' : rankRaw === 'B' ? 'B' : rankRaw === 'C' ? 'C'
+                    : (rankRaw && rankRaw !== '0') ? 'D' : null;
+
+    // ファネル：基準日が設定されていれば「基準日以前に完了」のみカウント
+    const dateOnOrBefore = (dateStr) => {
+      const d = parseDate(dateStr);
+      if (!d) return false;
+      if (baseDate) return d <= baseDate;
+      return true;
+    };
+    const hasSet    = dateOnOrBefore(mcg['設定日']);
+    const hasImpl   = dateOnOrBefore(mcg['実施日']);
+    const hasDec    = dateOnOrBefore(mcg['決定日']);
+    const hasStart  = dateOnOrBefore(mcg['開始日']);
+
+    if (contact)   m.contacted++;
+    if (qual)      m.qualified++;
+    if (exp)       m.experienced++;
+    if (noneNone)  m.noneNone++;
+    if (threePlus) m.threePlus++;
+    else if (!threePlus) m.twoOrLess++;
+    if (under60)   m.under60++;
+    else if (age !== null && age >= 60) m.over60++;
+    if (night)     m.nightShift++;
+
+    // 人選対象数 = 接触済み全員
+    if (contact) m.selTarget++;
+
+    // 人選ランク内訳
+    if (rank) {
+      if (rank==='A') m.rA++; else if (rank==='B') m.rB++; else if (rank==='C') m.rC++; else m.rD++;
+    }
+    if (hasSet)  { m.set++;   if(rank==='A')m.rASet++;   else if(rank==='B')m.rBSet++;   else if(rank==='C')m.rCSet++;   else if(rank)m.rDSet++;   }
+    if (hasImpl) { m.impl++;  if(rank==='A')m.rAImpl++;  else if(rank==='B')m.rBImpl++;  else if(rank==='C')m.rCImpl++;  else if(rank)m.rDImpl++;  }
+    if (hasDec)  { m.dec++;   if(rank==='A')m.rADec++;   else if(rank==='B')m.rBDec++;   else if(rank==='C')m.rCDec++;   else if(rank)m.rDDec++;   }
+    if (hasStart){ m.start++; if(rank==='A')m.rAStart++; else if(rank==='B')m.rBStart++; else if(rank==='C')m.rCStart++; else if(rank)m.rDStart++; }
+  });
+
+  state.mcgUnregisteredList = mcgUnregisteredList;
+
+  // Compute totals
+  OFFICES.forEach(o => addMetrics(total, result[o]));
+
+  return { offices: result, total };
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function renderDashboardFromData(result, year, month) {
+  window._PRECOMPUTED = result;
+  renderDashboard();
+}
+
+function renderDashboard() {
+  if (!state.medRows && !state.mcgRows && !window._PRECOMPUTED) return;
+
+  let D, T;
+  if (window._PRECOMPUTED) {
+    D = window._PRECOMPUTED.offices;
+    T = window._PRECOMPUTED.total;
+  } else {
+    const r = processData();
+    D = r.offices; T = r.total;
+  }
+  const year  = document.getElementById('sel-year').value;
+  const month = document.getElementById('sel-month').value;
+  const title = (year && month) ? `${year}年${month}月` : '（月を選択してください）';
+
+  const wrap = document.getElementById('table-wrap');
+
+  // helper: cell class based on position (office vs total)
+  const vc  = (isTotal, sub) => isTotal ? (sub ? 'val-total-sub' : 'val-total') : (sub ? 'val-sub' : 'val-main');
+  const vc2 = (isTotal) => isTotal ? 'val-total-sub2' : 'val-sub2';
+
+  function rateCell(num, den, warn, cls) {
+    const rate = den ? (num / den * 100) : null;
+    const txt = rate !== null ? rate.toFixed(1) + '%' : '';
+    let warnCls = '';
+    if (rate !== null && warn !== null && rate < warn) warnCls = ' warn-red';
+    return `<td class="${cls}${warnCls}">${txt}</td>`;
+  }
+
+  function buildRow(label, lblCls, valFn, subFn, subLabel) {
+    let html = `<tr><td class="lbl-cell ${lblCls}">${label}</td>`;
+    [...OFFICES, '合計'].forEach((o,i) => {
+      const isTotal = o === '合計';
+      const m = isTotal ? T : D[o];
+      html += `<td class="${vc(isTotal, false)}">${valFn(m)}</td>`;
+    });
+    html += '</tr>';
+    if (subFn) {
+      html += `<tr><td class="lbl-cell lbl-sub">${subLabel || '（割合）'}</td>`;
+      [...OFFICES, '合計'].forEach((o) => {
+        const isTotal = o === '合計';
+        const m = isTotal ? T : D[o];
+        html += subFn(m, isTotal);
+      });
+      html += '</tr>';
+    }
+    return html;
+  }
+
+  function buildRankRows(prefix, baseKey, lblSuffix, getVal) {
+    // prefix = 'set', baseKey = 'set', ...
+    const ranks = [
+      ['A','★★★★','lbl-sub2'],
+      ['B','★★★☆','lbl-sub2'],
+      ['C','★★☆☆','lbl-sub2'],
+    ];
+    return ranks.map(([r,lbl,cls]) => {
+      return `<tr><td class="lbl-cell ${cls}">　${lbl}</td>`
+        + [...OFFICES,'合計'].map(o => {
+            const isTotal = o === '合計';
+            const m = isTotal ? T : D[o];
+            const v = getVal(m, r);
+            return `<td class="${vc2(isTotal)}">${fmt(v)}</td>`;
+          }).join('')
+        + '</tr>';
+    }).join('');
+  }
+
+  // ── Table ──────────────────────────────────────
+  let html = `<table>
+<thead>
+<tr>
+  <th class="lbl-cell th-space">${title}</th>
+  ${OFFICES.map(o => `<th class="th-office">${o}</th>`).join('')}
+  <th class="th-total">合計</th>
+</tr>
+</thead>
+<tbody>`;
+
+  // ── 集客費用 ──────────────────────────────────
+  html += `<tr class="cost-row"><td class="lbl-cell lbl-main" style="background:#fff3d4">集客費用</td>`;
+  [...OFFICES,'合計'].forEach(o => {
+    const isTotal = o === '合計';
+    const m = isTotal ? T : D[o];
+    html += `<td class="${isTotal ? 'val-total' : 'val-main'}">${fmtCost(m.cost)}</td>`;
+  });
+  html += '</tr>';
+
+  // ── 総応募 ────────────────────────────────────
+  html += buildRow('総応募', 'lbl-main', m => fmt(m.total), null);
+
+  // ── MCG未登録 ────────────────────────────────────
+
+  // ── 有効応募 ──────────────────────────────────
+  html += buildRow('有効応募', 'lbl-main lbl-star', m => fmt(m.valid),
+    (m, isTotal) => rateCell(m.valid, m.total, 70, vc(isTotal,true)),
+    '（有効率）70%未満↓');
+
+  // ── 接触数 ────────────────────────────────────
+  html += buildRow('接触数', 'lbl-main', m => fmt(m.contacted),
+    (m, isTotal) => rateCell(m.contacted, m.valid, 90, vc(isTotal,true)),
+    '（接触率）90%未満↓');
+
+  // ── 属性 section ─────────────────────────────
+  html += `<tr class="sec-header"><td class="lbl-cell">📋 有効応募 属性内訳</td>${[...OFFICES,'合計'].map(()=>'<td></td>').join('')}</tr>`;
+
+  // ★資格アリ
+  html += buildRow('★資格アリ', 'lbl-star',
+    m => fmt(m.qualified),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.qualified, m.valid)}</td>`, '（割合）');
+
+  // ★経験アリ
+  html += buildRow('★経験アリ', 'lbl-star',
+    m => fmt(m.experienced),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.experienced, m.valid)}</td>`, '（割合）');
+
+  // なしなし
+  html += buildRow('なしなし', 'lbl-sub',
+    m => fmt(m.noneNone),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.noneNone, m.valid)}</td>`, '（割合）');
+
+  // ★週3日以上
+  html += buildRow('★週3日以上 (LT)', 'lbl-star',
+    m => fmt(m.threePlus),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.threePlus, m.valid)}</td>`, '（割合）');
+
+  // 週2日以下
+  html += buildRow('週2日以下', 'lbl-sub',
+    m => fmt(m.twoOrLess),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.twoOrLess, m.valid)}</td>`, '（割合）');
+
+  // 60歳以上
+  html += buildRow('60歳以上', 'lbl-sub',
+    m => fmt(m.over60),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.over60, m.valid)}</td>`, '（割合）');
+
+  // ★60歳未満
+  html += buildRow('★60歳未満', 'lbl-star',
+    m => fmt(m.under60),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.under60, m.valid)}</td>`, '（割合）');
+
+  // 夜勤専従希望
+  html += buildRow('夜勤専従希望', 'lbl-sub',
+    m => fmt(m.nightShift),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.nightShift, m.valid)}</td>`, '（割合）');
+
+  // ── ファネル section ──────────────────────────
+  html += `<tr class="sec-header"><td class="lbl-cell">🎯 人選・ファネル</td>${[...OFFICES,'合計'].map(()=>'<td></td>').join('')}</tr>`;
+
+  // 人選対象数
+  html += buildRow('人選対象数', 'lbl-main lbl-star',
+    m => fmt(m.selTarget),
+    (m,isTotal) => `<td class="${vc(isTotal,true)}">${fmtRate(m.selTarget, m.valid)}</td>`,
+    '（有効応募からの割合）');
+
+  // A/B/C/その他 内訳
+  html += buildRankRows('rank','','', (m,r) => r==='A'?m.rA:r==='B'?m.rB:r==='C'?m.rC:m.rD);
+
+  // 設定数
+  html += buildRow('設定数', 'lbl-main',
+    m => fmt(m.set),
+    (m,isTotal) => rateCell(m.set, m.valid, null, vc(isTotal,true)),
+    '（設定率 / 有効応募比）');
+  html += buildRankRows('set','set','設定', (m,r) => r==='A'?m.rASet:r==='B'?m.rBSet:r==='C'?m.rCSet:m.rDSet);
+
+  // 実施数
+  html += buildRow('実施数', 'lbl-main',
+    m => fmt(m.impl),
+    (m,isTotal) => rateCell(m.impl, m.set, null, vc(isTotal,true)),
+    '（実施率 / 設定比）');
+  html += buildRankRows('impl','impl','実施', (m,r) => r==='A'?m.rAImpl:r==='B'?m.rBImpl:r==='C'?m.rCImpl:m.rDImpl);
+
+  // 決定数
+  html += buildRow('決定数', 'lbl-main',
+    m => fmt(m.dec),
+    (m,isTotal) => rateCell(m.dec, m.impl, null, vc(isTotal,true)),
+    '（決定率 / 実施比）');
+  html += buildRankRows('dec','dec','決定', (m,r) => r==='A'?m.rADec:r==='B'?m.rBDec:r==='C'?m.rCDec:m.rDDec);
+
+  // 開始数
+  html += buildRow('開始数', 'lbl-main',
+    m => fmt(m.start),
+    (m,isTotal) => rateCell(m.start, m.dec, null, vc(isTotal,true)),
+    '（開始率 / 決定比）');
+  html += buildRankRows('start','start','開始', (m,r) => r==='A'?m.rAStart:r==='B'?m.rBStart:r==='C'?m.rCStart:m.rDStart);
+
+  // ── 単価一覧 ──────────────────────────────────
+  html += `<tr class="sec-header"><td class="lbl-cell">💰 単価一覧（集客費用/件数）</td>${[...OFFICES,'合計'].map(()=>'<td></td>').join('')}</tr>`;
+
+  const cpaDefs = [
+    ['総応募/単価',  m => fmtCpa(m.cost, m.total)],
+    ['有効応募/単価', m => fmtCpa(m.cost, m.valid)],
+    ['人選対象/単価', m => fmtCpa(m.cost, m.selTarget)],
+    ['設定/単価',    m => fmtCpa(m.cost, m.set)],
+    ['実施/単価',    m => fmtCpa(m.cost, m.impl)],
+    ['決定/単価',    m => fmtCpa(m.cost, m.dec)],
+    ['開始/単価',    m => fmtCpa(m.cost, m.start)],
+  ];
+  cpaDefs.forEach(([lbl, fn]) => {
+    html += `<tr><td class="lbl-cell lbl-sub">${lbl}</td>`
+      + [...OFFICES,'合計'].map(o => {
+          const isTotal = o === '合計';
+          const m = isTotal ? T : D[o];
+          return `<td class="${vc(isTotal,false)}">${fn(m)}</td>`;
+        }).join('')
+      + '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  // bottom note
+  document.getElementById('bottom-note').textContent =
+    `※ 有効応募・接触・属性・ファネルはMCGデータを基に集計。総応募は統合ツールCSVベース。MCG未入力＝統合ツールに応募記録があるがMCGに電話番号が見つからない人。`;
+
+  renderUnregisteredList();
+}
+
+// ══════════════════════════════════════════
+// 集客費用 inputs
+// ══════════════════════════════════════════
+function buildAdvGrid() {
+  const grid = document.getElementById('adv-grid');
+  grid.innerHTML = OFFICES.map(o => {
+    const savedVal = localStorage.getItem('adv-' + o) || '';
+    return `<div class="adv-item">
+      <label>${o}</label>
+      <input type="text" id="adv-${o}" placeholder="0"
+        value="${savedVal}"
+        oninput="localStorage.setItem('adv-${o}', this.value); renderDashboard()">
+    </div>`;
+  }).join('');
+}
+buildAdvGrid();
+
+// ── 共有HTML出力 ──────────────────────────────
+function exportSharedHtml() {
+  if (!state.medRows || !state.mcgRows) {
+    alert('CSVを読み込んでから出力してください');
+    return;
+  }
+
+  const year  = document.getElementById('sel-year').value;
+  const month = document.getElementById('sel-month').value;
+
+  if (!year || !month) {
+    alert('年・月を選択してから出力してください');
+    return;
+  }
+
+  // 集客費用を収集
+  const costData = {};
+  OFFICES.forEach(o => {
+    costData[o] = {};
+    MEDIAS.forEach(med => {
+      const el = document.getElementById('sk-cost-' + o + '-' + med.key);
+      costData[o][med.key] = el ? el.value : '0';
+    });
+  });
+
+  // ── 集計済み結果を埋め込む（生データではなく計算結果のみ）──
+  // renderDashboardと同じロジックで計算してJSON化
+  const selYear  = parseInt(year);
+  const selMonth = parseInt(month);
+
+  // processData関数を呼んで結果を取得
+  const result = processData(selYear, selMonth, null);
+
+  const embedData = {
+    year,
+    month,
+    costData,
+    result: result ? {
+      offices: Object.fromEntries(
+        Object.entries(result.offices).map(([k,v]) => [k, {...v}])
+      ),
+      total: {...result.total}
+    } : null,
+    mcgUnregisteredList: state.mcgUnregisteredList || [],
+    totalRows: state.medRows.length,
+    mcgRows: state.mcgRows.length,
+  };
+
+  // 現在のHTMLを取得
+  const currentHtml = document.documentElement.outerHTML;
+
+  const embedScript = `
+<script>
+window._EMBEDDED_DATA = ${JSON.stringify(embedData)};
+<\/script>`;
+
+  const autoLoadScript = `
+<script>
+window.addEventListener('load', function() {
+  const d = window._EMBEDDED_DATA;
+  if (!d) return;
+
+  // CSVボタン・出力ボタンを非表示
+  ['wrap-med','wrap-mcg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.textContent.includes('共有HTML出力')) btn.style.display = 'none';
+  });
+
+  // stat更新
+  document.getElementById('stat-med').innerHTML = '統合ツール: <span>' + d.totalRows.toLocaleString() + '行<\/span>';
+  document.getElementById('stat-mcg').innerHTML = 'MCG: <span>' + d.mcgRows.toLocaleString() + '行<\/span>';
+
+  // 年月セット
+  ['sel-year','pref-year','sk-year'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="' + d.year + '">' + d.year + '年<\/option>';
+    sel.value = d.year;
+  });
+  ['sel-month','pref-month','sk-month'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = d.month;
+  });
+
+  // 集計結果を直接描画（processDataをスキップ）
+  if (d.result) {
+    window._PRECOMPUTED = d.result;
+    state.mcgUnregisteredList = d.mcgUnregisteredList || [];
+    renderDashboardFromData(d.result, parseInt(d.year), parseInt(d.month));
+  }
+
+  // 集客費用セット
+  buildSkAdvGrid();
+  setTimeout(() => {
+    Object.keys(d.costData).forEach(office => {
+      Object.keys(d.costData[office]).forEach(mediaKey => {
+        const el = document.getElementById('sk-cost-' + office + '-' + mediaKey);
+        if (el) el.value = d.costData[office][mediaKey];
+      });
+    });
+  }, 200);
+});
+<\/script>`;
+
+  let outputHtml = currentHtml.replace('
+<script>
+window._EMBEDDED_DATA = {"year":"2026","month":"3","costData":{"青森":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"盛岡":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"仙台":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"千葉":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"横浜":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"新宿":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"新潟":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"金沢":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"名古屋":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"京都":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"梅田":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"神戸":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"福岡":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"},"鹿児島":{"バイトル":"0","マイナビ":"0","e介護転職":"0","キューメイト":"0","求人ボックス":"0","自社求人":"0","自社会員":"0","自社電話":"0","紹介BS":"0","その他":"0"}},"result":{"offices":{"青森":{"cost":257400,"total":24,"valid":21,"mcgUnregistered":1,"contacted":20,"qualified":13,"experienced":10,"noneNone":7,"threePlus":8,"twoOrLess":13,"over60":7,"under60":14,"nightShift":5,"selTarget":20,"rA":4,"rB":6,"rC":4,"rD":0,"set":4,"rASet":1,"rBSet":3,"rCSet":0,"rDSet":0,"impl":4,"rAImpl":1,"rBImpl":3,"rCImpl":0,"rDImpl":0,"dec":2,"rADec":1,"rBDec":1,"rCDec":0,"rDDec":0,"start":2,"rAStart":1,"rBStart":1,"rCStart":0,"rDStart":0},"盛岡":{"cost":366056,"total":40,"valid":24,"mcgUnregistered":0,"contacted":18,"qualified":9,"experienced":6,"noneNone":15,"threePlus":12,"twoOrLess":12,"over60":7,"under60":17,"nightShift":2,"selTarget":18,"rA":5,"rB":3,"rC":2,"rD":0,"set":2,"rASet":1,"rBSet":0,"rCSet":0,"rDSet":0,"impl":2,"rAImpl":1,"rBImpl":0,"rCImpl":0,"rDImpl":0,"dec":1,"rADec":0,"rBDec":0,"rCDec":0,"rDDec":0,"start":1,"rAStart":0,"rBStart":0,"rCStart":0,"rDStart":0},"仙台":{"cost":546512,"total":69,"valid":39,"mcgUnregistered":6,"contacted":34,"qualified":17,"experienced":16,"noneNone":20,"threePlus":14,"twoOrLess":25,"over60":18,"under60":21,"nightShift":4,"selTarget":34,"rA":4,"rB":10,"rC":5,"rD":0,"set":5,"rASet":1,"rBSet":2,"rCSet":0,"rDSet":0,"impl":5,"rAImpl":1,"rBImpl":2,"rCImpl":0,"rDImpl":0,"dec":3,"rADec":0,"rBDec":1,"rCDec":0,"rDDec":0,"start":2,"rAStart":0,"rBStart":0,"rCStart":0,"rDStart":0},"千葉":{"cost":370714,"total":45,"valid":36,"mcgUnregistered":1,"contacted":36,"qualified":26,"experienced":22,"noneNone":9,"threePlus":21,"twoOrLess":15,"over60":10,"under60":26,"nightShift":22,"selTarget":36,"rA":11,"rB":10,"rC":7,"rD":0,"set":8,"rASet":6,"rBSet":2,"rCSet":0,"rDSet":0,"impl":8,"rAImpl":6,"rBImpl":2,"rCImpl":0,"rDImpl":0,"dec":5,"rADec":5,"rBDec":0,"rCDec":0,"rDDec":0,"start":5,"rAStart":5,"rBStart":0,"rCStart":0,"rDStart":0},"横浜":{"cost":561429,"total":62,"valid":39,"mcgUnregistered":4,"contacted":35,"qualified":28,"experienced":27,"noneNone":7,"threePlus":25,"twoOrLess":14,"over60":12,"under60":27,"nightShift":13,"selTarget":35,"rA":12,"rB":14,"rC":6,"rD":0,"set":8,"rASet":4,"rBSet":4,"rCSet":0,"rDSet":0,"impl":8,"rAImpl":4,"rBImpl":4,"rCImpl":0,"rDImpl":0,"dec":6,"rADec":4,"rBDec":2,"rCDec":0,"rDDec":0,"start":6,"rAStart":4,"rBStart":2,"rCStart":0,"rDStart":0},"新宿":{"cost":834286,"total":101,"valid":41,"mcgUnregistered":7,"contacted":35,"qualified":28,"experienced":20,"noneNone":8,"threePlus":24,"twoOrLess":17,"over60":10,"under60":31,"nightShift":12,"selTarget":35,"rA":9,"rB":13,"rC":10,"rD":0,"set":5,"rASet":2,"rBSet":3,"rCSet":0,"rDSet":0,"impl":5,"rAImpl":2,"rBImpl":3,"rCImpl":0,"rDImpl":0,"dec":2,"rADec":1,"rBDec":1,"rCDec":0,"rDDec":0,"start":2,"rAStart":1,"rBStart":1,"rCStart":0,"rDStart":0},"新潟":{"cost":315714,"total":50,"valid":19,"mcgUnregistered":1,"contacted":18,"qualified":13,"experienced":10,"noneNone":3,"threePlus":12,"twoOrLess":7,"over60":7,"under60":12,"nightShift":5,"selTarget":18,"rA":4,"rB":7,"rC":3,"rD":0,"set":5,"rASet":2,"rBSet":2,"rCSet":0,"rDSet":0,"impl":5,"rAImpl":2,"rBImpl":2,"rCImpl":0,"rDImpl":0,"dec":4,"rADec":2,"rBDec":2,"rCDec":0,"rDDec":0,"start":3,"rAStart":2,"rBStart":1,"rCStart":0,"rDStart":0},"金沢":{"cost":431714,"total":29,"valid":19,"mcgUnregistered":2,"contacted":14,"qualified":8,"experienced":8,"noneNone":10,"threePlus":10,"twoOrLess":9,"over60":8,"under60":11,"nightShift":3,"selTarget":14,"rA":3,"rB":4,"rC":3,"rD":0,"set":5,"rASet":1,"rBSet":3,"rCSet":1,"rDSet":0,"impl":5,"rAImpl":1,"rBImpl":3,"rCImpl":1,"rDImpl":0,"dec":4,"rADec":1,"rBDec":3,"rCDec":0,"rDDec":0,"start":4,"rAStart":1,"rBStart":3,"rCStart":0,"rDStart":0},"名古屋":{"cost":588114,"total":113,"valid":48,"mcgUnregistered":5,"contacted":41,"qualified":28,"experienced":28,"noneNone":14,"threePlus":20,"twoOrLess":28,"over60":13,"under60":35,"nightShift":10,"selTarget":41,"rA":9,"rB":13,"rC":12,"rD":0,"set":2,"rASet":1,"rBSet":1,"rCSet":0,"rDSet":0,"impl":2,"rAImpl":1,"rBImpl":1,"rCImpl":0,"rDImpl":0,"dec":0,"rADec":0,"rBDec":0,"rCDec":0,"rDDec":0,"start":0,"rAStart":0,"rBStart":0,"rCStart":0,"rDStart":0},"京都":{"cost":355714,"total":30,"valid":12,"mcgUnregistered":1,"contacted":12,"qualified":10,"experienced":10,"noneNone":2,"threePlus":8,"twoOrLess":4,"over60":4,"under60":8,"nightShift":3,"selTarget":12,"rA":5,"rB":4,"rC":1,"rD":0,"set":3,"rASet":2,"rBSet":1,"rCSet":0,"rDSet":0,"impl":3,"rAImpl":2,"rBImpl":1,"rCImpl":0,"rDImpl":0,"dec":2,"rADec":2,"rBDec":0,"rCDec":0,"rDDec":0,"start":2,"rAStart":2,"rBStart":0,"rCStart":0,"rDStart":0},"梅田":{"cost":911114,"total":108,"valid":68,"mcgUnregistered":6,"contacted":62,"qualified":42,"experienced":44,"noneNone":19,"threePlus":34,"twoOrLess":34,"over60":25,"under60":43,"nightShift":32,"selTarget":62,"rA":13,"rB":22,"rC":17,"rD":0,"set":16,"rASet":6,"rBSet":7,"rCSet":2,"rDSet":0,"impl":15,"rAImpl":5,"rBImpl":7,"rCImpl":2,"rDImpl":0,"dec":9,"rADec":3,"rBDec":4,"rCDec":1,"rDDec":0,"start":9,"rAStart":3,"rBStart":4,"rCStart":1,"rDStart":0},"神戸":{"cost":365714,"total":48,"valid":21,"mcgUnregistered":4,"contacted":20,"qualified":14,"experienced":15,"noneNone":5,"threePlus":12,"twoOrLess":9,"over60":8,"under60":13,"nightShift":12,"selTarget":20,"rA":7,"rB":2,"rC":8,"rD":0,"set":4,"rASet":3,"rBSet":1,"rCSet":0,"rDSet":0,"impl":4,"rAImpl":3,"rBImpl":1,"rCImpl":0,"rDImpl":0,"dec":0,"rADec":0,"rBDec":0,"rCDec":0,"rDDec":0,"start":0,"rAStart":0,"rBStart":0,"rCStart":0,"rDStart":0},"福岡":{"cost":567543,"total":67,"valid":46,"mcgUnregistered":2,"contacted":41,"qualified":25,"experienced":23,"noneNone":17,"threePlus":20,"twoOrLess":26,"over60":11,"under60":35,"nightShift":19,"selTarget":41,"rA":11,"rB":14,"rC":2,"rD":0,"set":8,"rASet":6,"rBSet":2,"rCSet":0,"rDSet":0,"impl":7,"rAImpl":5,"rBImpl":2,"rCImpl":0,"rDImpl":0,"dec":3,"rADec":3,"rBDec":0,"rCDec":0,"rDDec":0,"start":3,"rAStart":3,"rBStart":0,"rCStart":0,"rDStart":0},"鹿児島":{"cost":352114,"total":51,"valid":25,"mcgUnregistered":3,"contacted":22,"qualified":15,"experienced":14,"noneNone":7,"threePlus":9,"twoOrLess":16,"over60":4,"under60":21,"nightShift":10,"selTarget":22,"rA":5,"rB":8,"rC":4,"rD":0,"set":5,"rASet":2,"rBSet":2,"rCSet":1,"rDSet":0,"impl":5,"rAImpl":2,"rBImpl":2,"rCImpl":1,"rDImpl":0,"dec":3,"rADec":1,"rBDec":1,"rCDec":1,"rDDec":0,"start":3,"rAStart":1,"rBStart":1,"rCStart":1,"rDStart":0}},"total":{"cost":6824138,"total":837,"valid":458,"mcgUnregistered":43,"contacted":408,"qualified":276,"experienced":253,"noneNone":143,"threePlus":229,"twoOrLess":229,"over60":144,"under60":314,"nightShift":152,"selTarget":408,"rA":102,"rB":130,"rC":84,"rD":0,"set":80,"rASet":38,"rBSet":33,"rCSet":4,"rDSet":0,"impl":78,"rAImpl":36,"rBImpl":33,"rCImpl":4,"rDImpl":0,"dec":44,"rADec":23,"rBDec":15,"rCDec":2,"rDDec":0,"start":42,"rAStart":23,"rBStart":13,"rCStart":2,"rDStart":0}},"mcgUnregisteredList":[{"name":"古賀　耕作","media":"キューメイト","office":"梅田","date":"2026/3/28","tel":"7085225783"},{"name":"根来　克吉","media":"キューメイト","office":"新宿","date":"2026/3/27","tel":"7091546895"},{"name":"竹内友見子","media":"マイナビ","office":"横浜","date":"2026/3/27","tel":"9051952682"},{"name":"田中圭子","media":"マイナビ","office":"梅田","date":"2026/3/27","tel":"9036243082"},{"name":"増田和則","media":"e介護転職","office":"金沢","date":"2026/3/28","tel":"9077433910"},{"name":"樋口剛司","media":"e介護転職","office":"神戸","date":"2026/3/1","tel":"8014388535"},{"name":"平田貴美恵","media":"e介護転職","office":"名古屋","date":"2026/3/1","tel":"8082645144"},{"name":"根来克吉","media":"e介護転職","office":"新宿","date":"2026/3/2","tel":"7091546895"},{"name":"根来克吉","media":"e介護転職","office":"新宿","date":"2026/3/2","tel":"7091546895"},{"name":"平田貴美恵","media":"e介護転職","office":"名古屋","date":"2026/3/2","tel":"8082645144"},{"name":"石坂友裕","media":"バイトル","office":"鹿児島","date":"2026/3/3","tel":"8067187526"},{"name":"安永宗史","media":"キューメイト","office":"神戸","date":"2026/3/4","tel":"9088396847"},{"name":"両角一浩","media":"マイナビ","office":"横浜","date":"2026/3/5","tel":"8082930049"},{"name":"生橋綾","media":"e介護転職","office":"梅田","date":"2026/3/5","tel":"7091168281"},{"name":"松田千記","media":"キューメイト","office":"梅田","date":"2026/3/5","tel":"7090966584"},{"name":"高倉和美","media":"バイトル","office":"福岡","date":"2026/3/6","tel":"9015896374"},{"name":"根来克吉","media":"e介護転職","office":"新宿","date":"2026/3/7","tel":"7091546895"},{"name":"太田希望","media":"キューメイト","office":"仙台","date":"2026/3/9","tel":"9044792896"},{"name":"山崎　暁子","media":"マイナビ","office":"千葉","date":"2026/3/9","tel":"9017080638"},{"name":"林義孝","media":"求人BOX","office":"神戸","date":"2026/3/10","tel":"9011303611"},{"name":"ＳＰ電話応募","media":"マイナビ","office":"青森","date":"2026/3/12","tel":""},{"name":"********************","media":"e介護転職","office":"神戸","date":"2026/3/12","tel":"**********"},{"name":"ＳＰ電話応募","media":"マイナビ","office":"名古屋","date":"2026/3/15","tel":""},{"name":"太田　希望","media":"キューメイト","office":"仙台","date":"2026/3/17","tel":"9044792896"},{"name":"太田　希望","media":"キューメイト","office":"仙台","date":"2026/3/17","tel":"9044792896"},{"name":"本田真由美","media":"マイナビ","office":"金沢","date":"2026/3/17","tel":"7094513770"},{"name":"国本　唯奈","media":"キューメイト","office":"福岡","date":"2026/3/18","tel":"8039717252"},{"name":"かけ直し応募","media":"マイナビ","office":"名古屋","date":"2026/3/19","tel":""},{"name":"石高里実","media":"マイナビ","office":"新潟","date":"2026/3/20","tel":"8025617939"},{"name":"曽我部直美","media":"e介護転職","office":"横浜","date":"2026/3/20","tel":"9023285974"},{"name":"福井　真一","media":"キューメイト","office":"梅田","date":"2026/3/21","tel":"8077922571"},{"name":"久保麻美","media":"マイナビ","office":"鹿児島","date":"2026/3/22","tel":"7041553122"},{"name":"久保麻美","media":"マイナビ","office":"鹿児島","date":"2026/3/22","tel":"7041553122"},{"name":"太田　希望","media":"キューメイト","office":"仙台","date":"2026/3/22","tel":"9044792896"},{"name":"根来 克吉","media":"マイナビ","office":"新宿","date":"2026/3/23","tel":"7091546895"},{"name":"太田　希望","media":"キューメイト","office":"仙台","date":"2026/3/23","tel":"9044792896"},{"name":"太田　希望","media":"キューメイト","office":"仙台","date":"2026/3/23","tel":"9044792896"},{"name":"桑江　勉","media":"自社（会員登録）","office":"新宿","date":"2026/3/23","tel":"8011905536"},{"name":"桑江　勉","media":"自社","office":"新宿","date":"2026/3/23","tel":"8011905536"},{"name":"長島久恵","media":"マイナビ","office":"横浜","date":"2026/3/24","tel":"8094560306"},{"name":"田中圭子","media":"マイナビ","office":"梅田","date":"2026/3/25","tel":"9036243082"},{"name":"松本　小夜子","media":"キューメイト","office":"京都","date":"2026/3/25","tel":"9060521518"},{"name":"ＳＰ電話応募","media":"マイナビ","office":"名古屋","date":"2026/3/26","tel":""}],"totalRows":840,"mcgRows":17770};
+</script>
+<script>
+window.addEventListener('load', function() {
+  const d = window._EMBEDDED_DATA;
+  if (!d) return;
+
+  // CSVボタン・出力ボタンを非表示
+  ['wrap-med','wrap-mcg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.textContent.includes('共有HTML出力')) btn.style.display = 'none';
+  });
+
+  // stat更新
+  document.getElementById('stat-med').innerHTML = '統合ツール: <span>' + d.totalRows.toLocaleString() + '行</span>';
+  document.getElementById('stat-mcg').innerHTML = 'MCG: <span>' + d.mcgRows.toLocaleString() + '行</span>';
+
+  // 年月セット
+  ['sel-year','pref-year','sk-year'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="' + d.year + '">' + d.year + '年</option>';
+    sel.value = d.year;
+  });
+  ['sel-month','pref-month','sk-month'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = d.month;
+  });
+
+  // 集計結果を直接描画（processDataをスキップ）
+  if (d.result) {
+    window._PRECOMPUTED = d.result;
+    state.mcgUnregisteredList = d.mcgUnregisteredList || [];
+    renderDashboardFromData(d.result, parseInt(d.year), parseInt(d.month));
+  }
+
+  // 集客費用セット
+  buildSkAdvGrid();
+  setTimeout(() => {
+    Object.keys(d.costData).forEach(office => {
+      Object.keys(d.costData[office]).forEach(mediaKey => {
+        const el = document.getElementById('sk-cost-' + office + '-' + mediaKey);
+        if (el) el.value = d.costData[office][mediaKey];
+      });
+    });
+  }, 200);
+});
+</script></body>', embedScript + autoLoadScript + '</body>');
+
+  const blob = new Blob([outputHtml], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  const m = month.toString().padStart(2, '0');
+  a.href = URL.createObjectURL(blob);
+  a.download = `hop_dashboard_${year}-${m}.html`;
+  a.click();
+
+  alert(`✅ ${year}年${m}月版を出力しました！\nGitHubにアップロードしてください。`);
+}
+
+// ══════════════════════════════════════════
+// 集客DB
+// ══════════════════════════════════════════
+const MEDIAS = [
+  { key: 'バイトル',     label: 'バイトル',     match: v => ['バイトル','バイトルPro'].includes(v) },
+  { key: 'マイナビ',     label: 'マイナビ',     match: v => v === 'マイナビ' },
+  { key: 'e介護転職',    label: 'e介護転職',    match: v => v === 'e介護転職' },
+  { key: 'キューメイト', label: 'キューメイト', match: v => ['キューメイト','indeed'].includes(v) },
+  { key: '求人ボックス', label: '求人ボックス', match: v => ['求人BOX','求人ボックス'].includes(v) },
+  { key: '自社求人',     label: '自社（求人）', match: v => ['自社（求人応募）','自社'].includes(v) },
+  { key: '自社会員',     label: '自社（会員）', match: v => v === '自社（会員登録）' },
+  { key: '自社電話',     label: '自社（電話）', match: v => v === '自社（電話）' },
+  { key: '紹介BS',       label: '紹介・BS',     match: v => ['紹介','BS','メイトdeランチ','友人紹介（オーガニック）','ホップ感謝祭'].includes(v) },
+  { key: 'その他',       label: 'その他',       match: v => true }, // 上記以外すべて
+];
+
+function getMediaKey(mediaName) {
+  const v = String(mediaName || '').trim();
+  for (let i = 0; i < MEDIAS.length - 1; i++) {
+    if (MEDIAS[i].match(v)) return MEDIAS[i].key;
+  }
+  return 'その他';
+}
+
+let currentSkView = 'media';
+
+function switchSkTab(view) {
+  currentSkView = view;
+  const tabs = ['media','office'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('sk-tab-' + t);
+    if (t === view) {
+      btn.style.borderBottomColor = 'var(--primary)';
+      btn.style.color = 'var(--primary)';
+      btn.style.fontWeight = '700';
+    } else {
+      btn.style.borderBottomColor = 'transparent';
+      btn.style.color = 'var(--muted)';
+      btn.style.fontWeight = 'normal';
+    }
+  });
+  renderShukyaku(view);
+}
+
+function syncShukyakuFilters() {
+  const y = document.getElementById('sel-year').value;
+  const m = document.getElementById('sel-month').value;
+  const d = document.getElementById('sel-date').value;
+  const ySel = document.getElementById('sk-year');
+  const mSel = document.getElementById('sk-month');
+  // yearオプションを同期
+  const srcSel = document.getElementById('sel-year');
+  if (srcSel.options.length > 1 && ySel.options.length <= 1) {
+    ySel.innerHTML = srcSel.innerHTML;
+  }
+  if (y) ySel.value = y;
+  if (m) mSel.value = m;
+  if (d) document.getElementById('sk-date').value = d;
+  buildSkAdvGrid();
+}
+
+function buildSkAdvGrid() {
+  const grid = document.getElementById('sk-adv-grid');
+  if (!grid) return;
+  let html = '<div style="overflow-x:auto; width:100%;"><table style="border-collapse:collapse; font-size:10px; white-space:nowrap;">';
+  html += '<tr><th style="padding:3px 8px; background:#e8ecf4; border:1px solid var(--border); min-width:60px;">オフィス</th>';
+  MEDIAS.forEach(med => {
+    html += `<th style="padding:3px 6px; background:#e8ecf4; border:1px solid var(--border); min-width:80px;">${med.label}</th>`;
+  });
+  html += '</tr>';
+  OFFICES.forEach(office => {
+    html += `<tr><td style="padding:3px 8px; border:1px solid var(--border); font-weight:700; background:#f4f5f9;">${office}</td>`;
+    MEDIAS.forEach(med => {
+      const savedVal = localStorage.getItem('sk-cost-' + office + '-' + med.key) || '';
+      html += `<td style="padding:2px 4px; border:1px solid var(--border);">
+        <input type="text" id="sk-cost-${office}-${med.key}" placeholder="0" value="${savedVal}"
+          style="width:72px; padding:2px 4px; border:1px solid var(--border); border-radius:3px; font-size:10px; text-align:right;"
+          oninput="saveSkCost('${office}','${med.key}',this.value); renderShukyaku(currentSkView)">
+      </td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table></div>';
+  grid.innerHTML = html;
+}
+
+function saveSkCost(office, mediaKey, value) {
+  localStorage.setItem('sk-cost-' + office + '-' + mediaKey, value);
+}
+
+function getSkCost(office, mediaKey) {
+  const el = document.getElementById('sk-cost-' + office + '-' + mediaKey);
+  if (el) return parseFloat(el.value.replace(/,/g,'')) || 0;
+  // elがない場合はlocalStorageから
+  return parseFloat(localStorage.getItem('sk-cost-' + office + '-' + mediaKey)) || 0;
+}
+
+function createSkMetrics() {
+  return { cost: 0, target: 0, total: 0, valid: 0, contacted: 0,
+    selTarget: 0, rA: 0, rB: 0, rC: 0,
+    set: 0, impl: 0, dec: 0, start: 0 };
+}
+
+function renderShukyaku(view) {
+  if (!state.medRows && !state.mcgRows) return;
+  const wrap = document.getElementById('sk-table-wrap');
+  if (!wrap) return;
+
+  const year  = parseInt(document.getElementById('sk-year').value) || null;
+  const month = parseInt(document.getElementById('sk-month').value) || null;
+  const baseDateVal = document.getElementById('sk-date').value;
+  const baseDate = baseDateVal ? new Date(baseDateVal + 'T23:59:59') : null;
+
+  // D[office][mediaKey] or D[mediaKey][office]
+  // まず office×media の2次元マップを作る
+  const data = {};
+  OFFICES.forEach(o => {
+    data[o] = {};
+    MEDIAS.forEach(med => { data[o][med.key] = createSkMetrics(); });
+  });
+
+  // 集客費用をセット（オフィス×媒体単位）
+  OFFICES.forEach(o => {
+    MEDIAS.forEach(med => {
+      data[o][med.key].cost = getSkCost(o, med.key);
+    });
+  });
+
+  // 総応募カウント（統合ツール）
+  const medFiltered = (state.medRows || []).filter(r => {
+    const d = parseDate(r['応募日'] || r['（応募内容）応募日'] || '');
+    if (!d) return false;
+    if (year && d.getFullYear() !== year) return false;
+    if (month && d.getMonth() + 1 !== month) return false;
+    return true;
+  });
+
+  medFiltered.forEach(r => {
+    const office = normalizeOffice(r['対応オフィス'] || r['拠点'] || '');
+    if (!OFFICES.includes(office)) return;
+    const mediaKey = getMediaKey(r['媒体']);
+    data[office][mediaKey].total++;
+  });
+
+  // 有効応募以降（MCG）
+  const counted = new Set();
+  (state.mcgRows || []).forEach(mcg => {
+    const appDate = parseDate(mcg['応募日'] || '');
+    if (!appDate) return;
+    if (year && appDate.getFullYear() !== year) return;
+    if (month && appDate.getMonth() + 1 !== month) return;
+
+    if (parseFloat(String(mcg['有効応募'] ?? '').trim()) !== 1) return;
+
+    const phone = normalizePhone(String(mcg['電話番号'] || ''));
+    const office = String(mcg['所属'] || '').trim();
+    if (!OFFICES.includes(office)) return;
+
+    const mediaKey = getMediaKey(mcg['媒体一覧からの媒体']);
+    const dedupKey = office + '|' + mediaKey + '|' + phone;
+    if (phone && counted.has(dedupKey)) return;
+    if (phone) counted.add(dedupKey);
+
+    const m = data[office][mediaKey];
+    m.valid++;
+    const contacted = parseFloat(String(mcg['接触ステータス'] ?? '').trim()) === 1;
+    if (contacted) { m.contacted++; m.selTarget++; }
+
+    const rankRaw = String(mcg['人選'] ?? '').trim();
+    const rank = rankRaw==='A'?'A': rankRaw==='B'?'B': rankRaw==='C'?'C': null;
+    if (contacted && rank==='A') m.rA++;
+    else if (contacted && rank==='B') m.rB++;
+    else if (contacted && rank==='C') m.rC++;
+
+    const dateOK = (key) => { const d = parseDate(mcg[key]); return d && (baseDate ? d <= baseDate : true); };
+    if (dateOK('設定日')) m.set++;
+    if (dateOK('実施日')) m.impl++;
+    if (dateOK('決定日')) m.dec++;
+    if (dateOK('開始日')) m.start++;
+  });
+
+  const ym = (year && month) ? `${year}年${month}月` : '（月を選択）';
+
+  if (view === 'media') {
+    renderSkMediaView(data, ym, wrap);
+  } else {
+    renderSkOfficeView(data, ym, wrap);
+  }
+}
+
+// ── 媒体別ビュー（列：媒体、行：オフィス）──
+function renderSkMediaView(data, ym, wrap) {
+  const fmtC = n => n ? '¥' + Math.round(n).toLocaleString() : '';
+  const fmtCpa = (cost, cnt) => (cost && cnt) ? '¥' + Math.round(cost/cnt).toLocaleString() : '';
+  const fmtR = (n, d) => d ? (n/d*100).toFixed(1)+'%' : '';
+
+  // 合計列を追加
+  const mediaCols = [...MEDIAS, { key: 'ALL', label: 'ALL合計' }];
+
+  let html = '<table><thead><tr>';
+  html += `<th class="lbl-cell th-space">${ym}</th>`;
+  mediaCols.forEach(med => {
+    const isTot = med.key === 'ALL';
+    html += `<th class="${isTot ? 'th-total' : 'th-office'}" style="min-width:80px;">${med.label}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // オフィスごとの行 + 合計行
+  const allOffices = ['ALL合計', ...OFFICES];
+  allOffices.forEach(office => {
+    const isTotal = office === 'ALL合計';
+    const rowCls = isTotal ? 'style="background:#e8ecf4;"' : '';
+
+    // 各メディアのメトリクスを集計
+    const getM = (mediaKey) => {
+      if (isTotal) {
+        // 全オフィスの合計
+        const m = createSkMetrics();
+        OFFICES.forEach(o => {
+          const src = mediaKey === 'ALL' ? MEDIAS.reduce((acc, med) => {
+            const s = data[o][med.key];
+            Object.keys(acc).forEach(k => { if (k !== 'cost') acc[k] += s[k]; });
+            acc.cost += s.cost;
+            return acc;
+          }, createSkMetrics()) : data[o][mediaKey];
+          Object.keys(m).forEach(k => { m[k] += src[k]; });
+        });
+        return m;
+      } else {
+        if (mediaKey === 'ALL') {
+          return MEDIAS.reduce((acc, med) => {
+            const s = data[office][med.key];
+            Object.keys(acc).forEach(k => { if (k !== 'cost') acc[k] += s[k]; });
+            acc.cost += s.cost;
+            return acc;
+          }, createSkMetrics());
+        }
+        return data[office][mediaKey];
+      }
+    };
+
+    const metrics = [
+      ['集客費用', m => fmtC(m.cost), 'lbl-sub'],
+      ['総応募', m => fmt(m.total), 'lbl-main'],
+      ['有効応募', m => fmt(m.valid), 'lbl-star'],
+      ['', m => fmtR(m.valid, m.total), 'lbl-sub'],
+      ['接触数', m => fmt(m.contacted), 'lbl-main'],
+      ['', m => fmtR(m.contacted, m.valid), 'lbl-sub'],
+      ['人選対象数', m => fmt(m.selTarget), 'lbl-star'],
+      ['　★★★★', m => fmt(m.rA), 'lbl-sub2'],
+      ['　★★★☆', m => fmt(m.rB), 'lbl-sub2'],
+      ['　★★☆☆', m => fmt(m.rC), 'lbl-sub2'],
+      ['設定数', m => fmt(m.set), 'lbl-main'],
+      ['実施数', m => fmt(m.impl), 'lbl-main'],
+      ['決定数', m => fmt(m.dec), 'lbl-main'],
+      ['開始数', m => fmt(m.start), 'lbl-main'],
+      ['総応募単価', m => fmtCpa(m.cost, m.total), 'lbl-sub'],
+      ['有効応募単価', m => fmtCpa(m.cost, m.valid), 'lbl-sub'],
+      ['設定単価', m => fmtCpa(m.cost, m.set), 'lbl-sub'],
+      ['開始単価', m => fmtCpa(m.cost, m.start), 'lbl-sub'],
+    ];
+
+    // オフィス名ヘッダー行
+    html += `<tr><td class="lbl-cell lbl-main" colspan="${mediaCols.length + 1}" style="background:${isTotal ? '#334e7a' : 'var(--primary)'}; color:#fff; padding:4px 8px;">${isTotal ? '合計' : office}</td></tr>`;
+
+    metrics.forEach(([label, fn, cls]) => {
+      html += `<tr ${rowCls}><td class="lbl-cell ${cls}" style="padding-left:${label?'7px':'20px'};">${label || '（割合）'}</td>`;
+      mediaCols.forEach(med => {
+        const m = getM(med.key);
+        const isTotCol = med.key === 'ALL';
+        html += `<td class="${isTotCol ? 'val-total' : 'val-main'}">${fn(m)}</td>`;
+      });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ── オフィス別ビュー（列：オフィス、行：媒体）──
+function renderSkOfficeView(data, ym, wrap) {
+  const fmtC = n => n ? '¥' + Math.round(n).toLocaleString() : '';
+  const fmtCpa = (cost, cnt) => (cost && cnt) ? '¥' + Math.round(cost/cnt).toLocaleString() : '';
+  const fmtR = (n, d) => d ? (n/d*100).toFixed(1)+'%' : '';
+
+  const officeCols = [...OFFICES, 'ALL合計'];
+
+  let html = '<table><thead><tr>';
+  html += `<th class="lbl-cell th-space">${ym}</th>`;
+  officeCols.forEach(o => {
+    const isTot = o === 'ALL合計';
+    html += `<th class="${isTot ? 'th-total' : 'th-office'}">${isTot ? '合計' : o}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  const getOfficeM = (office, mediaKey) => {
+    if (office === 'ALL合計') {
+      const m = createSkMetrics();
+      OFFICES.forEach(o => {
+        const s = data[o][mediaKey];
+        Object.keys(m).forEach(k => { m[k] += s[k]; });
+      });
+      return m;
+    }
+    return data[office][mediaKey];
+  };
+
+  // 媒体ごとのセクション（合計→各媒体の順）
+  const allMediaRows = [{ key: 'ALL_ROW', label: '合計' }, ...MEDIAS];
+  allMediaRows.forEach(med => {
+    html += `<tr><td class="lbl-cell lbl-main" colspan="${officeCols.length + 1}" style="background:var(--primary-light); color:#fff; padding:4px 8px;">${med.label}</td></tr>`;
+
+    const metrics = [
+      ['集客費用', m => fmtC(m.cost), 'lbl-sub'],
+      ['総応募', m => fmt(m.total), 'lbl-main'],
+      ['有効応募', m => fmt(m.valid), 'lbl-star'],
+      ['', m => fmtR(m.valid, m.total), 'lbl-sub'],
+      ['接触数', m => fmt(m.contacted), 'lbl-main'],
+      ['人選対象数', m => fmt(m.selTarget), 'lbl-star'],
+      ['　★★★★', m => fmt(m.rA), 'lbl-sub2'],
+      ['　★★★☆', m => fmt(m.rB), 'lbl-sub2'],
+      ['　★★☆☆', m => fmt(m.rC), 'lbl-sub2'],
+      ['設定数', m => fmt(m.set), 'lbl-main'],
+      ['実施数', m => fmt(m.impl), 'lbl-main'],
+      ['決定数', m => fmt(m.dec), 'lbl-main'],
+      ['開始数', m => fmt(m.start), 'lbl-main'],
+      ['総応募単価', m => fmtCpa(m.cost, m.total), 'lbl-sub'],
+      ['有効応募単価', m => fmtCpa(m.cost, m.valid), 'lbl-sub'],
+      ['開始単価', m => fmtCpa(m.cost, m.start), 'lbl-sub'],
+    ];
+
+    metrics.forEach(([label, fn, cls]) => {
+      html += `<tr><td class="lbl-cell ${cls}" style="padding-left:${label?'7px':'20px'};">${label || '（割合）'}</td>`;
+      officeCols.forEach(o => {
+        const m = getOfficeM(o, med.key);
+        const isTot = o === 'ALL合計';
+        html += `<td class="${isTot ? 'val-total' : 'val-main'}">${fn(m)}</td>`;
+      });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+
+// ── ページ切り替え ──
+function showPage(page, el) {
+  document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // 全ページ非表示
+  ['jinzai-page', 'page-pref', 'page-shukyaku'].forEach(id => {
+    const p = document.getElementById(id);
+    if (p) p.style.display = 'none';
+  });
+
+  if (page === 'jinzai') {
+    document.getElementById('page-title').textContent = '人材ダッシュボード';
+    document.getElementById('jinzai-page').style.display = 'block';
+  } else if (page === 'pref') {
+    document.getElementById('page-title').textContent = '都道府県分析';
+    document.getElementById('page-pref').style.display = 'block';
+    syncPrefFilters();
+    renderPref();
+  } else if (page === 'shukyaku') {
+    document.getElementById('page-title').textContent = '集客ダッシュボード';
+    document.getElementById('page-shukyaku').style.display = 'block';
+    syncShukyakuFilters();
+    renderShukyaku('media');
+  }
+}
+
+const CITY_PREF_MAP = {"神奈川県川崎市中原区": "神奈川県", "京都市中京区": "京都府", "京都市南区": "京都府", "大阪市東成区": "大阪府", "大阪市生野区": "大阪府", "愛知県丹羽郡扶桑町": "愛知県", "昭島市": "東京都", "大田区": "東京都", "尼崎市": "兵庫県", "名古屋市港区": "愛知県", "堺市堺区": "大阪府", "岡崎市": "愛知県", "名古屋市緑区": "愛知県", "愛知県安城市": "愛知県", "河内長野市": "大阪府", "福岡市城南区": "福岡県", "古賀市": "福岡県", "近江八幡市": "滋賀県", "大津市": "滋賀県", "足立区": "東京都", "奥州市": "岩手県", "北九州市小倉北区": "福岡県", "柏市": "千葉県", "横浜市瀬谷区": "神奈川県", "川口市": "埼玉県", "福岡市早良区": "福岡県", "知立市": "愛知県", "刈谷市": "愛知県", "豊中市": "大阪府", "吹田市": "大阪府", "京都市北区": "京都府", "大阪市東淀川区": "大阪府", "清須市": "愛知県", "あま市": "愛知県", "海部郡大治町": "愛知県", "名古屋市守山区": "愛知県", "大阪市都島区": "大阪府", "宝塚市": "兵庫県", "大阪市大正区": "大阪府", "港区": "東京都", "八王子市": "東京都", "越谷市": "埼玉県", "岩手郡雫石町": "岩手県", "春日市": "福岡県", "福岡市東区": "福岡県", "国立市": "東京都", "山形市": "山形県", "米沢市": "山形県", "横浜市旭区": "神奈川県", "大阪狭山市": "大阪府", "小平市": "東京都", "春日部市": "埼玉県", "北九州市八幡西区": "福岡県", "北九州市若松区": "福岡県", "千葉市花見川区": "千葉県", "さいたま市北区": "埼玉県", "新座市": "埼玉県", "福岡県福岡市西区": "岐阜県", "大阪府東大阪市": "大阪府", "仙台市若林区": "宮城県", "西多摩郡瑞穂町": "東京都", "霧島市": "鹿児島県", "三重県島市": "三重県", "市川市": "滋賀県", "宇治市": "兵庫県", "紫波郡紫波町": "岩手県", "中央区": "東京都", "大阪市城東区": "大阪府", "京都市山科区": "京都府", "我孫子市": "千葉県", "川崎市高津区": "神奈川県", "遠賀郡水巻町": "福岡県", "名取市": "宮城県", "城陽市": "京都府", "名古屋市北区": "愛知県", "福岡県糟屋郡粕屋町": "福岡県", "神戸市北区": "兵庫県", "神戸市西区": "兵庫県", "大阪市住之江区": "大阪府", "和泉市": "大阪府", "埼玉県　三郷市": "埼玉県", "姫路市": "兵庫県", "宮城県柴田郡大河原町": "宮城県", "板橋区": "東京都", "川崎市幸区": "神奈川県", "豊能郡豊能町": "大阪府", "松戸市": "千葉県", "堺市中区": "大阪府", "横須賀市": "神奈川県", "大阪市福島区": "大阪府", "守口市": "大阪府", "町田市": "東京都", "堺市南区": "大阪府", "北九州市門司区": "福岡県", "糸島市": "福岡県", "大東市": "大阪府", "大阪市平野区": "大阪府", "横浜市泉区": "神奈川県", "横浜市港南区": "神奈川県", "名古屋市熱田区": "愛知県", "名古屋市天白区": "愛知県", "横浜市港北区": "神奈川県", "茨木市": "大阪府", "大阪市港区": "大阪府", "八尾市": "大阪府", "長久手市": "愛知県", "北九州市小倉南区": "福岡県", "富士見市": "埼玉県", "横浜市青葉区": "東京都", "横浜市戸塚区": "神奈川県", "相模原市緑区": "神奈川県", "三郷市": "埼玉県", "新庄市": "山形県", "大牟田市": "福岡県", "葛飾区": "東京都", "江戸川区": "東京都", "船橋市": "千葉県", "宮城郡利府町": "宮城県", "神戸市垂水区": "兵庫県", "太宰府市": "福岡県", "川崎市中原区": "神奈川県", "北九州市八幡東区": "福岡県", "江東区": "東京都", "東京都調布市": "東京都", "東大阪市": "大阪府", "川崎市多摩区": "神奈川県", "小金井市": "東京都", "京都市伏見区": "京都府", "豊田市": "愛知県", "千葉市緑区": "千葉県", "尾張旭市": "愛知県", "堺区": "大阪府", "新宿区": "東京都", "西尾市": "愛知県", "行橋市": "福岡県", "茂原市": "千葉県", "京田辺市": "京都府", "神戸市東灘区": "兵庫県", "東村山郡中山町": "山形県", "堺市西区": "大阪府", "武蔵野市": "東京都", "世田谷区": "東京都", "和光市": "埼玉県", "宮城郡松島町": "宮城県", "愛知県あま市": "愛知県", "仙台市太白区": "宮城県", "愛知県犬山市": "愛知県", "高槻市": "大阪府", "杉並区": "東京都", "愛知県名古屋市南区": "愛知県", "大阪市住吉区": "大阪府", "千葉市稲毛区": "千葉県", "大阪市中央区": "大阪府", "名古屋市瑞穂区": "愛知県", "春日井市": "愛知県", "神奈川県川崎市高津区": "神奈川県", "鹿児島市": "鹿児島県", "加古郡稲美町": "兵庫県", "高砂市": "兵庫県", "横浜市鶴見区": "神奈川県", "仙台市宮城野区": "宮城県", "多賀城市": "宮城県", "いちき串木野市": "鹿児島県", "向日市": "京都府", "豊島区": "東京都", "所沢市": "埼玉県", "八潮市": "埼玉県", "さいたま市南区": "埼玉県", "行田市": "埼玉県", "千葉市美浜区": "千葉県", "南埼玉郡宮代町": "埼玉県", "横浜市南区": "神奈川県", "愛知県一宮市": "愛知県", "愛知県豊田市": "愛知県", "福岡市西区": "福岡県", "清瀬市": "東京都", "京都市左京区": "京都府", "愛知県春日井市": "愛知県", "渋谷区": "東京都", "大崎市": "宮城県", "富田林市": "大阪府", "名古屋市南区": "愛知県", "滝沢市": "岩手県", "川越市": "埼玉県", "亘理郡亘理町": "宮城県", "藤沢市": "神奈川県", "加古川市": "兵庫県", "兵庫県神戸市垂水区": "兵庫県", "福岡県福岡市早良区": "福岡県", "大阪府枚方市": "大阪府", "練馬区": "東京都", "さいたま市岩槻区": "埼玉県", "台東区": "東京都", "大阪市阿倍野区": "大阪府", "大阪市淀川区": "大阪府", "高石市": "大阪府", "直方市": "福岡県", "那珂川市": "福岡県", "仙台市青葉区": "宮城県", "多賀城市山王字山王二区": "宮城県", "墨田区": "東京都", "羽生市": "埼玉県", "土浦市": "茨城県", "堺市美原区": "大阪府", "名古屋市千種区": "愛知県", "和賀郡西和賀町": "愛知県", "枚方市": "大阪府", "一関市": "岩手県", "大阪市旭区": "大阪府", "栃木県宇都宮市": "愛知県", "一宮市": "岐阜県", "京都市上京区": "京都府", "藤井寺市": "大阪府", "名古屋市東区": "愛知県", "北九州市戸畑区": "福岡県", "芦屋市": "兵庫県", "北上市": "岩手県", "浦安市": "千葉県", "貝塚市": "大阪府", "岐阜市": "岐阜県", "岸和田市": "大阪府", "河北郡津幡町": "石川県", "大阪市西成区": "大阪府", "白山市": "石川県", "金沢市": "石川県", "名古屋市西区": "愛知県", "名古屋市中川区": "愛知県", "名古屋市昭和区": "愛知県", "北名古屋市": "愛知県", "塩竈市": "宮城県", "東久留米市": "東京都", "神戸市兵庫区": "兵庫県", "箕面市": "大阪府", "豊橋市": "愛知県", "羽島郡岐南町": "岐阜県", "酒田市": "山形県", "交野市": "大阪府", "各務原市": "岐阜県", "花巻市東和町土沢５区": "岩手県", "相模原市南区": "神奈川県", "京都市右京区": "京都府", "神戸市須磨区": "兵庫県", "大阪市鶴見区": "大阪府", "盛岡市": "岩手県", "北区": "東京都", "福岡市南区": "福岡県", "塩釜市": "宮城県", "大垣市": "岐阜県", "千葉市中央区": "千葉県", "加賀市": "石川県", "みよし市": "愛知県", "池田市": "大阪府", "福岡県北九州市戸畑区": "福岡県", "可児市": "岐阜県", "三田市": "兵庫県", "かほく市": "石川県", "小松市": "石川県", "安城市": "三重県", "花巻市": "岩手県", "七尾市": "石川県", "小牧市": "愛知県", "横浜市中区": "神奈川県", "横浜市金沢区": "神奈川県", "糟屋郡新宮町": "福岡県", "柴田郡柴田町": "宮城県", "岩倉市": "愛知県", "印西市": "千葉県", "埼玉県草加市": "埼玉県", "神戸市長田区": "兵庫県", "川西市": "兵庫県", "青葉区": "宮城県", "千葉市若葉区": "千葉県", "相模原市中央区": "神奈川県", "高浜市": "愛知県", "半田市": "愛知県", "京都郡苅田町": "福岡県", "川崎市": "神奈川県", "横浜市保土ケ谷区": "神奈川県", "堺市北区": "大阪府", "門真市": "大阪府", "寒河江市": "山形県", "安八郡神戸町": "岐阜県", "福岡県福岡市中央区": "福岡県", "長岡京市": "京都府", "神戸市灘区": "兵庫県", "横浜市神奈川区": "神奈川県", "大網白里市": "千葉県", "日進市": "愛知県", "丹羽郡大口町": "愛知県", "東海市": "愛知県", "東松島市": "宮城県", "調布市": "東京都", "狛江市": "東京都", "取手市": "茨城県", "大阪市東住吉区": "大阪府", "瑞穂市": "岐阜県", "福岡県古賀市": "福岡県", "福岡県福岡市南区": "福岡県", "大府市": "愛知県", "福岡県宗像市": "福岡県", "鹿児島県　鹿児島市": "鹿児島県", "稲城市": "東京都", "寝屋川市": "大阪府", "愛知県東海市": "愛知県", "岩手県大船渡市": "岩手県", "筑紫野市": "福岡県", "座間市": "神奈川県", "岐阜県岐阜市": "岐阜県", "中野区": "東京都", "三浦市": "神奈川県", "品川区": "東京都", "朝来市": "兵庫県", "岩沼市": "宮城県", "京都市下京区": "京都府", "小田原市": "神奈川県", "南足柄市": "神奈川県", "大和市": "神奈川県", "明石市": "兵庫県", "諸江町": "石川県", "中津川市": "岐阜県", "八千代市": "千葉県", "伊勢原市": "神奈川県", "糟屋郡粕屋町": "福岡県", "中郡二宮町": "神奈川県", "西東京市": "東京都", "立川市": "東京都", "可児郡御嵩町": "岐阜県", "三木市": "兵庫県", "多治見市": "岐阜県", "堺市東区": "大阪府", "亀岡市": "京都府", "宮城県柴田郡柴田町": "兵庫県", "栗原市": "岩手県", "豊明市": "愛知県", "厚木市": "神奈川県", "三鷹市": "東京都", "西宮市": "兵庫県", "豊能郡能勢町": "大阪府", "瀬戸市": "愛知県", "平塚市": "神奈川県", "稲敷郡阿見町": "茨城県", "知多郡武豊町": "愛知県", "名古屋市名東区": "愛知県", "大阪市浪速区": "大阪府", "愛知県　春日井市": "愛知県", "米原市": "東京都", "知多市": "愛知県", "南河内郡河南町": "大阪府", "羽島市": "岐阜県", "川崎市麻生区": "神奈川県", "秦野市": "神奈川県", "習志野市": "千葉県", "野田市": "千葉県", "福岡市中央区": "福岡県", "福岡市博多区": "福岡県", "鹿児島県鹿児島市": "鹿児島県", "松原市": "大阪府", "美濃加茂市": "岐阜県", "鹿児島県志布志市": "鹿児島県", "国分寺市": "東京都", "綴喜郡宇治田原町": "京都府", "鎌ケ谷市": "大阪府", "愛西市": "愛知県", "市原市": "神奈川県", "牛久市": "茨城県", "稲沢市": "愛知県", "糟屋郡篠栗町": "福岡県", "加古郡播磨町": "兵庫県", "羽曳野市": "大阪府", "府中市": "東京都", "石川県能美市": "石川県", "揖斐郡池田町": "岐阜県", "宮城県名取市": "宮城県", "川崎市川崎区": "神奈川県", "柴田郡川崎町": "宮城県", "武蔵村山市": "東京都", "糟屋郡須惠町": "福岡県", "宮城県塩竈市": "兵庫県", "山形県東置賜郡高畠町": "山形県", "草津市": "滋賀県", "野々市": "石川県", "茅ヶ崎市": "神奈川県", "長生郡睦沢町": "石川県", "石川県金沢市": "東京都", "小野市": "兵庫県", "龍ケ崎市": "愛知県", "木津川市": "京都府", "大阪市大阪市此花区": "愛知県", "京都市西京区": "京都府", "四街道市": "千葉県", "天童市": "山形県", "加美郡加美町": "宮城県", "富山市": "富山県", "入間市": "埼玉県", "君津市": "千葉県", "村山市": "山形県", "関市": "岐阜県", "江南市": "愛知県", "宮城県　大崎市": "宮城県", "兵庫県尼崎市": "兵庫県", "大和郡山市": "埼玉県", "川崎市宮前区": "神奈川県", "逗子市": "兵庫県", "名古屋市中村区": "愛知県", "吉川市": "埼玉県", "足柄上郡松田町": "神奈川県", "高座郡寒川町": "神奈川県", "千代田区": "東京都", "大船渡市": "大阪府", "比企郡川島町": "宮城県", "鹿屋市": "鹿児島県", "海老名市": "神奈川県", "久世郡久御山町": "京都府", "八幡市": "京都府", "大阪市此花区": "大阪府", "大阪府寝屋川市": "大阪府", "さいたま市見沼区": "埼玉県", "宮崎県都城市": "兵庫県", "射水市": "富山県", "岐阜県可児市": "岐阜県", "横浜市磯子区": "神奈川県", "水俣市": "石川県", "鶴岡市": "山形県", "高島市": "千葉県", "大阪府高槻市": "大阪府", "摂津市": "大阪府", "香芝市": "福岡県", "横浜市栄区": "神奈川県", "足柄下郡真鶴町": "神奈川県", "草加市": "埼玉県", "青梅市": "東京都", "愛知県名古屋市中区": "愛知県", "揖斐郡大野町": "岐阜県", "富山県高岡市": "富山県", "登米市": "宮城県", "尾花沢市": "山形県", "東村山市": "東京都", "南さつま市": "鹿児島県", "下関市": "兵庫県", "山武郡九十九里町": "千葉県", "愛知県名古屋市緑区": "愛知県", "京都府京田辺市": "京都府", "京都府木津川市": "京都府", "伊東市": "千葉県", "西多摩郡奥多摩町": "東京都", "大阪府富田林市": "大阪府", "名古屋市": "愛知県", "能美市": "石川県", "八女市": "福岡県", "姫路市飾磨区": "兵庫県", "仙台市泉区": "宮城県", "京都府京都市伏見区": "京都府", "大阪市": "大阪府", "遠野市": "岩手県", "赤穂市": "兵庫県", "兵庫県たつの市": "兵庫県", "柏原市": "大阪府", "木更津市": "千葉県", "大阪府大阪市西区": "大阪府", "あきる野市": "東京都", "福岡県太宰府市": "宮城県", "出水市": "鹿児島県", "久喜市": "埼玉県", "佐倉市": "千葉県", "兵庫県神戸市須磨区": "兵庫県", "養老郡養老町": "岐阜県", "大阪府和泉市": "大阪府", "兵庫県姫路市飾磨区": "兵庫県", "東根市": "山形県", "足柄上郡開成町": "埼玉県", "薩摩川内市": "鹿児島県", "横浜市緑区": "神奈川県", "大阪府大東市": "大阪府", "多摩市": "東京都", "さいたま市大宮区": "埼玉県", "福岡県福岡市東区": "石川県", "千葉県習志野市": "愛知県", "さいたま市西区": "埼玉県", "兵庫県神戸市兵庫区": "兵庫県", "高岡市": "富山県", "大阪府堺市西区": "大阪府", "岡山県岡山市北区": "愛知県", "大阪府四條畷市": "大阪府", "宮城県遠田郡涌谷町": "宮城県", "兵庫県加東市": "東京都", "日高市": "埼玉県", "上尾市": "埼玉県", "奈良市": "大阪府", "足柄下郡湯河原町": "神奈川県", "大阪府守口市": "大阪府", "鹿児島県　霧島市": "京都府", "愛知県名古屋市瑞穂区": "京都府", "宗像市": "福岡県", "さいたま市桜区": "埼玉県", "南陽市": "山形県", "田川市": "福岡県", "大阪府大阪市都島区": "大阪府", "さいたま市緑区": "埼玉県", "いなべ市": "京都府", "羽咋市": "神奈川県", "えびの市": "富山県", "大阪府門真市": "大阪府", "流山市": "千葉県", "兵庫県西宮市": "兵庫県", "丹波篠山市": "兵庫県", "淡路市": "兵庫県", "東松山市": "埼玉県", "河北郡内灘町": "石川県", "大阪府大阪市東住吉区": "大阪府", "大阪市西淀川区": "大阪府", "兵庫県明石市": "兵庫県", "鎌倉市": "神奈川県", "大阪府吹田市": "大阪府", "大阪府松原市": "大阪府", "大阪府堺市": "大阪府", "兵庫県姫路市大津区": "兵庫県", "小矢部市": "富山県", "戸田市": "埼玉県", "大阪府大阪市西成区": "大阪府", "たつの市": "兵庫県", "大阪府大阪市淀川区": "大阪府", "兵庫県加古川市": "兵庫県", "田川郡福智町伊方4510-203東区": "福岡県", "愛知県北名古屋市": "愛知県", "岐阜県羽島市": "岐阜県", "揖保郡太子町": "兵庫県", "福生市": "東京都", "犬山市": "愛知県", "兵庫県神戸市北区": "兵庫県", "秋田市": "秋田県", "つくば市": "茨城県", "京都府京都市西京区": "京都府", "土岐市": "岐阜県", "大阪府堺市東区": "大阪府", "京都府八幡市": "京都府", "いすみ市": "千葉県", "仙台市仙台市太白区": "宮城県", "田川郡福智町": "福岡県", "紫波郡矢巾町": "岩手県", "加東市": "兵庫県", "横浜市西区": "神奈川県", "大阪市天王寺区": "大阪府", "唐津市": "佐賀県", "日置市": "鹿児島県", "船井郡京丹波町": "京都府", "大阪府大阪市東成区": "大阪府", "遠賀郡岡垣町": "福岡県", "糟屋郡志免町": "福岡県", "愛知郡東郷町": "愛知県", "燕市": "新潟県", "新潟市秋葉区": "新潟県", "神戸市中央区": "兵庫県", "姫路市広畑区": "兵庫県", "胆沢郡金ヶ崎町": "岩手県", "大阪府大阪市東淀川区": "大阪府", "兵庫県神戸市長田区": "兵庫県", "大阪府三島郡島本町": "大阪府", "大阪府大阪市平野区": "大阪府", "黒川郡大和町": "宮城県", "長生郡長柄町": "千葉県", "大阪府堺市美原区": "大阪府", "大阪府豊中市": "大阪府", "千葉県千葉市若葉区": "千葉県", "兵庫県高砂市": "兵庫県", "羽村市": "東京都", "東大和市": "東京都", "新発田市": "新潟県", "小千谷市": "新潟県", "長岡市": "新潟県", "上越市": "新潟県", "新潟市西区": "新潟県", "柏崎市": "新潟県", "胎内市": "新潟県", "下閉伊郡山田町": "岩手県", "横浜市": "神奈川県", "三条市": "新潟県", "東金市": "千葉県", "新潟市江南区": "新潟県", "愛知県稲沢市": "愛知県", "蓮田市": "埼玉県", "泉南郡熊取町": "大阪府", "大阪府堺市堺区": "大阪府", "美濃市": "岐阜県", "大阪市西区": "大阪府", "富山県射水市": "富山県", "見附市": "新潟県", "神奈川県横浜市港南区": "神奈川県", "京都府京都市山科区": "京都府", "多摩区": "神奈川県", "大阪府大阪市浪速区": "大阪府", "伊丹市": "兵庫県", "砺波市": "富山県", "北蒲原郡聖籠町": "新潟県", "大阪府大阪市生野区": "大阪府", "神奈川県横須賀市": "神奈川県", "白岡市": "埼玉県", "南九州市": "鹿児島県", "村上市": "新潟県", "姫路市余部区": "兵庫県", "日野市": "東京都", "京都府亀岡市": "京都府", "さいたま市浦和区": "埼玉県", "山県市": "岐阜県", "姶良市": "鹿児島県", "仙台市": "宮城県", "大阪府羽曳野市": "大阪府", "阿賀野市": "新潟県", "愛知県名古屋市守山区": "愛知県", "京都府長岡京市": "京都府", "南蒲原郡田上町": "新潟県", "京都府京都市中京区": "京都府", "新潟市南区": "新潟県", "大阪府柏原市": "大阪府", "大阪府堺市中区": "大阪府", "不破郡垂井町": "岐阜県", "花巻市東和町北川目３区": "岩手県", "姫路市網干区": "兵庫県", "荒川区": "東京都", "大野城市": "福岡県", "大阪府泉佐野市": "大阪府", "十日町市": "新潟県", "新潟市東区": "兵庫県", "岐阜県瑞穂市": "岐阜県", "岐阜県加茂郡八百津町": "岐阜県", "遠田郡美里町": "宮城県", "愛知県西尾市": "愛知県", "大阪府大阪市北区": "大阪府", "岐阜県養老郡養老町": "岐阜県", "本巣郡北方町": "岐阜県", "白井市": "千葉県", "大阪府大阪市中央区": "大阪府", "新潟市北区": "新潟県", "愛知県海部郡蟹江町": "愛知県", "新潟市西蒲区": "新潟県", "豊川市": "愛知県", "宮城県仙台市若林区": "宮城県", "名古屋市中区": "愛知県", "北相馬郡利根町": "茨城県", "海津市": "岐阜県", "文京区": "東京都", "福津市": "福岡県", "新潟市中央区": "新潟県", "五泉市": "新潟県", "安八郡安八町": "岐阜県", "愛知県江南市": "愛知県", "さいたま市中央区": "東京都", "大阪府茨木市": "大阪府", "大阪府南河内郡千早赤阪村": "大阪府", "氷見市": "富山県", "綾瀬市": "神奈川県", "横浜市保土ヶ谷区": "神奈川県", "愛知県名古屋市港区": "愛知県", "宮古市": "岩手県", "大阪府河内長野市": "大阪府", "愛知県尾張旭市": "愛知県", "大阪府大阪市阿倍野区": "大阪府", "奥州市水沢区": "岩手県", "富谷市": "宮城県", "神崎郡福崎町": "兵庫県", "中郡大磯町": "神奈川県", "山形県新庄市": "山形県", "西村山郡大江町": "山形県", "愛知県清須市": "愛知県", "愛知県岡崎市": "愛知県", "新潟県新潟市西区": "新潟県", "京都市": "京都府", "加茂郡八百津町": "岐阜県", "石巻市": "宮城県", "伊具郡丸森町": "宮城県", "兵庫県神戸市灘区": "兵庫県", "岐阜県大垣市": "岐阜県", "愛知県名古屋市北区": "愛知県", "津島市": "愛知県", "宮若市": "福岡県", "兵庫県姫路市": "兵庫県", "つくばみらい市": "茨城県", "大阪府摂津市": "大阪府", "宮城県富谷市": "宮城県", "西村山郡朝日町": "山形県", "兵庫県川辺郡猪名川町": "兵庫県", "岐阜県揖斐郡大野町": "岐阜県", "新潟県三条市": "新潟県", "京都市東山区": "京都府", "鞍手郡小竹町": "福岡県", "佐賀県三養基郡基山町": "佐賀県", "愛知県高浜市": "愛知県", "新潟県新潟市西蒲区": "新潟県", "狭山市": "埼玉県", "兵庫県芦屋市": "兵庫県", "魚津市": "富山県", "大阪府大阪狭山市": "大阪府", "岐阜県　美濃加茂市": "岐阜県", "北足立郡伊奈町": "埼玉県", "志布志市": "鹿児島県", "本庄市": "埼玉県", "宮城県遠田郡美里町": "宮城県", "大阪府大阪市天王寺区": "大阪府", "新潟県小千谷市": "新潟県", "蒲郡市": "愛知県", "愛知県小牧市": "愛知県", "東田川郡庄内町": "山形県", "兵庫県伊丹市": "兵庫県", "北本市": "埼玉県", "志木市": "埼玉県", "新潟県新潟市東区": "新潟県", "四條畷市": "大阪府", "蕨市": "埼玉県", "兵庫県神戸市東灘区": "兵庫県", "南魚沼市": "新潟県", "神奈川県横浜市西区": "神奈川県", "伊佐市": "鹿児島県", "筑後市": "福岡県", "愛知県名古屋市西区": "愛知県", "有珠郡壮瞥町": "宮城県", "加茂郡川辺町": "岐阜県", "大阪府南河内郡太子町": "大阪府", "鳥栖市": "佐賀県", "大阪府藤井寺市": "大阪府", "丹羽郡扶桑町": "愛知県", "二戸郡一戸町": "岩手県", "岐阜県　瑞穂市": "岐阜県", "久留米市": "福岡県", "三井郡大刀洗町": "福岡県", "兵庫県　西宮市": "兵庫県", "新潟県新潟市北区": "新潟県", "佐賀市": "佐賀県", "中間市": "福岡県", "亘理郡山元町": "宮城県", "三重県名張市": "三重県", "泉佐野市": "大阪府", "陸前高田市": "岩手県", "愛甲郡愛川町": "神奈川県", "東京都西東京市": "東京都", "肝属郡東串良町": "鹿児島県", "額田郡幸田町": "愛知県", "鹿児島県姶良市": "鹿児島県", "泉大津市": "大阪府", "八女郡広川町": "福岡県", "西村山郡河北町": "山形県", "魚沼市": "新潟県", "東京都杉並区": "東京都", "最上郡真室川町": "山形県", "東京都八王子市": "東京都", "博多区": "福岡県", "新潟県村上市": "新潟県", "飯能市": "埼玉県", "各務ヶ原市": "岐阜県", "上越市三和区": "新潟県", "新潟県新潟市秋葉区": "新潟県", "本巣市": "岐阜県", "遠賀郡遠賀町": "福岡県", "福井市": "福井県", "兵庫県川西市": "兵庫県", "愛知県名古屋市中川区": "愛知県", "新潟県新潟市江南区": "新潟県", "大阪府交野市": "大阪府", "東京都立川市": "東京都", "西多摩郡日の出町": "東京都", "朝霞市": "埼玉県", "埼玉県川口市": "埼玉県", "大阪府大阪市西淀川区": "大阪府", "薩摩郡さつま町": "鹿児島県", "猿島郡境町": "茨城県", "北村山郡大石田町": "山形県", "妙高市": "新潟県", "京都府京都市右京区": "京都府", "南丹市": "京都府", "岐阜県本巣郡北方町": "岐阜県", "常総市": "茨城県", "嘉麻市": "福岡県", "福岡県久留米市": "福岡県", "田川郡糸田町": "福岡県", "吉田郡永平寺町": "福井県", "坂井市": "福井県", "福岡県春日市": "佐賀県", "鯖江市": "福井県", "福井県坂井市": "福井県", "角田市": "宮城県", "羽島郡笠松町": "岐阜県", "八戸市": "青森県", "大阪府大阪市住吉区": "大阪府", "西磐井郡平泉町": "岩手県", "神栖市": "茨城県", "かすみがうら市": "茨城県", "秩父市": "埼玉県", "大阪府貝塚市": "大阪府", "大阪府堺市南区": "大阪府", "横浜市都筑区": "神奈川県", "神戸市神戸市垂水区": "兵庫県", "八街市": "千葉県", "大阪市北区": "大阪府", "入間郡毛呂山町": "埼玉県", "京都府京丹後市": "京都府", "大阪府八尾市": "大阪府", "あわら市": "福井県", "神奈川県　川崎市多摩区": "神奈川県", "姶良郡湧水町": "鹿児島県", "鹿児島県肝属郡南大隅町": "鹿児島県", "能代市": "秋田県", "十和田市": "青森県", "知多郡阿久比町": "愛知県", "糟屋郡宇美町": "福岡県", "中新川郡立山町": "富山県", "東村山郡山辺町": "山形県", "姫路市勝原区": "兵庫県", "勝山市": "福井県", "山形県酒田市": "山形県", "知多郡美浜町": "愛知県", "京都府舞鶴市": "京都府", "新潟県長岡市": "新潟県", "大阪府堺市北区": "大阪府", "弘前市": "青森県", "長生郡一宮町": "千葉県", "糸魚川市": "新潟県", "ふじみ野市": "埼玉県", "福井県あわら市": "福井県", "岐阜県土岐市": "岐阜県", "大阪府大阪市住之江区": "大阪府", "指宿市": "鹿児島県", "香取市": "千葉県", "久世郡久御山町市": "京都府", "兵庫県揖保郡太子町": "兵庫県", "兵庫県　明石市": "兵庫県", "大阪府　大阪市平野区": "大阪府", "神戸市": "兵庫県", "長田区": "兵庫県", "銚子市": "千葉県", "兵庫県神戸市中央区": "兵庫県", "三戸郡階上町": "青森県", "兵庫県　尼崎市": "兵庫県", "兵庫県宝塚市": "兵庫県", "山武郡横芝光町": "千葉県", "海部郡蟹江町": "愛知県", "宮城県仙台市泉区": "宮城県", "弥富市": "愛知県", "兵庫県丹波篠山市": "兵庫県", "郡上市": "岐阜県", "岐阜県中津川市": "岐阜県", "下新川郡朝日町": "富山県", "兵庫県神戸市西区": "兵庫県", "垂水市": "鹿児島県", "三島郡島本町": "大阪府", "気仙郡住田町": "岩手県", "上越市頸城区": "新潟県", "丹生郡越前町": "福井県", "大阪府阪南市": "大阪府", "柳川市": "福岡県", "青森市": "青森県", "姫路市大津区": "兵庫県", "宮城県　登米市": "宮城県", "北葛飾郡杉戸町": "埼玉県", "京都府京都市": "京都府", "埼玉県越谷市": "埼玉県", "入間郡越生町": "埼玉県", "気仙沼市": "宮城県", "東田川郡三川町": "山形県", "黒川郡大衡村": "宮城県", "大阪府岸和田市": "大阪府", "兵庫県神戸市": "兵庫県", "南津軽郡藤崎町": "青森県", "鴻巣市": "埼玉県", "遠田郡涌谷町": "宮城県", "泉南市": "大阪府", "瑞浪市": "岐阜県", "袖ケ浦市": "千葉県", "熊谷市": "埼玉県", "最上郡戸沢村": "山形県", "桑名市": "三重県", "高崎市": "埼玉県", "阪南市": "大阪府", "黒部市": "富山県", "成田市": "千葉県", "姫路市姫路市飾磨区": "兵庫県", "石川県河北郡内灘町": "石川県", "朝倉郡筑前町": "福岡県", "坂戸市": "埼玉県", "西明石市": "兵庫県", "南河内郡太子町": "大阪府", "四日市": "三重県", "京都府綴喜郡井手町": "京都府", "山形県東根市": "山形県", "西多摩郡みずほ町": "東京都", "肝属郡肝付町": "鹿児島県", "福井県福井市": "福井県", "上北郡野辺地町": "青森県", "相模原市": "神奈川県", "上北郡六戸町": "青森県", "神戸市神戸市長田区": "兵庫県", "加茂郡富加町": "岐阜県", "曽於市": "鹿児島県", "山形県西村山郡朝日町": "山形県", "開成町": "神奈川県", "武雄市": "佐賀県", "富山市五福3区": "富山県", "児玉郡上里町": "埼玉県", "新潟県十日町市": "新潟県", "現住所：大阪市鶴見区": "大阪府", "東津軽郡外ヶ浜町": "青森県", "神奈川県高座郡寒川町": "神奈川県", "深谷市": "埼玉県", "大川市": "福岡県", "神奈川県大和市": "神奈川県", "稲敷市": "茨城県", "平川市": "青森県", "神奈川県平塚市": "神奈川県", "碧南市": "愛知県", "東京都江東区": "東京都", "宮城県　塩竈市": "宮城県", "刈田郡蔵王町": "宮城県", "宮城県仙台市青葉区": "宮城県", "新潟県胎内市": "新潟県", "胆沢郡金ケ崎町": "岩手県", "大野市": "福井県", "大阪府高石市": "大阪府", "九戸郡洋野町": "岩手県", "二戸市": "岩手県", "上閉伊郡大槌町": "岩手県", "岩手県一関市": "岩手県", "飯塚市": "福岡県", "黒川郡大郷町": "宮城県", "旭市": "千葉県", "大阪府箕面市": "大阪府", "出水郡長島町": "鹿児島県", "千葉県市": "千葉県", "印旛郡栄町": "千葉県", "兵庫県相生市": "兵庫県", "むつ市": "青森県", "中区": "愛知県", "足柄上郡中井町": "神奈川県", "上北郡七戸町": "青森県", "上山市": "山形県", "みやま市": "福岡県", "南砺市": "富山県", "中魚沼郡津南町": "新潟県", "熊本市中央区": "兵庫県", "柴田郡村田町": "宮城県", "三重郡川越町": "三重県", "新潟県見附市": "新潟県", "加茂郡白川町": "岐阜県", "糟屋郡須恵町": "福岡県", "由利本荘市": "秋田県", "秩父郡横瀬町": "埼玉県", "比企郡嵐山町": "埼玉県", "秋田県潟上市": "秋田県", "大仙市": "秋田県", "富津市": "千葉県", "仙台泉区": "宮城県", "戸塚区": "神奈川県", "神奈川県茅ヶ崎市": "神奈川県", "新潟県南魚沼市": "新潟県", "潟上市": "秋田県", "山武市": "千葉県", "上北郡おいらせ町": "青森県", "三養基郡みやき町": "佐賀県", "宮城県石巻市": "宮城県", "東置賜郡高畠町": "山形県", "黒石市": "青森県", "長生郡白子町": "千葉県", "朝倉市": "福岡県", "亀山市": "三重県", "三沢市": "青森県", "那珂郡東海村": "千葉県", "上越市名立区": "新潟県", "鶴見区": "大阪府", "三島郡出雲崎町": "新潟県", "中村区": "愛知県", "にかほ市": "秋田県", "湯沢市": "秋田県", "婦中町": "富山県", "横手市": "秋田県", "千葉県佐倉市": "千葉県", "宮城野区": "宮城県", "乙訓郡大山崎町": "京都府", "枕崎市": "鹿児島県", "大阪府大阪市鶴見区": "大阪府", "埼玉県久喜市": "埼玉県", "綴喜郡井手町": "京都府", "宮城県大崎市": "宮城県", "東区": "愛知県", "野洲市": "滋賀県", "神戸市神戸市須磨区": "兵庫県", "大阪府大阪市旭区": "大阪府", "長井市": "山形県", "上北郡東北町": "青森県", "西区": "愛知県", "神崎郡吉野ヶ里町": "福岡県", "川辺郡猪名川町": "兵庫県", "久慈市": "岩手県", "京丹後市": "京都府", "古河市": "茨城県", "うきは市": "福岡県", "京都府京都市東山区": "京都府", "京都府京都市下京区": "京都府", "西春日井郡豊山町": "愛知県", "児玉郡神川町": "埼玉県", "福知山市": "京都府", "東蒲原郡阿賀町": "新潟県", "五所川原市": "青森県", "大阪府泉大津市": "大阪府", "愛知県名古屋市天白区": "愛知県", "三浦郡葉山町": "神奈川県", "富里市": "千葉県", "富山市大町1区": "富山県", "伊賀市": "三重県", "山形県東田川郡庄内町": "山形県", "福岡県柳川市": "福岡県", "愛知県名古屋市中村区": "愛知県", "加茂郡 八百津町": "岐阜県", "勝浦市": "千葉県", "神奈川県横浜市磯子区": "神奈川県", "揖斐郡揖斐川町": "岐阜県", "三潴郡大木町": "福岡県", "上越市吉川区": "新潟県", "築上郡築上町": "福岡県", "横須賀三春町": "神奈川県", "福岡県小郡市": "福岡県", "与謝郡伊根町": "京都府", "宮城県亘理郡山元町": "宮城県", "館山市": "千葉県", "綾部市": "京都府", "さいたま市 大宮区": "埼玉県", "目黒区": "東京都", "加西市": "兵庫県", "福岡市": "福岡県", "太田区": "東京都", "新城市": "愛知県", "常滑市": "愛知県", "岐阜県多治見市": "岐阜県", "宮津市": "京都府", "新潟市新潟市西区": "新潟県", "神奈川県秦野市": "神奈川県", "猪名川町": "兵庫県", "京都府京都市北区": "京都府", "東近江市": "滋賀県", "大阪府堺市堺市美原区": "大阪府", "柏崎市〇〇区": "新潟県", "南津軽郡大鰐町": "青森県", "宮城県 富谷市": "宮城県", "岐阜県各務原市": "岐阜県", "愛知県　西尾市": "愛知県", "東京都品川区": "東京都", "三戸郡五戸町": "青森県", "柴田郡大河原町": "宮城県", "千葉県千葉市緑区": "千葉県", "鹿児島県霧島市": "鹿児島県", "西脇市": "兵庫県", "京都市京都市右京区": "京都府", "新潟県　新潟市中央区": "新潟県", "南秋田郡井川町": "秋田県", "宮城県仙台市太白区": "宮城県", "太白区": "宮城県", "千葉市": "千葉県", "中新川郡上市": "富山県", "山形県西村山郡西川町": "山形県", "宮城県亘理郡亘理町": "宮城県", "仙北郡美郷町": "秋田県", "千葉県 富津市": "千葉県", "加美郡色麻町": "宮城県", "三戸郡五戸町上市": "青森県", "宮城県 伊具郡 丸森町": "宮城県", "宮城県角田市": "宮城県", "田原市": "愛知県", "三条市〇〇区": "新潟県", "八幡平市": "岩手県", "南津軽郡田舎館村": "青森県", "小城市": "佐賀県", "由布市": "福岡県", "福岡県 福岡市 南区": "福岡県", "加茂郡東白川村": "岐阜県", "鈴鹿市": "三重県", "つがる市": "青森県", "滑川市": "富山県", "安八郡輪之内町": "岐阜県", "宮城郡七ヶ浜町": "宮城県", "舞鶴市": "京都府", "津市": "三重県", "岩手郡岩手町": "岩手県", "多久市": "佐賀県", "松阪市": "三重県", "南相馬市原町区": "宮城県", "岐阜県飛騨市": "岐阜県", "下妻市": "茨城県", "白石市": "宮城県", "越前市": "福井県", "新潟県 新潟市東区": "新潟県", "新潟県燕市": "新潟県", "鹿児島県出水市": "鹿児島県", "大阪府大阪市此花区": "大阪府"};
+
+// ── 都道府県分析 ──────────────────────────────
+const PREF_MAP = {
+  '青森': { office: '青森', prefs: ['青森県', 'その他_青森'] },
+  '盛岡': { office: '盛岡', prefs: ['岩手県', '秋田県', 'その他_盛岡'] },
+  '仙台': { office: '仙台', prefs: ['宮城県', '山形県', 'その他_仙台'] },
+  '千葉': { office: '千葉', prefs: ['千葉県', '茨城県', 'その他_千葉'] },
+  '横浜': { office: '横浜', prefs: ['神奈川県', 'その他_横浜'] },
+  '新宿': { office: '新宿', prefs: ['東京都', '埼玉県', 'その他_新宿'] },
+  '新潟': { office: '新潟', prefs: ['新潟県', 'その他_新潟'] },
+  '金沢': { office: '金沢', prefs: ['富山県', '石川県', '福井県', 'その他_金沢'] },
+  '名古屋': { office: '名古屋', prefs: ['岐阜県', '愛知県', '三重県', 'その他_名古屋'] },
+  '京都': { office: '京都', prefs: ['京都府', '滋賀県', 'その他_京都'] },
+  '梅田': { office: '梅田', prefs: ['大阪府', '奈良県', 'その他_梅田'] },
+  '神戸': { office: '神戸', prefs: ['兵庫県', 'その他_神戸'] },
+  '福岡': { office: '福岡', prefs: ['福岡県', '佐賀県', '山口県', 'その他_福岡'] },
+  '鹿児島': { office: '鹿児島', prefs: ['鹿児島県', 'その他_鹿児島'] },
+};
+
+// 都道府県名の正規化（末尾の都道府県が省略されているケースに対応）
+function normalizePref(raw) {
+  if (!raw || raw === '0' || raw === 0) return null;
+  const s = String(raw).trim();
+  if (!s || s === '0') return null;
+
+  // 全管轄都道府県リスト
+  const allPrefs = Object.values(PREF_MAP).flatMap(({ prefs }) => prefs);
+
+  // 完全一致
+  if (allPrefs.includes(s)) return s;
+
+  // 先頭3文字で管轄都道府県に一致（長い住所対応）
+  for (const p of allPrefs) {
+    if (s.startsWith(p.slice(0, 3))) return p;
+  }
+
+  // 末尾に都道府県がない場合は補完（「神奈川」→「神奈川県」など）
+  for (const suffix of ['都', '道', '府', '県']) {
+    if (allPrefs.includes(s + suffix)) return s + suffix;
+  }
+
+  // 「大阪市」→「大阪府」など市区町村から推測
+  for (const p of allPrefs) {
+    if (s.includes(p.slice(0, 2))) return p;
+  }
+
+  return null;
+}
+
+function syncPrefFilters() {
+  const y = document.getElementById('sel-year').value;
+  const m = document.getElementById('sel-month').value;
+  const d = document.getElementById('sel-date').value;
+  if (y) document.getElementById('pref-year').value = y;
+  if (m) document.getElementById('pref-month').value = m;
+  if (d) document.getElementById('pref-date').value = d;
+
+  // pref-yearのオプションを同期
+  const srcSel = document.getElementById('sel-year');
+  const dstSel = document.getElementById('pref-year');
+  if (srcSel.options.length > 1 && dstSel.options.length <= 1) {
+    dstSel.innerHTML = srcSel.innerHTML;
+    if (y) dstSel.value = y;
+  }
+}
+
+function createPrefMetrics() {
+  return {
+    total: 0, valid: 0, contacted: 0,
+    selTarget: 0, rA: 0, rB: 0, rC: 0,
+    set: 0, rASet: 0, rBSet: 0, rCSet: 0,
+    impl: 0, rAImpl: 0, rBImpl: 0, rCImpl: 0,
+    dec: 0, rADec: 0, rBDec: 0, rCDec: 0,
+    start: 0, rAStart: 0, rBStart: 0, rCStart: 0,
+  };
+}
+
+function renderPref() {
+  if (!state.medRows && !state.mcgRows) return;
+  const wrap = document.getElementById('pref-table-wrap');
+  if (!wrap) return;
+
+  const year  = parseInt(document.getElementById('pref-year').value) || null;
+  const month = parseInt(document.getElementById('pref-month').value) || null;
+  const baseDateVal = document.getElementById('pref-date').value;
+  const baseDate = baseDateVal ? new Date(baseDateVal + 'T23:59:59') : null;
+
+  const INVALID_STATUS = ['Z（その他）', 'Z（約外終了）', '対象外'];
+
+  // 全都道府県のメトリクスを初期化
+  const D = {};
+  for (const { prefs } of Object.values(PREF_MAP)) {
+    for (const p of prefs) D[p] = createPrefMetrics();
+  }
+  // 各オフィスのその他を初期化
+  Object.keys(PREF_MAP).forEach(office => { D['その他_' + office] = createPrefMetrics(); });
+
+  // STEP1用：月フィルター済みmedRows
+  const medFiltered = (state.medRows || []).filter(r => {
+    const d = parseDate(r['応募日'] || r['（応募内容）応募日'] || '');
+    if (!d) return false;
+    if (year && d.getFullYear() !== year) return false;
+    if (month && d.getMonth() + 1 !== month) return false;
+    return true;
+  });
+
+  // STEP1: 総応募カウント（統合ツールCSV・月フィルター済み）
+  // 統合ツール→都道府県で集計（管轄外はオフィスのその他へ）
+  // 都道府県→オフィスの逆引きマップを構築
+  const prefToOffice = {};
+  for (const [office, { prefs }] of Object.entries(PREF_MAP)) {
+    for (const p of prefs) {
+      if (!p.startsWith('その他_')) prefToOffice[p] = office;
+    }
+  }
+  medFiltered.forEach(r => {
+    const pref = normalizePref(r['都道府県名']);
+    if (pref && D[pref]) {
+      D[pref].total++;
+    } else {
+      // 管轄外→オフィスの対応オフィスに振り分け（統合ツールは対応オフィス列がある）
+      const office = normalizeOffice(r['対応オフィス'] || r['拠点'] || '');
+      const otherKey = 'その他_' + office;
+      if (D[otherKey]) D[otherKey].total++;
+    }
+  });
+
+  // STEP2: MCGで有効応募以降（電話番号マップで都道府県を特定）
+  const countedPhones = new Set();
+  (state.mcgRows || []).forEach(mcg => {
+    const appDate = parseDate(mcg['応募日'] || '');
+    if (!appDate) return;
+    if (year && appDate.getFullYear() !== year) return;
+    if (month && appDate.getMonth() + 1 !== month) return;
+
+    const isValid = parseFloat(String(mcg['有効応募'] ?? '').trim()) === 1;
+    if (!isValid) return;
+
+    // 同一人物の重複カウント防止（電話番号で管理）
+    const phone = normalizePhone(String(mcg['電話番号'] || ''));
+    const dedupKey = phone || (cityRaw + '|||' + String(mcg['人材番号'] || ''));
+    if (countedPhones.has(dedupKey)) return;
+    countedPhones.add(dedupKey);
+
+    // 都道府県列から直接取得、管轄外はオフィスのその他へ
+    const prefRaw = normalizePref(mcg['都道府県'] || '');
+    let pref;
+    if (prefRaw && D[prefRaw]) {
+      pref = prefRaw;
+    } else {
+      const officeKey = String(mcg['所属'] || '').trim();
+      pref = 'その他_' + officeKey;
+    }
+    if (!D[pref]) return;
+
+    D[pref].valid++;
+
+    const flag = (key) => parseFloat(String(mcg[key] ?? '').trim()) === 1;
+    if (flag('接触ステータス')) D[pref].contacted++;
+
+    // 人選ランク
+    const rankRaw = String(mcg['人選'] ?? '').trim();
+    const rank = rankRaw==='A'?'A': rankRaw==='B'?'B': rankRaw==='C'?'C': null;
+    if (flag('接触ステータス')) {
+      D[pref].selTarget++;
+      if (rank==='A') D[pref].rA++; else if (rank==='B') D[pref].rB++; else if (rank==='C') D[pref].rC++;
+    }
+
+    const dateOK = (key) => {
+      const d = parseDate(mcg[key]);
+      if (!d) return false;
+      return baseDate ? d <= baseDate : true;
+    };
+    if (dateOK('設定日')) {
+      D[pref].set++;
+      if (rank==='A') D[pref].rASet++; else if (rank==='B') D[pref].rBSet++; else if (rank==='C') D[pref].rCSet++;
+    }
+    if (dateOK('実施日')) {
+      D[pref].impl++;
+      if (rank==='A') D[pref].rAImpl++; else if (rank==='B') D[pref].rBImpl++; else if (rank==='C') D[pref].rCImpl++;
+    }
+    if (dateOK('決定日')) {
+      D[pref].dec++;
+      if (rank==='A') D[pref].rADec++; else if (rank==='B') D[pref].rBDec++; else if (rank==='C') D[pref].rCDec++;
+    }
+    if (dateOK('開始日')) {
+      D[pref].start++;
+      if (rank==='A') D[pref].rAStart++; else if (rank==='B') D[pref].rBStart++; else if (rank==='C') D[pref].rCStart++;
+    }
+  });
+
+  // テーブル生成
+  // その他（管轄外都道府県）のメトリクスはループ前に初期化済み
+
+  const ym = (year && month) ? year + '年' + month + '月' : '（月を選択）';
+  let html = '<table><thead>';
+
+  // 1段目：オフィス名（colspan）+ その他
+  html += `<tr><th class="lbl-cell th-space">${ym}</th>`;
+  for (const [office, { prefs }] of Object.entries(PREF_MAP)) {
+    html += `<th class="th-office" colspan="${prefs.length}" style="text-align:center;">${office}</th>`;
+  }
+  html += '</tr>';
+
+  // 2段目：都道府県名 + その他
+  html += '<tr><th class="lbl-cell th-space"></th>';
+  for (const { prefs } of Object.values(PREF_MAP)) {
+    for (const p of prefs) {
+      const label = p.startsWith('その他_') ? 'その他' : p.replace(/[都道府県]$/, '');
+      const bg = p.startsWith('その他_') ? '#4a6fa5' : '#2d5186';
+      html += `<th class="th-office" style="font-size:9px; background:${bg};">${label}</th>`;
+    }
+  }
+  html += '</tr></thead><tbody>';
+
+  const allPrefs = Object.values(PREF_MAP).flatMap(({ prefs }) => prefs);
+
+  const addRow = (label, cls, fn, subFn, subLabel) => {
+    html += `<tr><td class="lbl-cell ${cls}">${label}</td>`;
+    allPrefs.forEach(p => {
+      const m = D[p];
+      const isOther = p.startsWith('その他_');
+      html += `<td class="${isOther ? 'val-sub' : 'val-main'}">${fn(m)}</td>`;
+    });
+    html += '</tr>';
+    if (subFn) {
+      html += `<tr><td class="lbl-cell lbl-sub">${subLabel}</td>`;
+      allPrefs.forEach(p => { html += subFn(D[p]); });
+      html += '</tr>';
+    }
+  };
+
+  const fmtR = (num, den, warn) => {
+    if (!den) return '<td class="val-sub"></td>';
+    const r = num / den * 100;
+    const wc = warn && r < warn ? ' warn-red' : '';
+    return `<td class="val-sub${wc}">${r.toFixed(1)}%</td>`;
+  };
+
+  addRow('総応募', 'lbl-main', m => fmt(m.total));
+  addRow('有効応募', 'lbl-main lbl-star', m => fmt(m.valid),
+    m => fmtR(m.valid, m.total, 70), '（有効率）');
+  addRow('接触数', 'lbl-main', m => fmt(m.contacted),
+    m => fmtR(m.contacted, m.valid, 90), '（接触率）');
+  addRow('設定数', 'lbl-main', m => fmt(m.set),
+    m => fmtR(m.set, m.valid, null), '（設定率）');
+  addRow('実施数', 'lbl-main', m => fmt(m.impl),
+    m => fmtR(m.impl, m.set, null), '（実施率）');
+  addRow('決定数', 'lbl-main', m => fmt(m.dec),
+    m => fmtR(m.dec, m.impl, null), '（決定率）');
+  addRow('開始数', 'lbl-main', m => fmt(m.start),
+    m => fmtR(m.start, m.dec, null), '（開始率）');
+
+  // ── 人選・ファネルセクション ──
+  // セクションヘッダー
+  html += `<tr class="sec-header"><td class="lbl-cell">🎯 人選・ファネル</td>${allPrefs.map(()=>'<td></td>').join('')}</tr>`;
+
+  const addRankRows = (getTotal, getA, getB, getC) => {
+    const ranks = [['★★★★', getA], ['★★★☆', getB], ['★★☆☆', getC]];
+    return ranks.map(([lbl, getFn]) => {
+      let row = `<tr><td class="lbl-cell lbl-sub2">　${lbl}</td>`;
+      allPrefs.forEach(p => {
+        row += `<td class="val-sub2">${fmt(getFn(D[p]))}</td>`;
+      });
+      return row + '</tr>';
+    }).join('');
+  };
+
+  // 人選対象数（接触済み）
+  addRow('人選対象数', 'lbl-main lbl-star', m => fmt(m.selTarget),
+    m => fmtR(m.selTarget, m.valid, null), '（有効応募比）');
+  html += addRankRows(m=>m.selTarget, m=>m.rA, m=>m.rB, m=>m.rC);
+
+  // 設定数
+  addRow('設定数', 'lbl-main', m => fmt(m.set),
+    m => fmtR(m.set, m.valid, null), '（設定率）');
+  html += addRankRows(m=>m.set, m=>m.rASet, m=>m.rBSet, m=>m.rCSet);
+
+  // 実施数
+  addRow('実施数', 'lbl-main', m => fmt(m.impl),
+    m => fmtR(m.impl, m.set, null), '（実施率）');
+  html += addRankRows(m=>m.impl, m=>m.rAImpl, m=>m.rBImpl, m=>m.rCImpl);
+
+  // 決定数
+  addRow('決定数', 'lbl-main', m => fmt(m.dec),
+    m => fmtR(m.dec, m.impl, null), '（決定率）');
+  html += addRankRows(m=>m.dec, m=>m.rADec, m=>m.rBDec, m=>m.rCDec);
+
+  // 開始数
+  addRow('開始数', 'lbl-main', m => fmt(m.start),
+    m => fmtR(m.start, m.dec, null), '（開始率）');
+  html += addRankRows(m=>m.start, m=>m.rAStart, m=>m.rBStart, m=>m.rCStart);
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+
+// MCG未入力リスト描画
+function renderUnregisteredList() {
+  const list = state.mcgUnregisteredList || [];
+  const panel = document.getElementById('unreg-panel');
+  const tbody = document.getElementById('unreg-body');
+  if (!list.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  tbody.innerHTML = list.map((r, i) => {
+    const bg = i % 2 === 0 ? '#fff' : '#fdf8f8';
+    return `<tr style="background:${bg};">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">${r.date.substring(0,10)}</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">${r.name}</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">${r.media}</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">${r.office}</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">${r.tel}</td>
+    </tr>`;
+  }).join('');
+}
+
+// CSVダウンロード
+function downloadUnreg() {
+  const list = state.mcgUnregisteredList || [];
+  const bom = '\uFEFF';
+  const header = '応募日,氏名,媒体,オフィス,電話番号\n';
+  const rows = list.map(r =>
+    [r.date.substring(0,10), r.name, r.media, r.office, r.tel]
+    .map(v => `"${v}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([bom + header + rows], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MCG未入力リスト.csv';
+  a.click();
+}
+</script>
+
+</div><!-- /jinzai-page -->
+
+<!-- 都道府県分析ページ -->
+<div id="page-pref" style="display:none;">
+  <div class="controls" id="pref-controls">
+    <div class="filter-grp">
+      <label>年</label>
+      <select id="pref-year" onchange="renderPref()"><option value="">---</option></select>
+    </div>
+    <div class="filter-grp">
+      <label>月</label>
+      <select id="pref-month" onchange="renderPref()">
+        <option value="">---</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <div class="filter-grp">
+      <label>基準日</label>
+      <input type="date" id="pref-date" onchange="renderPref()">
+      <button onclick="document.getElementById('pref-date').value=''; renderPref();" style="font-size:10px; padding:4px 8px; border:1px solid var(--border); border-radius:4px; cursor:pointer; background:#fff;">クリア</button>
+    </div>
+  </div>
+  <div class="table-outer">
+    <div class="table-wrap" id="pref-table-wrap">
+      <div class="empty-state">
+        <div class="ico">🗾</div>
+        <h3>CSVをアップロードしてください</h3>
+        <p>人材DBと同じCSVファイルを使います。<br>人材DBタブでCSVを読み込むと自動で反映されます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 集客DBページ -->
+<div id="page-shukyaku" style="display:none;">
+  <div class="controls">
+    <div class="filter-grp">
+      <label>年</label>
+      <select id="sk-year" onchange="renderShukyaku(currentSkView)"><option value="">---</option></select>
+    </div>
+    <div class="filter-grp">
+      <label>月</label>
+      <select id="sk-month" onchange="renderShukyaku(currentSkView)">
+        <option value="">---</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <div class="filter-grp">
+      <label>基準日</label>
+      <input type="date" id="sk-date" onchange="renderShukyaku(currentSkView)">
+      <button onclick="document.getElementById('sk-date').value=''; renderShukyaku(currentSkView);" style="font-size:10px; padding:4px 8px; border:1px solid var(--border); border-radius:4px; cursor:pointer; background:#fff;">クリア</button>
+    </div>
+  </div>
+
+  <!-- タブ -->
+  <div style="background:#fff; border-bottom:2px solid var(--border); padding:0 20px; display:flex; gap:0;">
+    <button id="sk-tab-media" onclick="switchSkTab('media')" style="padding:10px 20px; font-size:12px; border:none; border-bottom:3px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; cursor:pointer;">
+      📺 媒体別ビュー
+    </button>
+    <button id="sk-tab-office" onclick="switchSkTab('office')" style="padding:10px 20px; font-size:12px; border:none; border-bottom:3px solid transparent; background:#fff; color:var(--muted); cursor:pointer;">
+      🏢 オフィス別ビュー
+    </button>
+  </div>
+
+  <!-- 集客費用入力 -->
+  <details class="adv-bar" id="sk-adv-details">
+    <summary>▶ 集客費用を入力する（クリックで展開）</summary>
+    <div id="sk-adv-grid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;"></div>
+  </details>
+
+  <div class="table-outer">
+    <div class="table-wrap" id="sk-table-wrap">
+      <div class="empty-state">
+        <div class="ico">📊</div>
+        <h3>CSVをアップロードしてください</h3>
+        <p>人材DBタブでCSVを読み込むと自動で反映されます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main-content -->
+
+
+
+</body></html>
