@@ -1,0 +1,1187 @@
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>+ホップ 人材ダッシュボード 3期通期</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;font-size:13px;background:#eef0f4;color:#222;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* ── sidebar ── */
+.sidebar{width:196px;min-width:196px;background:#1c2135;color:#8892a4;display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid #2d3548}
+.sidebar-logo .brand{color:#fff;font-size:17px;font-weight:700;letter-spacing:.5px}
+.sidebar-logo .sub{color:#4e5a6e;font-size:10px;letter-spacing:1.5px;margin-top:3px}
+.nav-section{font-size:10px;font-weight:700;letter-spacing:1px;color:#4e5a6e;padding:14px 16px 5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 16px;color:#8892a4;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px}
+.nav-item:hover{color:#c5cad6;background:rgba(255,255,255,.04)}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.07);border-left-color:#e87040}
+
+/* ── main ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{background:#fff;border-bottom:1px solid #e0e2e8;padding:10px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.topbar-title{font-size:17px;font-weight:700;color:#1a1a2e}
+.badge{background:#6B2D1F;color:#fff;font-size:11px;padding:2px 9px;border-radius:10px;white-space:nowrap}
+.topbar-info{display:flex;gap:8px;margin-left:auto;font-size:12px;color:#6b7280;flex-wrap:wrap}
+.topbar-info span{background:#f3f4f6;padding:3px 10px;border-radius:4px;white-space:nowrap}
+.topbar-info span.ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.topbar-info span.warn{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.upload-btn{border:1px solid #d1d5db;border-radius:6px;padding:5px 13px;font-size:12px;cursor:pointer;color:#374151;background:#f9fafb;font-family:inherit;white-space:nowrap;transition:all .15s}
+.upload-btn:hover{background:#f3f4f6}
+.upload-btn.loaded{border-color:#16a34a;background:#f0fdf4;color:#15803d}
+
+.page-wrap{flex:1;overflow:auto;padding:14px 18px}
+.page{display:none}
+.page.active{display:block}
+
+/* ── view toggle ── */
+.view-toggle{display:flex;gap:4px;margin-bottom:11px}
+.view-btn{padding:6px 16px;border:1px solid #d1d5db;background:#fff;border-radius:20px;cursor:pointer;font-size:12px;font-family:inherit;color:#374151;transition:all .15s}
+.view-btn:hover{background:#f9fafb}
+.view-btn.active{background:#6B2D1F;color:#fff;border-color:#6B2D1F}
+
+/* ── office tabs ── */
+.office-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:11px}
+.office-tab{padding:5px 13px;border:1px solid #d1d5db;background:#fff;border-radius:20px;cursor:pointer;font-size:12px;font-family:inherit;color:#374151;transition:all .15s}
+.office-tab:hover{background:#f9fafb}
+.office-tab.active{background:#6B2D1F;color:#fff;border-color:#6B2D1F}
+
+/* ── cost input ── */
+.cost-box{background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:11px;overflow:hidden}
+.cost-toggle{padding:9px 16px;cursor:pointer;font-size:13px;color:#374151;display:flex;align-items:center;gap:6px;user-select:none;background:#fafafa;border-bottom:1px solid transparent}
+.cost-toggle:hover{background:#f3f4f6}
+.cost-toggle.open{border-bottom-color:#e5e7eb}
+.cost-body{display:none;padding:12px 16px 14px;overflow-x:auto}
+.cost-body.open{display:block}
+.cost-tbl{border-collapse:collapse;font-size:11px;white-space:nowrap}
+.cost-tbl th{background:#f9fafb;padding:4px 8px;border:1px solid #e5e7eb;font-weight:600;text-align:center;color:#374151}
+.cost-tbl td{border:1px solid #e5e7eb;padding:2px 3px;background:#fff}
+.cost-tbl td:first-child{padding:3px 8px;font-weight:500;background:#fafafa;text-align:center}
+.cost-tbl input{border:none;width:76px;padding:2px 4px;font-size:11px;font-family:inherit;text-align:right;outline:none;color:#222}
+.cost-tbl input:focus{background:#fffbf5;outline:1px solid #8B4513;border-radius:2px}
+
+/* ── data table ── */
+.tbl-wrap{overflow-x:auto;background:#fff;border:1px solid #e0e2e8;border-radius:8px}
+.dtbl{border-collapse:collapse;font-size:12px;white-space:nowrap}
+.dtbl th,.dtbl td{border:1px solid #d1d5db;padding:4px 8px;text-align:center}
+.dtbl thead th{background:#6B2D1F;color:#fff;font-weight:700;position:sticky;top:0;z-index:10}
+.dtbl thead th.th-total{background:#4a1e11}
+.dtbl thead th.th-label{text-align:left;min-width:130px;position:sticky;left:0;z-index:20}
+.dtbl td.td-label{text-align:left;font-weight:500;background:#fafafa;white-space:nowrap;position:sticky;left:0;z-index:5;border-right:2px solid #d1d5db}
+.dtbl td.td-sub{text-align:left;color:#6b7280;font-size:11px;padding-left:18px;background:#fafafa;position:sticky;left:0;z-index:5;border-right:2px solid #d1d5db}
+.dtbl td.td-total{background:#fff8f3;font-weight:600}
+.dtbl td.td-total.td-label{background:#fff0e8;font-weight:700;border-right:2px solid #c9a88a}
+.dtbl td.rate{font-size:11px;color:#6b7280}
+.dtbl td.rate-bad{font-size:11px;color:#dc2626;font-weight:700}
+.dtbl td.rate-ok{font-size:11px;color:#6b7280}
+
+/* section rows */
+.dtbl tr.sec-main td{background:#6B2D1F;color:#fff;font-weight:700}
+.dtbl tr.sec-attr td{background:#1e3a5f;color:#fff;font-weight:700}
+.dtbl tr.sec-funnel td{background:#7c4700;color:#fff;font-weight:700}
+.dtbl tr.sec-unit td{background:#1f3a1f;color:#fff;font-weight:700}
+.dtbl tr.highlight td.td-label,.dtbl tr.highlight td.td-sub{background:#fffbeb}
+.dtbl tr.highlight td{background:rgba(255,251,235,.45)}
+.dtbl tr.highlight td.td-total{background:#fff3c0}
+.dtbl td.empty{color:#d1d5db}
+
+/* star rank rows */
+.dtbl tr.rank-row td.td-label{padding-left:28px;font-weight:400;font-size:11px}
+
+/* ── MCG missing ── */
+.missing-box{background:#fff;border:1px solid #fca5a5;border-radius:8px;margin-top:11px}
+.missing-summary{padding:9px 16px;cursor:pointer;color:#dc2626;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.missing-inner{padding:0 16px 12px;overflow-x:auto}
+.missing-tbl{font-size:11px;border-collapse:collapse;width:100%}
+.missing-tbl th{background:#fef2f2;padding:4px 10px;border:1px solid #fca5a5;text-align:left;font-weight:600}
+.missing-tbl td{padding:4px 10px;border:1px solid #fecaca}
+
+/* ── empty state ── */
+.empty-state{text-align:center;padding:60px 20px;color:#9ca3af}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+.empty-state small{font-size:12px;color:#d1d5db}
+
+/* ── period info bar ── */
+.period-bar{background:#fffbf5;border:1px solid #f0d9c8;border-radius:8px;padding:8px 16px;margin-bottom:11px;font-size:12px;color:#7c4700;display:flex;align-items:center;gap:10px}
+.period-bar strong{color:#6B2D1F}
+</style>
+<script>window._EMBEDDED_DATA = {"version":"3ki","updatedDate":"2026/04/07 OFF分","totalRows":12805,"mcgRows":30267,"costData":{"仙台__2025-06":388124,"青森__2025-05":145621,"新宿__2025-05":1087469,"千葉__2025-05":350337,"横浜__2025-05":747055,"盛岡__2025-05":246065,"仙台__2025-05":401434,"新潟__2025-05":449333,"金沢__2025-05":372160,"名古屋__2025-05":761579,"京都__2025-05":379050,"梅田__2025-05":1188036,"神戸__2025-05":365392,"福岡__2025-05":394975,"鹿児島__2025-05":293142,"青森__2025-06":177896,"盛岡__2025-06":233167,"千葉__2025-06":396000,"新潟__2025-06":318620,"横浜__2025-06":683160,"新宿__2025-06":1017520,"金沢__2025-06":470060,"名古屋__2025-06":700160,"京都__2025-06":419760,"梅田__2025-06":1167020,"神戸__2025-06":326900,"福岡__2025-06":384040,"鹿児島__2025-06":301380,"青森__2025-07":173296,"盛岡__2025-07":222387,"仙台__2025-07":440226,"千葉__2025-07":411340,"横浜__2025-07":685160,"新宿__2025-07":1075280,"新潟__2025-07":348240,"金沢__2025-07":459240,"名古屋__2025-07":691760,"京都__2025-07":462400,"梅田__2025-07":1176000,"神戸__2025-07":613860,"福岡__2025-07":430880,"鹿児島__2025-07":370680,"青森__2025-08":122518,"盛岡__2025-08":247379,"仙台__2025-08":423294,"千葉__2025-08":229325,"横浜__2025-08":599907,"新宿__2025-08":691049,"新潟__2025-08":229600,"金沢__2025-08":243388,"名古屋__2025-08":459848,"京都__2025-08":239720,"梅田__2025-08":729761,"神戸__2025-08":309275,"福岡__2025-08":337280,"鹿児島__2025-08":287519,"青森__2025-09":147450,"盛岡__2025-09":353760,"仙台__2025-09":409920,"千葉__2025-09":626453,"横浜__2025-09":840413,"新宿__2025-09":1001093,"新潟__2025-09":329480,"金沢__2025-09":387340,"名古屋__2025-09":643510,"京都__2025-09":384080,"梅田__2025-09":814840,"神戸__2025-09":584340,"福岡__2025-09":447240,"鹿児島__2025-09":268290,"青森__2025-10":143300,"盛岡__2025-10":481853,"仙台__2025-10":378900,"千葉__2025-10":170000,"横浜__2025-10":325000,"新宿__2025-10":487750,"新潟__2025-10":485344,"金沢__2025-10":507153,"名古屋__2025-10":707994,"京都__2025-10":358744,"梅田__2025-10":485000,"神戸__2025-10":344200,"福岡__2025-10":489003,"鹿児島__2025-10":444753,"青森__2025-11":133450,"盛岡__2025-11":272850,"仙台__2025-11":483150,"新潟__2025-11":279400,"千葉__2025-11":340400,"新宿__2025-11":524150,"横浜__2025-11":420550,"金沢__2025-11":395800,"名古屋__2025-11":572500,"京都__2025-11":350000,"梅田__2025-11":700000,"神戸__2025-11":390000,"福岡__2025-11":360000,"鹿児島__2025-11":296300,"青森__2025-12":161000,"盛岡__2025-12":204472,"仙台__2025-12":328722,"千葉__2025-12":299472,"新潟__2025-12":254472,"新宿__2025-12":391466,"横浜__2025-12":308472,"金沢__2025-12":174472,"名古屋__2025-12":339472,"京都__2025-12":239472,"梅田__2025-12":510472,"神戸__2025-12":279472,"福岡__2025-12":251472,"鹿児島__2025-12":297972,"青森__2026-01":179000,"盛岡__2026-01":345774,"仙台__2026-01":308000,"新潟__2026-01":300000,"千葉__2026-01":210000,"新宿__2026-01":399500,"横浜__2026-01":225000,"金沢__2026-01":377200,"名古屋__2026-01":324500,"京都__2026-01":348000,"梅田__2026-01":583000,"神戸__2026-01":250000,"福岡__2026-01":374000,"鹿児島__2026-01":406000,"青森__2026-02":220352,"盛岡__2026-02":242502,"仙台__2026-02":378090,"新潟__2026-02":272640,"千葉__2026-02":270650,"新宿__2026-02":272000,"横浜__2026-02":491081,"金沢__2026-02":310324,"名古屋__2026-02":408363,"京都__2026-02":347705,"梅田__2026-02":665430,"神戸__2026-02":311741,"福岡__2026-02":404840,"鹿児島__2026-02":285392,"青森__2026-03":211252,"盛岡__2026-03":324992,"仙台__2026-03":499459,"新潟__2026-03":291259,"千葉__2026-03":355098,"横浜__2026-03":512963,"新宿__2026-03":779794,"金沢__2026-03":407390,"名古屋__2026-03":547089,"京都__2026-03":323562,"梅田__2026-03":830644,"神戸__2026-03":332077,"福岡__2026-03":529100,"鹿児島__2026-03":312100,"青森__2026-04":221548,"盛岡__2026-04":391939,"仙台__2026-04":659884,"千葉__2026-04":425708,"横浜__2026-04":598524,"新宿__2026-04":859481,"新潟__2026-04":374926,"金沢__2026-04":496866,"名古屋__2026-04":718623,"京都__2026-04":453834,"梅田__2026-04":889050,"神戸__2026-04":454790,"福岡__2026-04":549610,"鹿児島__2026-04":452347},"statsMatrix":{"青森":{"2025-5":{"total":0,"valid":1,"contacted":1,"qualified":1,"experienced":1,"neither":0,"lt":0,"under60":1,"nightShift":0,"selected":1,"rankA":0,"rankB":1,"rankC":0,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":145621},"2025-6":{"total":0,"valid":2,"contacted":2,"qualified":0,"experienced":2,"neither":0,"lt":2,"under60":2,"nightShift":1,"selected":2,"rankA":0,"rankB":2,"rankC":0,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":177896},"2025-7":{"total":0,"valid":8,"contacted":8,"qualified":4,"experienced":5,"neither":3,"lt":2,"under60":8,"nightShift":1,"selected":8,"rankA":1,"rankB":4,"rankC":0,"setN":3,"setA":0,"setB":2,"setC":0,"implN":3,"implA":0,"implB":2,"implC":0,"decidedN":3,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":173296},"2025-8":{"total":50,"valid":18,"contacted":18,"qualified":8,"experienced":4,"neither":10,"lt":3,"under60":13,"nightShift":1,"selected":18,"rankA":0,"rankB":3,"rankC":7,"setN":3,"setA":0,"setB":1,"setC":2,"implN":3,"implA":0,"implB":1,"implC":2,"decidedN":3,"decidedA":0,"decidedB":1,"decidedC":2,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":122518},"2025-9":{"total":46,"valid":22,"contacted":21,"qualified":10,"experienced":9,"neither":11,"lt":6,"under60":17,"nightShift":1,"selected":21,"rankA":5,"rankB":2,"rankC":5,"setN":1,"setA":0,"setB":0,"setC":1,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":147450},"2025-10":{"total":36,"valid":26,"contacted":24,"qualified":11,"experienced":7,"neither":15,"lt":9,"under60":17,"nightShift":3,"selected":24,"rankA":5,"rankB":2,"rankC":5,"setN":2,"setA":1,"setB":0,"setC":1,"implN":2,"implA":1,"implB":0,"implC":1,"decidedN":2,"decidedA":1,"decidedB":0,"decidedC":1,"startedN":1,"startedA":0,"startedB":0,"startedC":1,"cost":143300},"2025-11":{"total":26,"valid":12,"contacted":9,"qualified":4,"experienced":4,"neither":7,"lt":4,"under60":7,"nightShift":3,"selected":9,"rankA":0,"rankB":4,"rankC":1,"setN":3,"setA":0,"setB":2,"setC":0,"implN":3,"implA":0,"implB":2,"implC":0,"decidedN":1,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":1,"startedA":0,"startedB":0,"startedC":0,"cost":133450},"2025-12":{"total":22,"valid":20,"contacted":18,"qualified":9,"experienced":7,"neither":9,"lt":5,"under60":14,"nightShift":4,"selected":18,"rankA":2,"rankB":4,"rankC":5,"setN":5,"setA":1,"setB":2,"setC":1,"implN":5,"implA":1,"implB":2,"implC":1,"decidedN":5,"decidedA":1,"decidedB":2,"decidedC":1,"startedN":5,"startedA":1,"startedB":2,"startedC":1,"cost":161000},"2026-1":{"total":20,"valid":18,"contacted":18,"qualified":10,"experienced":11,"neither":6,"lt":8,"under60":15,"nightShift":6,"selected":18,"rankA":3,"rankB":7,"rankC":3,"setN":6,"setA":2,"setB":3,"setC":1,"implN":6,"implA":2,"implB":3,"implC":1,"decidedN":5,"decidedA":1,"decidedB":3,"decidedC":1,"startedN":4,"startedA":1,"startedB":2,"startedC":1,"cost":179000},"2026-2":{"total":21,"valid":21,"contacted":21,"qualified":11,"experienced":11,"neither":8,"lt":13,"under60":17,"nightShift":7,"selected":21,"rankA":4,"rankB":9,"rankC":2,"setN":7,"setA":3,"setB":3,"setC":1,"implN":6,"implA":2,"implB":3,"implC":1,"decidedN":5,"decidedA":2,"decidedB":3,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":220352},"2026-3":{"total":31,"valid":22,"contacted":21,"qualified":15,"experienced":11,"neither":6,"lt":10,"under60":15,"nightShift":7,"selected":21,"rankA":4,"rankB":8,"rankC":4,"setN":5,"setA":1,"setB":4,"setC":0,"implN":4,"implA":1,"implB":3,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":211252},"2026-4":{"total":9,"valid":6,"contacted":5,"qualified":3,"experienced":3,"neither":3,"lt":3,"under60":5,"nightShift":1,"selected":5,"rankA":2,"rankB":1,"rankC":1,"setN":2,"setA":0,"setB":1,"setC":1,"implN":2,"implA":0,"implB":1,"implC":1,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":221548}},"盛岡":{"2025-5":{"total":61,"valid":45,"contacted":40,"qualified":22,"experienced":22,"neither":19,"lt":21,"under60":37,"nightShift":14,"selected":40,"rankA":10,"rankB":8,"rankC":8,"setN":3,"setA":1,"setB":1,"setC":0,"implN":1,"implA":0,"implB":0,"implC":0,"decidedN":1,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":246065},"2025-6":{"total":64,"valid":40,"contacted":34,"qualified":17,"experienced":19,"neither":20,"lt":15,"under60":30,"nightShift":8,"selected":34,"rankA":9,"rankB":7,"rankC":4,"setN":8,"setA":4,"setB":2,"setC":0,"implN":6,"implA":3,"implB":1,"implC":0,"decidedN":5,"decidedA":2,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":233167},"2025-7":{"total":98,"valid":51,"contacted":47,"qualified":21,"experienced":22,"neither":23,"lt":19,"under60":41,"nightShift":7,"selected":47,"rankA":10,"rankB":7,"rankC":12,"setN":15,"setA":2,"setB":2,"setC":7,"implN":15,"implA":2,"implB":2,"implC":7,"decidedN":15,"decidedA":2,"decidedB":2,"decidedC":7,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":222387},"2025-8":{"total":49,"valid":17,"contacted":16,"qualified":11,"experienced":9,"neither":6,"lt":12,"under60":10,"nightShift":7,"selected":16,"rankA":3,"rankB":8,"rankC":0,"setN":2,"setA":0,"setB":2,"setC":0,"implN":2,"implA":0,"implB":2,"implC":0,"decidedN":2,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":247379},"2025-9":{"total":67,"valid":41,"contacted":39,"qualified":19,"experienced":23,"neither":17,"lt":26,"under60":28,"nightShift":8,"selected":39,"rankA":12,"rankB":8,"rankC":7,"setN":4,"setA":1,"setB":1,"setC":1,"implN":3,"implA":1,"implB":1,"implC":1,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":353760},"2025-10":{"total":73,"valid":33,"contacted":26,"qualified":16,"experienced":19,"neither":14,"lt":18,"under60":23,"nightShift":8,"selected":26,"rankA":7,"rankB":8,"rankC":7,"setN":2,"setA":1,"setB":0,"setC":0,"implN":2,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":481853},"2025-11":{"total":37,"valid":22,"contacted":13,"qualified":10,"experienced":9,"neither":10,"lt":8,"under60":17,"nightShift":2,"selected":13,"rankA":2,"rankB":5,"rankC":1,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":272850},"2025-12":{"total":30,"valid":14,"contacted":8,"qualified":3,"experienced":4,"neither":9,"lt":7,"under60":11,"nightShift":2,"selected":8,"rankA":2,"rankB":0,"rankC":3,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":204472},"2026-1":{"total":33,"valid":21,"contacted":18,"qualified":12,"experienced":11,"neither":7,"lt":11,"under60":16,"nightShift":9,"selected":18,"rankA":6,"rankB":5,"rankC":3,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":345774},"2026-2":{"total":30,"valid":16,"contacted":14,"qualified":6,"experienced":10,"neither":6,"lt":9,"under60":10,"nightShift":4,"selected":14,"rankA":3,"rankB":4,"rankC":4,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":242502},"2026-3":{"total":42,"valid":26,"contacted":21,"qualified":10,"experienced":8,"neither":16,"lt":13,"under60":19,"nightShift":2,"selected":21,"rankA":7,"rankB":2,"rankC":2,"setN":3,"setA":2,"setB":0,"setC":0,"implN":2,"implA":1,"implB":0,"implC":0,"decidedN":2,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":0,"startedB":0,"startedC":0,"cost":324992},"2026-4":{"total":7,"valid":6,"contacted":4,"qualified":2,"experienced":3,"neither":3,"lt":3,"under60":5,"nightShift":0,"selected":4,"rankA":1,"rankB":1,"rankC":2,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":391939}},"仙台":{"2025-5":{"total":104,"valid":42,"contacted":42,"qualified":20,"experienced":23,"neither":18,"lt":22,"under60":31,"nightShift":7,"selected":42,"rankA":9,"rankB":8,"rankC":12,"setN":11,"setA":3,"setB":2,"setC":4,"implN":10,"implA":3,"implB":1,"implC":4,"decidedN":8,"decidedA":2,"decidedB":1,"decidedC":4,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":401434},"2025-6":{"total":81,"valid":41,"contacted":39,"qualified":30,"experienced":21,"neither":11,"lt":26,"under60":32,"nightShift":10,"selected":39,"rankA":16,"rankB":6,"rankC":10,"setN":9,"setA":8,"setB":1,"setC":0,"implN":7,"implA":6,"implB":1,"implC":0,"decidedN":5,"decidedA":5,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":388124},"2025-7":{"total":80,"valid":46,"contacted":42,"qualified":28,"experienced":24,"neither":13,"lt":29,"under60":37,"nightShift":7,"selected":42,"rankA":13,"rankB":11,"rankC":8,"setN":4,"setA":2,"setB":2,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":440226},"2025-8":{"total":63,"valid":33,"contacted":28,"qualified":18,"experienced":17,"neither":12,"lt":16,"under60":23,"nightShift":9,"selected":28,"rankA":5,"rankB":9,"rankC":8,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":423294},"2025-9":{"total":75,"valid":52,"contacted":49,"qualified":31,"experienced":27,"neither":16,"lt":27,"under60":36,"nightShift":14,"selected":49,"rankA":10,"rankB":19,"rankC":6,"setN":6,"setA":2,"setB":3,"setC":0,"implN":5,"implA":2,"implB":2,"implC":0,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":409920},"2025-10":{"total":42,"valid":29,"contacted":28,"qualified":14,"experienced":11,"neither":12,"lt":15,"under60":22,"nightShift":5,"selected":28,"rankA":5,"rankB":8,"rankC":4,"setN":2,"setA":0,"setB":2,"setC":0,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":378900},"2025-11":{"total":93,"valid":49,"contacted":48,"qualified":23,"experienced":21,"neither":23,"lt":26,"under60":36,"nightShift":11,"selected":48,"rankA":11,"rankB":9,"rankC":9,"setN":5,"setA":1,"setB":1,"setC":2,"implN":4,"implA":1,"implB":0,"implC":2,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":483150},"2025-12":{"total":67,"valid":47,"contacted":46,"qualified":24,"experienced":19,"neither":23,"lt":28,"under60":32,"nightShift":14,"selected":46,"rankA":11,"rankB":8,"rankC":11,"setN":4,"setA":1,"setB":0,"setC":3,"implN":4,"implA":1,"implB":0,"implC":3,"decidedN":3,"decidedA":0,"decidedB":0,"decidedC":3,"startedN":1,"startedA":0,"startedB":0,"startedC":1,"cost":328722},"2026-1":{"total":82,"valid":51,"contacted":48,"qualified":27,"experienced":22,"neither":21,"lt":35,"under60":35,"nightShift":7,"selected":48,"rankA":12,"rankB":11,"rankC":14,"setN":8,"setA":4,"setB":1,"setC":3,"implN":6,"implA":3,"implB":1,"implC":2,"decidedN":4,"decidedA":3,"decidedB":0,"decidedC":1,"startedN":4,"startedA":3,"startedB":0,"startedC":1,"cost":308000},"2026-2":{"total":82,"valid":34,"contacted":32,"qualified":18,"experienced":19,"neither":12,"lt":21,"under60":26,"nightShift":6,"selected":32,"rankA":10,"rankB":9,"rankC":4,"setN":5,"setA":1,"setB":3,"setC":0,"implN":3,"implA":0,"implB":3,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":378090},"2026-3":{"total":88,"valid":44,"contacted":39,"qualified":21,"experienced":21,"neither":20,"lt":19,"under60":25,"nightShift":4,"selected":39,"rankA":7,"rankB":12,"rankC":5,"setN":7,"setA":2,"setB":3,"setC":0,"implN":5,"implA":2,"implB":1,"implC":0,"decidedN":5,"decidedA":2,"decidedB":1,"decidedC":0,"startedN":2,"startedA":1,"startedB":0,"startedC":0,"cost":499459},"2026-4":{"total":18,"valid":13,"contacted":12,"qualified":7,"experienced":6,"neither":5,"lt":6,"under60":8,"nightShift":3,"selected":12,"rankA":2,"rankB":4,"rankC":1,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":659884}},"千葉":{"2025-5":{"total":110,"valid":54,"contacted":52,"qualified":32,"experienced":33,"neither":15,"lt":30,"under60":33,"nightShift":17,"selected":52,"rankA":10,"rankB":19,"rankC":12,"setN":7,"setA":3,"setB":3,"setC":1,"implN":6,"implA":2,"implB":3,"implC":1,"decidedN":4,"decidedA":1,"decidedB":2,"decidedC":1,"startedN":2,"startedA":0,"startedB":2,"startedC":0,"cost":350337},"2025-6":{"total":110,"valid":43,"contacted":40,"qualified":27,"experienced":17,"neither":11,"lt":19,"under60":25,"nightShift":10,"selected":40,"rankA":8,"rankB":7,"rankC":14,"setN":2,"setA":0,"setB":0,"setC":1,"implN":2,"implA":0,"implB":0,"implC":1,"decidedN":2,"decidedA":0,"decidedB":0,"decidedC":1,"startedN":1,"startedA":0,"startedB":0,"startedC":1,"cost":396000},"2025-7":{"total":82,"valid":34,"contacted":30,"qualified":26,"experienced":19,"neither":8,"lt":18,"under60":20,"nightShift":17,"selected":30,"rankA":5,"rankB":13,"rankC":8,"setN":6,"setA":1,"setB":2,"setC":3,"implN":6,"implA":1,"implB":2,"implC":3,"decidedN":5,"decidedA":1,"decidedB":2,"decidedC":2,"startedN":4,"startedA":1,"startedB":1,"startedC":2,"cost":411340},"2025-8":{"total":91,"valid":36,"contacted":32,"qualified":26,"experienced":17,"neither":6,"lt":26,"under60":23,"nightShift":14,"selected":32,"rankA":8,"rankB":12,"rankC":6,"setN":2,"setA":1,"setB":1,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":229325},"2025-9":{"total":97,"valid":48,"contacted":43,"qualified":34,"experienced":27,"neither":10,"lt":21,"under60":34,"nightShift":9,"selected":43,"rankA":11,"rankB":11,"rankC":13,"setN":7,"setA":4,"setB":2,"setC":1,"implN":6,"implA":3,"implB":2,"implC":1,"decidedN":4,"decidedA":2,"decidedB":2,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":626453},"2025-10":{"total":33,"valid":21,"contacted":19,"qualified":16,"experienced":12,"neither":4,"lt":7,"under60":14,"nightShift":7,"selected":19,"rankA":3,"rankB":6,"rankC":7,"setN":2,"setA":1,"setB":1,"setC":0,"implN":2,"implA":1,"implB":1,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":170000},"2025-11":{"total":75,"valid":51,"contacted":48,"qualified":36,"experienced":28,"neither":11,"lt":23,"under60":31,"nightShift":20,"selected":48,"rankA":10,"rankB":13,"rankC":15,"setN":5,"setA":3,"setB":2,"setC":0,"implN":5,"implA":3,"implB":2,"implC":0,"decidedN":4,"decidedA":3,"decidedB":1,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":340400},"2025-12":{"total":32,"valid":17,"contacted":16,"qualified":15,"experienced":9,"neither":2,"lt":8,"under60":10,"nightShift":6,"selected":16,"rankA":4,"rankB":3,"rankC":6,"setN":3,"setA":1,"setB":0,"setC":1,"implN":3,"implA":1,"implB":0,"implC":1,"decidedN":3,"decidedA":1,"decidedB":0,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":299472},"2026-1":{"total":62,"valid":33,"contacted":32,"qualified":19,"experienced":19,"neither":9,"lt":20,"under60":23,"nightShift":10,"selected":32,"rankA":9,"rankB":9,"rankC":5,"setN":5,"setA":2,"setB":2,"setC":1,"implN":5,"implA":2,"implB":2,"implC":1,"decidedN":4,"decidedA":1,"decidedB":2,"decidedC":1,"startedN":3,"startedA":0,"startedB":2,"startedC":1,"cost":210000},"2026-2":{"total":34,"valid":25,"contacted":23,"qualified":15,"experienced":10,"neither":8,"lt":18,"under60":13,"nightShift":12,"selected":23,"rankA":4,"rankB":7,"rankC":7,"setN":3,"setA":1,"setB":2,"setC":0,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":270650},"2026-3":{"total":53,"valid":38,"contacted":38,"qualified":28,"experienced":24,"neither":9,"lt":23,"under60":27,"nightShift":22,"selected":38,"rankA":12,"rankB":11,"rankC":7,"setN":8,"setA":7,"setB":1,"setC":0,"implN":7,"implA":6,"implB":1,"implC":0,"decidedN":5,"decidedA":5,"decidedB":0,"decidedC":0,"startedN":4,"startedA":4,"startedB":0,"startedC":0,"cost":355098},"2026-4":{"total":6,"valid":8,"contacted":8,"qualified":7,"experienced":7,"neither":0,"lt":7,"under60":4,"nightShift":3,"selected":8,"rankA":3,"rankB":3,"rankC":2,"setN":3,"setA":3,"setB":0,"setC":0,"implN":3,"implA":3,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":425708}},"横浜":{"2025-5":{"total":140,"valid":68,"contacted":64,"qualified":56,"experienced":47,"neither":10,"lt":38,"under60":51,"nightShift":24,"selected":64,"rankA":20,"rankB":27,"rankC":12,"setN":8,"setA":3,"setB":4,"setC":1,"implN":8,"implA":3,"implB":4,"implC":1,"decidedN":4,"decidedA":1,"decidedB":2,"decidedC":1,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":747055},"2025-6":{"total":130,"valid":60,"contacted":53,"qualified":41,"experienced":31,"neither":17,"lt":26,"under60":36,"nightShift":20,"selected":53,"rankA":10,"rankB":17,"rankC":14,"setN":3,"setA":1,"setB":2,"setC":0,"implN":2,"implA":0,"implB":2,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":683160},"2025-7":{"total":123,"valid":72,"contacted":65,"qualified":49,"experienced":39,"neither":18,"lt":26,"under60":45,"nightShift":20,"selected":65,"rankA":15,"rankB":15,"rankC":17,"setN":11,"setA":2,"setB":4,"setC":4,"implN":10,"implA":2,"implB":4,"implC":3,"decidedN":7,"decidedA":2,"decidedB":3,"decidedC":2,"startedN":5,"startedA":1,"startedB":3,"startedC":1,"cost":685160},"2025-8":{"total":129,"valid":57,"contacted":50,"qualified":40,"experienced":29,"neither":16,"lt":28,"under60":31,"nightShift":14,"selected":50,"rankA":12,"rankB":14,"rankC":10,"setN":7,"setA":3,"setB":2,"setC":2,"implN":5,"implA":3,"implB":1,"implC":1,"decidedN":5,"decidedA":3,"decidedB":1,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":599907},"2025-9":{"total":120,"valid":59,"contacted":55,"qualified":39,"experienced":32,"neither":17,"lt":28,"under60":36,"nightShift":25,"selected":55,"rankA":13,"rankB":17,"rankC":9,"setN":7,"setA":7,"setB":0,"setC":0,"implN":5,"implA":5,"implB":0,"implC":0,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":840413},"2025-10":{"total":93,"valid":29,"contacted":27,"qualified":19,"experienced":18,"neither":7,"lt":18,"under60":22,"nightShift":7,"selected":27,"rankA":12,"rankB":4,"rankC":5,"setN":8,"setA":5,"setB":3,"setC":0,"implN":8,"implA":5,"implB":3,"implC":0,"decidedN":6,"decidedA":4,"decidedB":2,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":325000},"2025-11":{"total":82,"valid":40,"contacted":34,"qualified":29,"experienced":26,"neither":10,"lt":22,"under60":25,"nightShift":12,"selected":34,"rankA":15,"rankB":8,"rankC":6,"setN":9,"setA":9,"setB":0,"setC":0,"implN":6,"implA":6,"implB":0,"implC":0,"decidedN":5,"decidedA":5,"decidedB":0,"decidedC":0,"startedN":5,"startedA":5,"startedB":0,"startedC":0,"cost":420550},"2025-12":{"total":74,"valid":35,"contacted":33,"qualified":27,"experienced":26,"neither":7,"lt":18,"under60":25,"nightShift":6,"selected":33,"rankA":14,"rankB":9,"rankC":5,"setN":5,"setA":3,"setB":2,"setC":0,"implN":5,"implA":3,"implB":2,"implC":0,"decidedN":2,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":308472},"2026-1":{"total":86,"valid":38,"contacted":32,"qualified":24,"experienced":18,"neither":13,"lt":20,"under60":27,"nightShift":13,"selected":32,"rankA":12,"rankB":6,"rankC":7,"setN":3,"setA":3,"setB":0,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":225000},"2026-2":{"total":70,"valid":31,"contacted":30,"qualified":27,"experienced":25,"neither":2,"lt":19,"under60":15,"nightShift":20,"selected":30,"rankA":10,"rankB":7,"rankC":11,"setN":6,"setA":4,"setB":1,"setC":1,"implN":4,"implA":2,"implB":1,"implC":1,"decidedN":3,"decidedA":2,"decidedB":0,"decidedC":1,"startedN":3,"startedA":2,"startedB":0,"startedC":1,"cost":491081},"2026-3":{"total":71,"valid":40,"contacted":36,"qualified":29,"experienced":28,"neither":7,"lt":26,"under60":28,"nightShift":14,"selected":36,"rankA":13,"rankB":14,"rankC":6,"setN":10,"setA":5,"setB":5,"setC":0,"implN":8,"implA":5,"implB":3,"implC":0,"decidedN":7,"decidedA":5,"decidedB":2,"decidedC":0,"startedN":5,"startedA":3,"startedB":2,"startedC":0,"cost":512963},"2026-4":{"total":13,"valid":10,"contacted":7,"qualified":6,"experienced":5,"neither":3,"lt":4,"under60":6,"nightShift":5,"selected":7,"rankA":1,"rankB":3,"rankC":3,"setN":1,"setA":0,"setB":0,"setC":1,"implN":1,"implA":0,"implB":0,"implC":1,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":598524}},"新宿":{"2025-5":{"total":234,"valid":109,"contacted":94,"qualified":72,"experienced":62,"neither":28,"lt":64,"under60":83,"nightShift":36,"selected":94,"rankA":27,"rankB":28,"rankC":26,"setN":13,"setA":7,"setB":4,"setC":2,"implN":10,"implA":6,"implB":2,"implC":2,"decidedN":8,"decidedA":6,"decidedB":2,"decidedC":0,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":1087469},"2025-6":{"total":204,"valid":106,"contacted":90,"qualified":75,"experienced":59,"neither":26,"lt":55,"under60":75,"nightShift":37,"selected":90,"rankA":23,"rankB":36,"rankC":14,"setN":9,"setA":4,"setB":4,"setC":1,"implN":6,"implA":3,"implB":2,"implC":1,"decidedN":4,"decidedA":2,"decidedB":2,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":1017520},"2025-7":{"total":163,"valid":88,"contacted":79,"qualified":60,"experienced":43,"neither":22,"lt":47,"under60":66,"nightShift":35,"selected":79,"rankA":16,"rankB":30,"rankC":20,"setN":7,"setA":4,"setB":3,"setC":0,"implN":7,"implA":4,"implB":3,"implC":0,"decidedN":5,"decidedA":2,"decidedB":3,"decidedC":0,"startedN":4,"startedA":1,"startedB":3,"startedC":0,"cost":1075280},"2025-8":{"total":158,"valid":83,"contacted":75,"qualified":55,"experienced":45,"neither":22,"lt":46,"under60":42,"nightShift":22,"selected":75,"rankA":13,"rankB":26,"rankC":20,"setN":12,"setA":1,"setB":7,"setC":4,"implN":11,"implA":1,"implB":6,"implC":4,"decidedN":5,"decidedA":1,"decidedB":2,"decidedC":2,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":691049},"2025-9":{"total":133,"valid":72,"contacted":61,"qualified":40,"experienced":29,"neither":28,"lt":36,"under60":43,"nightShift":19,"selected":61,"rankA":12,"rankB":13,"rankC":19,"setN":1,"setA":0,"setB":1,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":1001093},"2025-10":{"total":130,"valid":59,"contacted":56,"qualified":45,"experienced":30,"neither":13,"lt":34,"under60":41,"nightShift":15,"selected":56,"rankA":12,"rankB":21,"rankC":13,"setN":10,"setA":4,"setB":5,"setC":1,"implN":9,"implA":3,"implB":5,"implC":1,"decidedN":5,"decidedA":2,"decidedB":2,"decidedC":1,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":487750},"2025-11":{"total":152,"valid":73,"contacted":65,"qualified":53,"experienced":37,"neither":16,"lt":48,"under60":48,"nightShift":30,"selected":65,"rankA":19,"rankB":19,"rankC":16,"setN":6,"setA":5,"setB":0,"setC":1,"implN":6,"implA":5,"implB":0,"implC":1,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":524150},"2025-12":{"total":122,"valid":54,"contacted":49,"qualified":38,"experienced":34,"neither":13,"lt":25,"under60":42,"nightShift":17,"selected":49,"rankA":16,"rankB":16,"rankC":6,"setN":7,"setA":5,"setB":1,"setC":0,"implN":6,"implA":5,"implB":1,"implC":0,"decidedN":4,"decidedA":3,"decidedB":1,"decidedC":0,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":391466},"2026-1":{"total":111,"valid":62,"contacted":52,"qualified":41,"experienced":34,"neither":20,"lt":31,"under60":43,"nightShift":19,"selected":52,"rankA":18,"rankB":16,"rankC":4,"setN":8,"setA":3,"setB":4,"setC":1,"implN":5,"implA":2,"implB":2,"implC":1,"decidedN":3,"decidedA":2,"decidedB":0,"decidedC":1,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":399500},"2026-2":{"total":97,"valid":52,"contacted":47,"qualified":31,"experienced":24,"neither":17,"lt":27,"under60":39,"nightShift":16,"selected":47,"rankA":10,"rankB":16,"rankC":6,"setN":7,"setA":3,"setB":3,"setC":1,"implN":5,"implA":1,"implB":3,"implC":1,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":272000},"2026-3":{"total":118,"valid":42,"contacted":36,"qualified":28,"experienced":20,"neither":9,"lt":24,"under60":31,"nightShift":12,"selected":36,"rankA":9,"rankB":13,"rankC":9,"setN":4,"setA":1,"setB":3,"setC":0,"implN":4,"implA":1,"implB":3,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":779794},"2026-4":{"total":42,"valid":18,"contacted":15,"qualified":12,"experienced":8,"neither":4,"lt":9,"under60":13,"nightShift":4,"selected":15,"rankA":3,"rankB":5,"rankC":6,"setN":1,"setA":1,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":859481}},"新潟":{"2025-5":{"total":71,"valid":32,"contacted":29,"qualified":19,"experienced":5,"neither":13,"lt":17,"under60":25,"nightShift":6,"selected":29,"rankA":3,"rankB":10,"rankC":7,"setN":5,"setA":0,"setB":4,"setC":0,"implN":4,"implA":0,"implB":3,"implC":0,"decidedN":3,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":2,"startedA":0,"startedB":1,"startedC":0,"cost":449333},"2025-6":{"total":59,"valid":26,"contacted":26,"qualified":17,"experienced":13,"neither":8,"lt":13,"under60":18,"nightShift":6,"selected":26,"rankA":3,"rankB":11,"rankC":4,"setN":5,"setA":1,"setB":3,"setC":0,"implN":5,"implA":1,"implB":3,"implC":0,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":3,"startedA":1,"startedB":2,"startedC":0,"cost":318620},"2025-7":{"total":42,"valid":18,"contacted":17,"qualified":15,"experienced":5,"neither":3,"lt":11,"under60":13,"nightShift":7,"selected":17,"rankA":2,"rankB":7,"rankC":5,"setN":4,"setA":1,"setB":1,"setC":2,"implN":3,"implA":0,"implB":1,"implC":2,"decidedN":2,"decidedA":0,"decidedB":1,"decidedC":1,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":348240},"2025-8":{"total":32,"valid":10,"contacted":10,"qualified":9,"experienced":5,"neither":0,"lt":8,"under60":6,"nightShift":3,"selected":10,"rankA":2,"rankB":5,"rankC":2,"setN":6,"setA":1,"setB":2,"setC":2,"implN":5,"implA":1,"implB":2,"implC":1,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":229600},"2025-9":{"total":39,"valid":19,"contacted":18,"qualified":13,"experienced":10,"neither":3,"lt":13,"under60":14,"nightShift":2,"selected":18,"rankA":3,"rankB":9,"rankC":4,"setN":4,"setA":0,"setB":3,"setC":1,"implN":3,"implA":0,"implB":2,"implC":1,"decidedN":2,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":329480},"2025-10":{"total":41,"valid":22,"contacted":19,"qualified":12,"experienced":11,"neither":6,"lt":13,"under60":13,"nightShift":4,"selected":19,"rankA":6,"rankB":3,"rankC":6,"setN":7,"setA":3,"setB":2,"setC":2,"implN":6,"implA":3,"implB":1,"implC":2,"decidedN":5,"decidedA":2,"decidedB":1,"decidedC":2,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":485344},"2025-11":{"total":55,"valid":18,"contacted":17,"qualified":11,"experienced":7,"neither":5,"lt":9,"under60":11,"nightShift":3,"selected":17,"rankA":1,"rankB":6,"rankC":6,"setN":4,"setA":0,"setB":3,"setC":0,"implN":2,"implA":0,"implB":2,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":279400},"2025-12":{"total":60,"valid":10,"contacted":8,"qualified":4,"experienced":2,"neither":5,"lt":4,"under60":5,"nightShift":2,"selected":8,"rankA":0,"rankB":3,"rankC":2,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":254472},"2026-1":{"total":44,"valid":17,"contacted":15,"qualified":8,"experienced":4,"neither":9,"lt":8,"under60":12,"nightShift":0,"selected":15,"rankA":1,"rankB":5,"rankC":3,"setN":1,"setA":0,"setB":1,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":300000},"2026-2":{"total":46,"valid":22,"contacted":21,"qualified":13,"experienced":10,"neither":6,"lt":13,"under60":14,"nightShift":3,"selected":21,"rankA":2,"rankB":9,"rankC":7,"setN":3,"setA":0,"setB":2,"setC":1,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":272640},"2026-3":{"total":56,"valid":19,"contacted":19,"qualified":14,"experienced":10,"neither":2,"lt":12,"under60":12,"nightShift":5,"selected":19,"rankA":4,"rankB":7,"rankC":4,"setN":5,"setA":2,"setB":2,"setC":0,"implN":4,"implA":2,"implB":2,"implC":0,"decidedN":4,"decidedA":2,"decidedB":2,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":291259},"2026-4":{"total":16,"valid":4,"contacted":4,"qualified":3,"experienced":1,"neither":1,"lt":0,"under60":2,"nightShift":2,"selected":4,"rankA":0,"rankB":1,"rankC":1,"setN":1,"setA":0,"setB":0,"setC":0,"implN":1,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":374926}},"金沢":{"2025-5":{"total":74,"valid":39,"contacted":35,"qualified":28,"experienced":25,"neither":10,"lt":19,"under60":26,"nightShift":11,"selected":35,"rankA":9,"rankB":14,"rankC":7,"setN":6,"setA":4,"setB":1,"setC":1,"implN":5,"implA":3,"implB":1,"implC":1,"decidedN":4,"decidedA":2,"decidedB":1,"decidedC":1,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":372160},"2025-6":{"total":46,"valid":31,"contacted":27,"qualified":16,"experienced":15,"neither":14,"lt":17,"under60":19,"nightShift":8,"selected":27,"rankA":7,"rankB":7,"rankC":4,"setN":4,"setA":2,"setB":2,"setC":0,"implN":2,"implA":1,"implB":1,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":470060},"2025-7":{"total":43,"valid":22,"contacted":21,"qualified":13,"experienced":13,"neither":7,"lt":9,"under60":17,"nightShift":9,"selected":21,"rankA":4,"rankB":7,"rankC":5,"setN":3,"setA":1,"setB":1,"setC":1,"implN":2,"implA":1,"implB":1,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":459240},"2025-8":{"total":32,"valid":18,"contacted":18,"qualified":10,"experienced":12,"neither":4,"lt":13,"under60":11,"nightShift":3,"selected":18,"rankA":4,"rankB":5,"rankC":6,"setN":5,"setA":1,"setB":2,"setC":1,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":243388},"2025-9":{"total":31,"valid":21,"contacted":20,"qualified":18,"experienced":16,"neither":3,"lt":13,"under60":15,"nightShift":10,"selected":20,"rankA":8,"rankB":7,"rankC":3,"setN":7,"setA":3,"setB":3,"setC":1,"implN":6,"implA":3,"implB":2,"implC":1,"decidedN":6,"decidedA":3,"decidedB":2,"decidedC":1,"startedN":4,"startedA":3,"startedB":0,"startedC":1,"cost":387340},"2025-10":{"total":56,"valid":29,"contacted":26,"qualified":15,"experienced":20,"neither":8,"lt":15,"under60":22,"nightShift":7,"selected":26,"rankA":8,"rankB":9,"rankC":5,"setN":7,"setA":5,"setB":1,"setC":1,"implN":6,"implA":5,"implB":0,"implC":1,"decidedN":4,"decidedA":3,"decidedB":0,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":507153},"2025-11":{"total":39,"valid":19,"contacted":16,"qualified":16,"experienced":14,"neither":3,"lt":13,"under60":10,"nightShift":6,"selected":16,"rankA":5,"rankB":9,"rankC":0,"setN":3,"setA":2,"setB":1,"setC":0,"implN":3,"implA":2,"implB":1,"implC":0,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":395800},"2025-12":{"total":20,"valid":11,"contacted":10,"qualified":8,"experienced":9,"neither":2,"lt":8,"under60":10,"nightShift":5,"selected":10,"rankA":6,"rankB":2,"rankC":2,"setN":2,"setA":1,"setB":1,"setC":0,"implN":2,"implA":1,"implB":1,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":174472},"2026-1":{"total":41,"valid":28,"contacted":22,"qualified":14,"experienced":14,"neither":12,"lt":17,"under60":19,"nightShift":6,"selected":22,"rankA":7,"rankB":6,"rankC":4,"setN":8,"setA":2,"setB":4,"setC":2,"implN":4,"implA":2,"implB":1,"implC":1,"decidedN":4,"decidedA":2,"decidedB":1,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":377200},"2026-2":{"total":35,"valid":17,"contacted":14,"qualified":13,"experienced":13,"neither":2,"lt":9,"under60":13,"nightShift":7,"selected":14,"rankA":4,"rankB":8,"rankC":2,"setN":7,"setA":1,"setB":4,"setC":2,"implN":5,"implA":1,"implB":4,"implC":0,"decidedN":4,"decidedA":1,"decidedB":3,"decidedC":0,"startedN":2,"startedA":0,"startedB":2,"startedC":0,"cost":310324},"2026-3":{"total":36,"valid":23,"contacted":17,"qualified":10,"experienced":10,"neither":12,"lt":12,"under60":13,"nightShift":4,"selected":17,"rankA":3,"rankB":6,"rankC":3,"setN":5,"setA":1,"setB":3,"setC":1,"implN":5,"implA":1,"implB":3,"implC":1,"decidedN":5,"decidedA":1,"decidedB":3,"decidedC":1,"startedN":2,"startedA":0,"startedB":2,"startedC":0,"cost":407390},"2026-4":{"total":6,"valid":3,"contacted":3,"qualified":3,"experienced":3,"neither":0,"lt":3,"under60":3,"nightShift":3,"selected":3,"rankA":3,"rankB":0,"rankC":0,"setN":2,"setA":2,"setB":0,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":496866}},"名古屋":{"2025-5":{"total":363,"valid":117,"contacted":99,"qualified":67,"experienced":61,"neither":40,"lt":45,"under60":77,"nightShift":15,"selected":99,"rankA":16,"rankB":36,"rankC":24,"setN":8,"setA":3,"setB":3,"setC":2,"implN":8,"implA":3,"implB":3,"implC":2,"decidedN":5,"decidedA":2,"decidedB":1,"decidedC":2,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":761579},"2025-6":{"total":387,"valid":73,"contacted":64,"qualified":43,"experienced":39,"neither":25,"lt":27,"under60":51,"nightShift":18,"selected":64,"rankA":13,"rankB":19,"rankC":17,"setN":1,"setA":0,"setB":1,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":700160},"2025-7":{"total":151,"valid":56,"contacted":46,"qualified":37,"experienced":27,"neither":15,"lt":26,"under60":38,"nightShift":9,"selected":46,"rankA":14,"rankB":7,"rankC":13,"setN":3,"setA":2,"setB":1,"setC":0,"implN":3,"implA":2,"implB":1,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":691760},"2025-8":{"total":119,"valid":62,"contacted":52,"qualified":39,"experienced":36,"neither":14,"lt":23,"under60":36,"nightShift":17,"selected":52,"rankA":11,"rankB":12,"rankC":16,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":459848},"2025-9":{"total":150,"valid":64,"contacted":57,"qualified":38,"experienced":39,"neither":16,"lt":34,"under60":40,"nightShift":9,"selected":57,"rankA":14,"rankB":14,"rankC":17,"setN":9,"setA":4,"setB":4,"setC":1,"implN":7,"implA":2,"implB":4,"implC":1,"decidedN":4,"decidedA":2,"decidedB":2,"decidedC":0,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":643510},"2025-10":{"total":128,"valid":55,"contacted":47,"qualified":32,"experienced":30,"neither":19,"lt":21,"under60":38,"nightShift":18,"selected":47,"rankA":10,"rankB":11,"rankC":12,"setN":4,"setA":3,"setB":0,"setC":1,"implN":2,"implA":1,"implB":0,"implC":1,"decidedN":2,"decidedA":1,"decidedB":0,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":707994},"2025-11":{"total":133,"valid":66,"contacted":56,"qualified":45,"experienced":44,"neither":18,"lt":37,"under60":48,"nightShift":15,"selected":56,"rankA":16,"rankB":22,"rankC":8,"setN":6,"setA":4,"setB":2,"setC":0,"implN":6,"implA":4,"implB":2,"implC":0,"decidedN":5,"decidedA":3,"decidedB":2,"decidedC":0,"startedN":3,"startedA":3,"startedB":0,"startedC":0,"cost":572500},"2025-12":{"total":83,"valid":36,"contacted":34,"qualified":20,"experienced":23,"neither":11,"lt":16,"under60":28,"nightShift":9,"selected":34,"rankA":8,"rankB":13,"rankC":4,"setN":7,"setA":3,"setB":3,"setC":0,"implN":5,"implA":2,"implB":2,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":339472},"2026-1":{"total":158,"valid":63,"contacted":56,"qualified":42,"experienced":45,"neither":14,"lt":31,"under60":45,"nightShift":24,"selected":56,"rankA":17,"rankB":19,"rankC":11,"setN":3,"setA":2,"setB":1,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":324500},"2026-2":{"total":92,"valid":43,"contacted":39,"qualified":27,"experienced":24,"neither":13,"lt":21,"under60":30,"nightShift":18,"selected":39,"rankA":9,"rankB":10,"rankC":11,"setN":2,"setA":0,"setB":1,"setC":1,"implN":2,"implA":0,"implB":1,"implC":1,"decidedN":2,"decidedA":0,"decidedB":1,"decidedC":1,"startedN":2,"startedA":0,"startedB":1,"startedC":1,"cost":408363},"2026-3":{"total":126,"valid":51,"contacted":48,"qualified":30,"experienced":32,"neither":14,"lt":26,"under60":36,"nightShift":13,"selected":48,"rankA":12,"rankB":14,"rankC":10,"setN":5,"setA":3,"setB":1,"setC":1,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":547089},"2026-4":{"total":23,"valid":13,"contacted":8,"qualified":7,"experienced":6,"neither":6,"lt":5,"under60":10,"nightShift":0,"selected":8,"rankA":4,"rankB":2,"rankC":1,"setN":0,"setA":0,"setB":0,"setC":0,"implN":0,"implA":0,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":718623}},"京都":{"2025-5":{"total":55,"valid":34,"contacted":33,"qualified":25,"experienced":23,"neither":5,"lt":14,"under60":23,"nightShift":9,"selected":33,"rankA":7,"rankB":12,"rankC":7,"setN":6,"setA":3,"setB":0,"setC":2,"implN":4,"implA":2,"implB":0,"implC":2,"decidedN":3,"decidedA":1,"decidedB":0,"decidedC":2,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":379050},"2025-6":{"total":27,"valid":15,"contacted":14,"qualified":7,"experienced":8,"neither":6,"lt":7,"under60":11,"nightShift":1,"selected":14,"rankA":2,"rankB":5,"rankC":3,"setN":2,"setA":0,"setB":1,"setC":1,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":419760},"2025-7":{"total":24,"valid":18,"contacted":18,"qualified":17,"experienced":16,"neither":1,"lt":10,"under60":11,"nightShift":6,"selected":18,"rankA":7,"rankB":6,"rankC":3,"setN":6,"setA":3,"setB":2,"setC":1,"implN":5,"implA":3,"implB":1,"implC":1,"decidedN":2,"decidedA":1,"decidedB":0,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":462400},"2025-8":{"total":42,"valid":16,"contacted":16,"qualified":12,"experienced":10,"neither":4,"lt":5,"under60":12,"nightShift":6,"selected":16,"rankA":3,"rankB":6,"rankC":3,"setN":3,"setA":1,"setB":2,"setC":0,"implN":2,"implA":1,"implB":1,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":239720},"2025-9":{"total":35,"valid":21,"contacted":18,"qualified":15,"experienced":17,"neither":4,"lt":9,"under60":11,"nightShift":7,"selected":18,"rankA":5,"rankB":5,"rankC":6,"setN":3,"setA":2,"setB":0,"setC":1,"implN":3,"implA":2,"implB":0,"implC":1,"decidedN":3,"decidedA":2,"decidedB":0,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":384080},"2025-10":{"total":55,"valid":32,"contacted":31,"qualified":20,"experienced":18,"neither":10,"lt":12,"under60":27,"nightShift":13,"selected":31,"rankA":7,"rankB":8,"rankC":9,"setN":9,"setA":4,"setB":3,"setC":2,"implN":8,"implA":4,"implB":2,"implC":2,"decidedN":7,"decidedA":4,"decidedB":2,"decidedC":1,"startedN":6,"startedA":3,"startedB":2,"startedC":1,"cost":358744},"2025-11":{"total":41,"valid":17,"contacted":17,"qualified":12,"experienced":10,"neither":3,"lt":4,"under60":11,"nightShift":4,"selected":17,"rankA":2,"rankB":5,"rankC":5,"setN":1,"setA":0,"setB":0,"setC":1,"implN":1,"implA":0,"implB":0,"implC":1,"decidedN":1,"decidedA":0,"decidedB":0,"decidedC":1,"startedN":1,"startedA":0,"startedB":0,"startedC":1,"cost":350000},"2025-12":{"total":35,"valid":19,"contacted":19,"qualified":10,"experienced":10,"neither":8,"lt":14,"under60":14,"nightShift":7,"selected":19,"rankA":7,"rankB":4,"rankC":1,"setN":5,"setA":3,"setB":1,"setC":0,"implN":5,"implA":3,"implB":1,"implC":0,"decidedN":4,"decidedA":2,"decidedB":1,"decidedC":0,"startedN":3,"startedA":2,"startedB":0,"startedC":0,"cost":239472},"2026-1":{"total":34,"valid":28,"contacted":25,"qualified":16,"experienced":15,"neither":10,"lt":13,"under60":22,"nightShift":7,"selected":25,"rankA":5,"rankB":12,"rankC":1,"setN":6,"setA":2,"setB":4,"setC":0,"implN":5,"implA":2,"implB":3,"implC":0,"decidedN":5,"decidedA":2,"decidedB":3,"decidedC":0,"startedN":3,"startedA":1,"startedB":2,"startedC":0,"cost":348000},"2026-2":{"total":19,"valid":14,"contacted":13,"qualified":11,"experienced":8,"neither":3,"lt":4,"under60":13,"nightShift":3,"selected":13,"rankA":4,"rankB":3,"rankC":4,"setN":4,"setA":2,"setB":1,"setC":1,"implN":3,"implA":1,"implB":1,"implC":1,"decidedN":3,"decidedA":1,"decidedB":1,"decidedC":1,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":347705},"2026-3":{"total":30,"valid":13,"contacted":13,"qualified":11,"experienced":11,"neither":2,"lt":9,"under60":8,"nightShift":3,"selected":13,"rankA":5,"rankB":5,"rankC":1,"setN":4,"setA":2,"setB":2,"setC":0,"implN":3,"implA":2,"implB":1,"implC":0,"decidedN":3,"decidedA":2,"decidedB":1,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":323562},"2026-4":{"total":5,"valid":5,"contacted":3,"qualified":4,"experienced":2,"neither":1,"lt":3,"under60":3,"nightShift":0,"selected":3,"rankA":1,"rankB":2,"rankC":0,"setN":3,"setA":1,"setB":2,"setC":0,"implN":3,"implA":1,"implB":2,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":453834}},"梅田":{"2025-5":{"total":203,"valid":93,"contacted":88,"qualified":67,"experienced":64,"neither":20,"lt":49,"under60":62,"nightShift":33,"selected":88,"rankA":27,"rankB":27,"rankC":18,"setN":12,"setA":6,"setB":6,"setC":0,"implN":12,"implA":6,"implB":6,"implC":0,"decidedN":4,"decidedA":2,"decidedB":2,"decidedC":0,"startedN":3,"startedA":1,"startedB":2,"startedC":0,"cost":1188036},"2025-6":{"total":152,"valid":74,"contacted":71,"qualified":49,"experienced":50,"neither":19,"lt":34,"under60":55,"nightShift":23,"selected":71,"rankA":21,"rankB":19,"rankC":16,"setN":14,"setA":8,"setB":4,"setC":1,"implN":13,"implA":7,"implB":4,"implC":1,"decidedN":8,"decidedA":3,"decidedB":3,"decidedC":1,"startedN":4,"startedA":3,"startedB":0,"startedC":1,"cost":1167020},"2025-7":{"total":140,"valid":82,"contacted":77,"qualified":61,"experienced":64,"neither":15,"lt":46,"under60":55,"nightShift":33,"selected":77,"rankA":27,"rankB":29,"rankC":9,"setN":25,"setA":13,"setB":11,"setC":1,"implN":21,"implA":11,"implB":9,"implC":1,"decidedN":14,"decidedA":9,"decidedB":4,"decidedC":1,"startedN":9,"startedA":5,"startedB":3,"startedC":1,"cost":1176000},"2025-8":{"total":129,"valid":65,"contacted":61,"qualified":39,"experienced":33,"neither":23,"lt":30,"under60":54,"nightShift":17,"selected":61,"rankA":16,"rankB":17,"rankC":9,"setN":9,"setA":6,"setB":3,"setC":0,"implN":7,"implA":5,"implB":2,"implC":0,"decidedN":6,"decidedA":5,"decidedB":1,"decidedC":0,"startedN":3,"startedA":3,"startedB":0,"startedC":0,"cost":729761},"2025-9":{"total":135,"valid":74,"contacted":65,"qualified":52,"experienced":50,"neither":16,"lt":37,"under60":48,"nightShift":21,"selected":65,"rankA":19,"rankB":19,"rankC":19,"setN":17,"setA":7,"setB":6,"setC":4,"implN":16,"implA":7,"implB":6,"implC":3,"decidedN":8,"decidedA":3,"decidedB":3,"decidedC":2,"startedN":4,"startedA":2,"startedB":2,"startedC":0,"cost":814840},"2025-10":{"total":139,"valid":86,"contacted":81,"qualified":57,"experienced":52,"neither":25,"lt":37,"under60":58,"nightShift":33,"selected":81,"rankA":20,"rankB":23,"rankC":18,"setN":10,"setA":6,"setB":2,"setC":2,"implN":7,"implA":4,"implB":1,"implC":2,"decidedN":5,"decidedA":3,"decidedB":1,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":485000},"2025-11":{"total":115,"valid":67,"contacted":62,"qualified":50,"experienced":43,"neither":15,"lt":32,"under60":43,"nightShift":25,"selected":62,"rankA":16,"rankB":21,"rankC":15,"setN":12,"setA":6,"setB":6,"setC":0,"implN":8,"implA":3,"implB":5,"implC":0,"decidedN":6,"decidedA":3,"decidedB":3,"decidedC":0,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":700000},"2025-12":{"total":98,"valid":61,"contacted":59,"qualified":40,"experienced":42,"neither":15,"lt":36,"under60":37,"nightShift":28,"selected":59,"rankA":18,"rankB":18,"rankC":10,"setN":12,"setA":5,"setB":7,"setC":0,"implN":12,"implA":5,"implB":7,"implC":0,"decidedN":6,"decidedA":3,"decidedB":3,"decidedC":0,"startedN":4,"startedA":3,"startedB":1,"startedC":0,"cost":510472},"2026-1":{"total":115,"valid":83,"contacted":79,"qualified":51,"experienced":49,"neither":27,"lt":45,"under60":60,"nightShift":32,"selected":79,"rankA":26,"rankB":19,"rankC":10,"setN":12,"setA":11,"setB":1,"setC":0,"implN":9,"implA":9,"implB":0,"implC":0,"decidedN":5,"decidedA":5,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":583000},"2026-2":{"total":110,"valid":73,"contacted":70,"qualified":48,"experienced":49,"neither":20,"lt":41,"under60":54,"nightShift":32,"selected":70,"rankA":22,"rankB":21,"rankC":12,"setN":20,"setA":12,"setB":4,"setC":4,"implN":20,"implA":12,"implB":4,"implC":4,"decidedN":14,"decidedA":9,"decidedB":3,"decidedC":2,"startedN":4,"startedA":2,"startedB":1,"startedC":1,"cost":665430},"2026-3":{"total":122,"valid":73,"contacted":69,"qualified":45,"experienced":48,"neither":20,"lt":39,"under60":45,"nightShift":37,"selected":69,"rankA":13,"rankB":25,"rankC":18,"setN":18,"setA":6,"setB":9,"setC":2,"implN":15,"implA":5,"implB":7,"implC":2,"decidedN":9,"decidedA":3,"decidedB":4,"decidedC":1,"startedN":4,"startedA":2,"startedB":0,"startedC":1,"cost":830644},"2026-4":{"total":29,"valid":17,"contacted":13,"qualified":10,"experienced":11,"neither":6,"lt":9,"under60":14,"nightShift":8,"selected":13,"rankA":4,"rankB":5,"rankC":2,"setN":1,"setA":0,"setB":1,"setC":0,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":889050}},"神戸":{"2025-5":{"total":171,"valid":60,"contacted":57,"qualified":47,"experienced":41,"neither":8,"lt":28,"under60":49,"nightShift":27,"selected":57,"rankA":14,"rankB":26,"rankC":7,"setN":4,"setA":2,"setB":2,"setC":0,"implN":3,"implA":1,"implB":2,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":365392},"2025-6":{"total":105,"valid":51,"contacted":48,"qualified":36,"experienced":37,"neither":11,"lt":25,"under60":30,"nightShift":21,"selected":48,"rankA":14,"rankB":14,"rankC":11,"setN":6,"setA":2,"setB":2,"setC":1,"implN":5,"implA":2,"implB":2,"implC":1,"decidedN":3,"decidedA":1,"decidedB":1,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":326900},"2025-7":{"total":103,"valid":58,"contacted":56,"qualified":47,"experienced":45,"neither":9,"lt":35,"under60":37,"nightShift":31,"selected":56,"rankA":21,"rankB":18,"rankC":9,"setN":9,"setA":7,"setB":1,"setC":1,"implN":8,"implA":7,"implB":0,"implC":1,"decidedN":4,"decidedA":3,"decidedB":0,"decidedC":1,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":613860},"2025-8":{"total":111,"valid":39,"contacted":38,"qualified":26,"experienced":25,"neither":8,"lt":18,"under60":28,"nightShift":14,"selected":38,"rankA":8,"rankB":11,"rankC":11,"setN":10,"setA":3,"setB":4,"setC":3,"implN":7,"implA":1,"implB":4,"implC":2,"decidedN":3,"decidedA":1,"decidedB":0,"decidedC":2,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":309275},"2025-9":{"total":84,"valid":41,"contacted":39,"qualified":23,"experienced":21,"neither":15,"lt":17,"under60":26,"nightShift":13,"selected":39,"rankA":7,"rankB":9,"rankC":11,"setN":5,"setA":2,"setB":1,"setC":1,"implN":4,"implA":1,"implB":1,"implC":1,"decidedN":1,"decidedA":0,"decidedB":0,"decidedC":1,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":584340},"2025-10":{"total":90,"valid":51,"contacted":49,"qualified":37,"experienced":33,"neither":12,"lt":27,"under60":38,"nightShift":28,"selected":49,"rankA":15,"rankB":16,"rankC":8,"setN":8,"setA":5,"setB":2,"setC":1,"implN":7,"implA":4,"implB":2,"implC":1,"decidedN":4,"decidedA":3,"decidedB":0,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":344200},"2025-11":{"total":95,"valid":38,"contacted":34,"qualified":28,"experienced":23,"neither":8,"lt":21,"under60":25,"nightShift":15,"selected":34,"rankA":10,"rankB":9,"rankC":10,"setN":2,"setA":2,"setB":0,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":390000},"2025-12":{"total":98,"valid":37,"contacted":33,"qualified":27,"experienced":26,"neither":8,"lt":21,"under60":25,"nightShift":16,"selected":33,"rankA":10,"rankB":14,"rankC":6,"setN":6,"setA":2,"setB":3,"setC":1,"implN":6,"implA":2,"implB":3,"implC":1,"decidedN":5,"decidedA":1,"decidedB":3,"decidedC":1,"startedN":2,"startedA":0,"startedB":2,"startedC":0,"cost":279472},"2026-1":{"total":101,"valid":44,"contacted":38,"qualified":28,"experienced":24,"neither":15,"lt":19,"under60":23,"nightShift":22,"selected":38,"rankA":8,"rankB":12,"rankC":6,"setN":3,"setA":1,"setB":2,"setC":0,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":250000},"2026-2":{"total":72,"valid":37,"contacted":30,"qualified":23,"experienced":23,"neither":12,"lt":20,"under60":27,"nightShift":19,"selected":30,"rankA":9,"rankB":11,"rankC":4,"setN":6,"setA":3,"setB":1,"setC":1,"implN":5,"implA":3,"implB":1,"implC":1,"decidedN":3,"decidedA":3,"decidedB":0,"decidedC":0,"startedN":3,"startedA":3,"startedB":0,"startedC":0,"cost":311741},"2026-3":{"total":52,"valid":22,"contacted":21,"qualified":16,"experienced":15,"neither":4,"lt":13,"under60":12,"nightShift":13,"selected":21,"rankA":7,"rankB":2,"rankC":9,"setN":4,"setA":3,"setB":1,"setC":0,"implN":3,"implA":3,"implB":0,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":332077},"2026-4":{"total":26,"valid":16,"contacted":15,"qualified":9,"experienced":9,"neither":6,"lt":9,"under60":8,"nightShift":4,"selected":15,"rankA":4,"rankB":5,"rankC":1,"setN":4,"setA":1,"setB":2,"setC":0,"implN":4,"implA":1,"implB":2,"implC":0,"decidedN":0,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":454790}},"福岡":{"2025-5":{"total":97,"valid":41,"contacted":39,"qualified":33,"experienced":33,"neither":5,"lt":21,"under60":36,"nightShift":14,"selected":39,"rankA":14,"rankB":18,"rankC":4,"setN":7,"setA":4,"setB":3,"setC":0,"implN":5,"implA":4,"implB":1,"implC":0,"decidedN":4,"decidedA":4,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":394975},"2025-6":{"total":112,"valid":56,"contacted":53,"qualified":39,"experienced":34,"neither":14,"lt":21,"under60":40,"nightShift":18,"selected":53,"rankA":9,"rankB":19,"rankC":13,"setN":3,"setA":1,"setB":2,"setC":0,"implN":3,"implA":1,"implB":2,"implC":0,"decidedN":2,"decidedA":1,"decidedB":1,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":384040},"2025-7":{"total":72,"valid":46,"contacted":43,"qualified":34,"experienced":33,"neither":10,"lt":23,"under60":31,"nightShift":21,"selected":43,"rankA":10,"rankB":21,"rankC":5,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":430880},"2025-8":{"total":73,"valid":36,"contacted":31,"qualified":26,"experienced":22,"neither":10,"lt":17,"under60":26,"nightShift":20,"selected":31,"rankA":11,"rankB":9,"rankC":5,"setN":4,"setA":4,"setB":0,"setC":0,"implN":3,"implA":3,"implB":0,"implC":0,"decidedN":3,"decidedA":3,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":337280},"2025-9":{"total":81,"valid":43,"contacted":42,"qualified":27,"experienced":28,"neither":12,"lt":20,"under60":34,"nightShift":15,"selected":42,"rankA":7,"rankB":18,"rankC":10,"setN":6,"setA":2,"setB":2,"setC":2,"implN":4,"implA":2,"implB":1,"implC":1,"decidedN":4,"decidedA":2,"decidedB":1,"decidedC":1,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":447240},"2025-10":{"total":81,"valid":44,"contacted":41,"qualified":27,"experienced":26,"neither":12,"lt":19,"under60":30,"nightShift":15,"selected":41,"rankA":9,"rankB":14,"rankC":8,"setN":6,"setA":4,"setB":2,"setC":0,"implN":4,"implA":3,"implB":1,"implC":0,"decidedN":4,"decidedA":3,"decidedB":1,"decidedC":0,"startedN":3,"startedA":2,"startedB":1,"startedC":0,"cost":489003},"2025-11":{"total":86,"valid":40,"contacted":35,"qualified":25,"experienced":23,"neither":15,"lt":16,"under60":27,"nightShift":13,"selected":35,"rankA":8,"rankB":15,"rankC":4,"setN":4,"setA":2,"setB":0,"setC":2,"implN":4,"implA":2,"implB":0,"implC":2,"decidedN":4,"decidedA":2,"decidedB":0,"decidedC":2,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":360000},"2025-12":{"total":58,"valid":24,"contacted":21,"qualified":14,"experienced":14,"neither":9,"lt":14,"under60":22,"nightShift":11,"selected":21,"rankA":9,"rankB":6,"rankC":1,"setN":2,"setA":2,"setB":0,"setC":0,"implN":2,"implA":2,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":251472},"2026-1":{"total":126,"valid":59,"contacted":50,"qualified":35,"experienced":36,"neither":19,"lt":28,"under60":45,"nightShift":26,"selected":50,"rankA":18,"rankB":15,"rankC":5,"setN":7,"setA":6,"setB":1,"setC":0,"implN":6,"implA":5,"implB":1,"implC":0,"decidedN":2,"decidedA":2,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":374000},"2026-2":{"total":70,"valid":38,"contacted":36,"qualified":25,"experienced":26,"neither":11,"lt":15,"under60":27,"nightShift":16,"selected":36,"rankA":9,"rankB":14,"rankC":4,"setN":1,"setA":1,"setB":0,"setC":0,"implN":1,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":1,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":404840},"2026-3":{"total":73,"valid":47,"contacted":44,"qualified":27,"experienced":26,"neither":15,"lt":23,"under60":36,"nightShift":22,"selected":44,"rankA":12,"rankB":16,"rankC":2,"setN":9,"setA":7,"setB":2,"setC":0,"implN":8,"implA":6,"implB":2,"implC":0,"decidedN":5,"decidedA":5,"decidedB":0,"decidedC":0,"startedN":2,"startedA":2,"startedB":0,"startedC":0,"cost":529100},"2026-4":{"total":18,"valid":10,"contacted":7,"qualified":5,"experienced":5,"neither":4,"lt":2,"under60":5,"nightShift":1,"selected":7,"rankA":1,"rankB":2,"rankC":1,"setN":2,"setA":1,"setB":0,"setC":0,"implN":2,"implA":1,"implB":0,"implC":0,"decidedN":1,"decidedA":0,"decidedB":0,"decidedC":0,"startedN":1,"startedA":0,"startedB":0,"startedC":0,"cost":549610}},"鹿児島":{"2025-5":{"total":50,"valid":33,"contacted":32,"qualified":23,"experienced":23,"neither":8,"lt":19,"under60":25,"nightShift":14,"selected":32,"rankA":8,"rankB":14,"rankC":6,"setN":8,"setA":0,"setB":5,"setC":3,"implN":6,"implA":0,"implB":4,"implC":2,"decidedN":3,"decidedA":0,"decidedB":2,"decidedC":1,"startedN":2,"startedA":0,"startedB":2,"startedC":0,"cost":293142},"2025-6":{"total":31,"valid":25,"contacted":25,"qualified":14,"experienced":18,"neither":6,"lt":15,"under60":17,"nightShift":5,"selected":25,"rankA":3,"rankB":11,"rankC":8,"setN":6,"setA":2,"setB":1,"setC":3,"implN":6,"implA":2,"implB":1,"implC":3,"decidedN":5,"decidedA":2,"decidedB":1,"decidedC":2,"startedN":5,"startedA":2,"startedB":1,"startedC":2,"cost":301380},"2025-7":{"total":47,"valid":22,"contacted":22,"qualified":16,"experienced":15,"neither":5,"lt":14,"under60":16,"nightShift":11,"selected":22,"rankA":8,"rankB":5,"rankC":5,"setN":7,"setA":2,"setB":2,"setC":3,"implN":7,"implA":2,"implB":2,"implC":3,"decidedN":3,"decidedA":0,"decidedB":2,"decidedC":1,"startedN":2,"startedA":0,"startedB":1,"startedC":1,"cost":370680},"2025-8":{"total":40,"valid":25,"contacted":24,"qualified":15,"experienced":14,"neither":8,"lt":14,"under60":17,"nightShift":9,"selected":24,"rankA":8,"rankB":6,"rankC":3,"setN":5,"setA":2,"setB":3,"setC":0,"implN":5,"implA":2,"implB":3,"implC":0,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":287519},"2025-9":{"total":48,"valid":24,"contacted":23,"qualified":15,"experienced":14,"neither":5,"lt":15,"under60":16,"nightShift":9,"selected":23,"rankA":6,"rankB":4,"rankC":9,"setN":4,"setA":4,"setB":0,"setC":0,"implN":4,"implA":4,"implB":0,"implC":0,"decidedN":3,"decidedA":3,"decidedB":0,"decidedC":0,"startedN":1,"startedA":1,"startedB":0,"startedC":0,"cost":268290},"2025-10":{"total":83,"valid":39,"contacted":38,"qualified":21,"experienced":15,"neither":15,"lt":13,"under60":31,"nightShift":22,"selected":38,"rankA":3,"rankB":12,"rankC":10,"setN":6,"setA":2,"setB":2,"setC":2,"implN":6,"implA":2,"implB":2,"implC":2,"decidedN":2,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":0,"startedA":0,"startedB":0,"startedC":0,"cost":444753},"2025-11":{"total":45,"valid":31,"contacted":26,"qualified":20,"experienced":14,"neither":10,"lt":17,"under60":21,"nightShift":10,"selected":26,"rankA":6,"rankB":7,"rankC":7,"setN":6,"setA":1,"setB":2,"setC":1,"implN":5,"implA":0,"implB":2,"implC":1,"decidedN":3,"decidedA":0,"decidedB":2,"decidedC":0,"startedN":3,"startedA":0,"startedB":2,"startedC":0,"cost":296300},"2025-12":{"total":40,"valid":24,"contacted":21,"qualified":13,"experienced":14,"neither":9,"lt":11,"under60":20,"nightShift":12,"selected":21,"rankA":4,"rankB":6,"rankC":6,"setN":4,"setA":2,"setB":1,"setC":1,"implN":4,"implA":2,"implB":1,"implC":1,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":297972},"2026-1":{"total":55,"valid":38,"contacted":35,"qualified":28,"experienced":25,"neither":9,"lt":18,"under60":29,"nightShift":21,"selected":35,"rankA":11,"rankB":8,"rankC":8,"setN":7,"setA":3,"setB":3,"setC":1,"implN":5,"implA":3,"implB":2,"implC":0,"decidedN":3,"decidedA":1,"decidedB":2,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":406000},"2026-2":{"total":45,"valid":19,"contacted":19,"qualified":12,"experienced":10,"neither":7,"lt":9,"under60":16,"nightShift":8,"selected":19,"rankA":6,"rankB":4,"rankC":2,"setN":4,"setA":2,"setB":2,"setC":0,"implN":4,"implA":2,"implB":2,"implC":0,"decidedN":3,"decidedA":2,"decidedB":1,"decidedC":0,"startedN":2,"startedA":1,"startedB":1,"startedC":0,"cost":285392},"2026-3":{"total":54,"valid":26,"contacted":23,"qualified":16,"experienced":15,"neither":7,"lt":10,"under60":22,"nightShift":10,"selected":23,"rankA":6,"rankB":8,"rankC":4,"setN":5,"setA":2,"setB":2,"setC":1,"implN":5,"implA":2,"implB":2,"implC":1,"decidedN":3,"decidedA":1,"decidedB":1,"decidedC":1,"startedN":2,"startedA":1,"startedB":0,"startedC":1,"cost":312100},"2026-4":{"total":11,"valid":8,"contacted":6,"qualified":4,"experienced":3,"neither":4,"lt":5,"under60":5,"nightShift":3,"selected":6,"rankA":2,"rankB":1,"rankC":2,"setN":1,"setA":0,"setB":1,"setC":0,"implN":1,"implA":0,"implB":1,"implC":0,"decidedN":1,"decidedA":0,"decidedB":1,"decidedC":0,"startedN":1,"startedA":0,"startedB":1,"startedC":0,"cost":452347}}}};</script></head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">+ホップ</div>
+    <div class="sub">MATCHING &amp; MANAGEMENT</div>
+  </div>
+  <div class="nav-section">メイン</div>
+  <div class="nav-item active" data-page="ninzai">👥 人材DB</div>
+  <div class="nav-item" data-page="shukyaku">📊 集客DB</div>
+  <div class="nav-section">分析</div>
+  <div class="nav-item" data-page="cpa">💰 広告費・CPA</div>
+  <div class="nav-item" data-page="leadtime">⏱️ リードタイム</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">人材ダッシュボード</span>
+    <span class="badge">3期通期 (2025年5月〜2026年4月)</span>
+    <button class="upload-btn loaded" id="btn-integrated" onclick="triggerUpload('integrated')">✅ 統合ツール (12805行)</button>
+    <button class="upload-btn loaded" id="btn-mcg" onclick="triggerUpload('mcg')">✅ MCG (30267行)</button>
+    <input type="file" id="inp-integrated" accept=".csv" style="display:none" onchange="loadCSV('integrated',this)">
+    <input type="file" id="inp-mcg" accept=".csv" style="display:none" onchange="loadCSV('mcg',this)">
+    <button class="upload-btn" id="btn-export" onclick="exportSharedHtml()" style="background:#1c2135;color:#fff;border-color:#1c2135" disabled="">⏳ 集計中...</button>
+    <div class="topbar-info">
+      <span id="info-integrated" class="ok">統合ツール: 12805行</span>
+      <span id="info-mcg" class="ok">MCG: 30267行</span>
+      <span id="info-match" style="" class="ok">マッチ: 9931/12805</span>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- 人材DB -->
+    <div id="page-ninzai" class="page active">
+      <div class="view-toggle">
+        <button class="view-btn active" id="vbtn-office" onclick="switchView('office')">🏢 オフィス別ビュー</button>
+        <button class="view-btn" id="vbtn-all" onclick="switchView('all')">📋 全オフィスビュー（通期合計）</button>
+      </div>
+
+      <!-- オフィス別 -->
+      <div id="view-office">
+        <div class="office-tabs" id="office-tabs"><button class="office-tab active" data-office="全オフィス" onclick="switchOffice('全オフィス')">全オフィス</button><button class="office-tab" data-office="青森" onclick="switchOffice('青森')">青森</button><button class="office-tab" data-office="盛岡" onclick="switchOffice('盛岡')">盛岡</button><button class="office-tab" data-office="仙台" onclick="switchOffice('仙台')">仙台</button><button class="office-tab" data-office="千葉" onclick="switchOffice('千葉')">千葉</button><button class="office-tab" data-office="横浜" onclick="switchOffice('横浜')">横浜</button><button class="office-tab" data-office="新宿" onclick="switchOffice('新宿')">新宿</button><button class="office-tab" data-office="新潟" onclick="switchOffice('新潟')">新潟</button><button class="office-tab" data-office="金沢" onclick="switchOffice('金沢')">金沢</button><button class="office-tab" data-office="名古屋" onclick="switchOffice('名古屋')">名古屋</button><button class="office-tab" data-office="京都" onclick="switchOffice('京都')">京都</button><button class="office-tab" data-office="梅田" onclick="switchOffice('梅田')">梅田</button><button class="office-tab" data-office="神戸" onclick="switchOffice('神戸')">神戸</button><button class="office-tab" data-office="福岡" onclick="switchOffice('福岡')">福岡</button><button class="office-tab" data-office="鹿児島" onclick="switchOffice('鹿児島')">鹿児島</button></div>
+        <div id="cost-office-wrap"><div class="cost-box"><div class="cost-toggle" id="cost-toggle-全オフィス" onclick="toggleCost('全オフィス')">▶ 集客費用を入力する（クリックで展開）</div><div class="cost-body" id="cost-body-全オフィス"><div class="cost-tbl-wrap"><table class="cost-tbl"><tbody><tr><th>オフィス / 月</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>計</th></tr><tr><td>青森</td><td><input type="text" inputmode="numeric" value="145621" placeholder="0" data-office="青森" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="青森" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-青森" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥2,036,683</td></tr><tr><td>盛岡</td><td><input type="text" inputmode="numeric" value="246065" placeholder="0" data-office="盛岡" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="盛岡" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-盛岡" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥3,567,140</td></tr><tr><td>仙台</td><td><input type="text" inputmode="numeric" value="401434" placeholder="0" data-office="仙台" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="仙台" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-仙台" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥5,099,203</td></tr><tr><td>千葉</td><td><input type="text" inputmode="numeric" value="350337" placeholder="0" data-office="千葉" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="千葉" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-千葉" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,084,783</td></tr><tr><td>横浜</td><td><input type="text" inputmode="numeric" value="747055" placeholder="0" data-office="横浜" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="横浜" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-横浜" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥6,437,285</td></tr><tr><td>新宿</td><td><input type="text" inputmode="numeric" value="1087469" placeholder="0" data-office="新宿" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新宿" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-新宿" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥8,586,552</td></tr><tr><td>新潟</td><td><input type="text" inputmode="numeric" value="449333" placeholder="0" data-office="新潟" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="新潟" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-新潟" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥3,933,314</td></tr><tr><td>金沢</td><td><input type="text" inputmode="numeric" value="372160" placeholder="0" data-office="金沢" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="金沢" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-金沢" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,601,393</td></tr><tr><td>名古屋</td><td><input type="text" inputmode="numeric" value="761579" placeholder="0" data-office="名古屋" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="名古屋" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-名古屋" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥6,875,398</td></tr><tr><td>京都</td><td><input type="text" inputmode="numeric" value="379050" placeholder="0" data-office="京都" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="京都" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-京都" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,306,327</td></tr><tr><td>梅田</td><td><input type="text" inputmode="numeric" value="1188036" placeholder="0" data-office="梅田" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="梅田" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-梅田" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥9,739,253</td></tr><tr><td>神戸</td><td><input type="text" inputmode="numeric" value="365392" placeholder="0" data-office="神戸" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="神戸" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-神戸" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,562,047</td></tr><tr><td>福岡</td><td><input type="text" inputmode="numeric" value="394975" placeholder="0" data-office="福岡" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="福岡" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-福岡" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,952,440</td></tr><tr><td>鹿児島</td><td><input type="text" inputmode="numeric" value="293142" placeholder="0" data-office="鹿児島" data-year="2025" data-month="5" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="6" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="7" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="8" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="9" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="10" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="11" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2025" data-month="12" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2026" data-month="1" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2026" data-month="2" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2026" data-month="3" oninput="onCostInput(this)" onfocus="this.select()"></td><td><input type="text" inputmode="numeric" value="" placeholder="0" data-office="鹿児島" data-year="2026" data-month="4" oninput="onCostInput(this)" onfocus="this.select()"></td><td id="cost-rowtotal-鹿児島" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">¥4,015,875</td></tr></tbody></table></div></div></div></div>
+        <div id="tbl-office-wrap"><div class="tbl-wrap"><table class="dtbl"><thead><tr><th class="th-label" style="min-width:150px">全オフィス（2025年5月〜2026年4月）</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th class="th-total">通期合計</th></tr></thead><tbody><tr class="sec-main"><td colspan="14"></td></tr><tr class=""><td class="td-label ">集客費用</td><td class="">¥7,181,648</td><td class="">¥6,983,807</td><td class="">¥7,560,749</td><td class="">¥5,149,863</td><td class="">¥7,238,209</td><td class="">¥5,808,994</td><td class="">¥5,518,550</td><td class="">¥4,040,880</td><td class="">¥4,629,974</td><td class="">¥4,881,110</td><td class="">¥6,256,779</td><td class="">¥7,547,130</td><td class="td-total ">¥72,797,693</td></tr><tr class=""><td class="td-label ">総応募</td><td class="">1733</td><td class="">1508</td><td class="">1168</td><td class="">1118</td><td class="">1141</td><td class="">1080</td><td class="">1074</td><td class="">839</td><td class="">1068</td><td class="">823</td><td class="">952</td><td class="">229</td><td class="td-total ">12733</td></tr><tr class="highlight"><td class="td-label ">有効応募</td><td class="">768</td><td class="">643</td><td class="">621</td><td class="">515</td><td class="">601</td><td class="">555</td><td class="">543</td><td class="">409</td><td class="">583</td><td class="">442</td><td class="">486</td><td class="">137</td><td class="td-total ">6303</td></tr><tr class=""><td class="td-label ">（有効率）70%未満↓</td><td class=""><span class="rate-bad">44.3%</span></td><td class=""><span class="rate-bad">42.6%</span></td><td class=""><span class="rate-bad">53.2%</span></td><td class=""><span class="rate-bad">46.1%</span></td><td class=""><span class="rate-bad">52.7%</span></td><td class=""><span class="rate-bad">51.4%</span></td><td class=""><span class="rate-bad">50.6%</span></td><td class=""><span class="rate-bad">48.7%</span></td><td class=""><span class="rate-bad">54.6%</span></td><td class=""><span class="rate-bad">53.7%</span></td><td class=""><span class="rate-bad">51.1%</span></td><td class=""><span class="rate-bad">59.8%</span></td><td class="td-total "><span class="rate-bad">49.5%</span></td></tr><tr class=""><td class="td-label ">接触数</td><td class="">705</td><td class="">586</td><td class="">571</td><td class="">469</td><td class="">550</td><td class="">512</td><td class="">480</td><td class="">375</td><td class="">520</td><td class="">409</td><td class="">445</td><td class="">110</td><td class="td-total ">5732</td></tr><tr class=""><td class="td-label ">（接触率）90%未満↓</td><td class=""><span class="rate-ok">91.8%</span></td><td class=""><span class="rate-ok">91.1%</span></td><td class=""><span class="rate-ok">91.9%</span></td><td class=""><span class="rate-ok">91.1%</span></td><td class=""><span class="rate-ok">91.5%</span></td><td class=""><span class="rate-ok">92.3%</span></td><td class=""><span class="rate-bad">88.4%</span></td><td class=""><span class="rate-ok">91.7%</span></td><td class=""><span class="rate-bad">89.2%</span></td><td class=""><span class="rate-ok">92.5%</span></td><td class=""><span class="rate-ok">91.6%</span></td><td class=""><span class="rate-bad">80.3%</span></td><td class="td-total "><span class="rate-ok">90.9%</span></td></tr><tr class="sec-attr"><td colspan="14">📋 有効応募 属性内訳</td></tr><tr class="highlight"><td class="td-label ">★資格アリ</td><td class="">512</td><td class="">411</td><td class="">428</td><td class="">334</td><td class="">374</td><td class="">342</td><td class="">362</td><td class="">252</td><td class="">355</td><td class="">280</td><td class="">300</td><td class="">82</td><td class="td-total ">4032</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">66.7%</span></td><td class=""><span class="rate-ok">63.9%</span></td><td class=""><span class="rate-ok">68.9%</span></td><td class=""><span class="rate-ok">64.9%</span></td><td class=""><span class="rate-ok">62.2%</span></td><td class=""><span class="rate-ok">61.6%</span></td><td class=""><span class="rate-ok">66.7%</span></td><td class=""><span class="rate-ok">61.6%</span></td><td class=""><span class="rate-ok">60.9%</span></td><td class=""><span class="rate-ok">63.3%</span></td><td class=""><span class="rate-ok">61.7%</span></td><td class=""><span class="rate-ok">59.9%</span></td><td class="td-total "><span class="rate-ok">64.0%</span></td></tr><tr class="highlight"><td class="td-label ">★経験アリ</td><td class="">463</td><td class="">363</td><td class="">370</td><td class="">278</td><td class="">342</td><td class="">302</td><td class="">303</td><td class="">239</td><td class="">327</td><td class="">262</td><td class="">279</td><td class="">72</td><td class="td-total ">3600</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">60.3%</span></td><td class=""><span class="rate-ok">56.5%</span></td><td class=""><span class="rate-ok">59.6%</span></td><td class=""><span class="rate-ok">54.0%</span></td><td class=""><span class="rate-ok">56.9%</span></td><td class=""><span class="rate-ok">54.4%</span></td><td class=""><span class="rate-ok">55.8%</span></td><td class=""><span class="rate-ok">58.4%</span></td><td class=""><span class="rate-ok">56.1%</span></td><td class=""><span class="rate-ok">59.3%</span></td><td class=""><span class="rate-ok">57.4%</span></td><td class=""><span class="rate-ok">52.6%</span></td><td class="td-total "><span class="rate-ok">57.1%</span></td></tr><tr class=""><td class="td-label ">なしなし</td><td class="">199</td><td class="">188</td><td class="">152</td><td class="">143</td><td class="">173</td><td class="">172</td><td class="">154</td><td class="">130</td><td class="">191</td><td class="">127</td><td class="">143</td><td class="">46</td><td class="td-total ">1818</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">25.9%</span></td><td class=""><span class="rate-ok">29.2%</span></td><td class=""><span class="rate-ok">24.5%</span></td><td class=""><span class="rate-ok">27.8%</span></td><td class=""><span class="rate-ok">28.8%</span></td><td class=""><span class="rate-ok">31.0%</span></td><td class=""><span class="rate-ok">28.4%</span></td><td class=""><span class="rate-ok">31.8%</span></td><td class=""><span class="rate-ok">32.8%</span></td><td class=""><span class="rate-ok">28.7%</span></td><td class=""><span class="rate-ok">29.4%</span></td><td class=""><span class="rate-ok">33.6%</span></td><td class="td-total "><span class="rate-ok">28.8%</span></td></tr><tr class="highlight"><td class="td-label ">★週3日以上 (LT)</td><td class="">387</td><td class="">302</td><td class="">315</td><td class="">259</td><td class="">302</td><td class="">258</td><td class="">280</td><td class="">215</td><td class="">304</td><td class="">239</td><td class="">259</td><td class="">68</td><td class="td-total ">3188</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">50.4%</span></td><td class=""><span class="rate-ok">47.0%</span></td><td class=""><span class="rate-ok">50.7%</span></td><td class=""><span class="rate-ok">50.3%</span></td><td class=""><span class="rate-ok">50.2%</span></td><td class=""><span class="rate-ok">46.5%</span></td><td class=""><span class="rate-ok">51.6%</span></td><td class=""><span class="rate-ok">52.6%</span></td><td class=""><span class="rate-ok">52.1%</span></td><td class=""><span class="rate-ok">54.1%</span></td><td class=""><span class="rate-ok">53.3%</span></td><td class=""><span class="rate-ok">49.6%</span></td><td class="td-total "><span class="rate-ok">50.6%</span></td></tr><tr class=""><td class="td-label ">週2日以下</td><td class="">381</td><td class="">341</td><td class="">306</td><td class="">256</td><td class="">299</td><td class="">297</td><td class="">263</td><td class="">194</td><td class="">279</td><td class="">203</td><td class="">227</td><td class="">69</td><td class="td-total ">3115</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">49.6%</span></td><td class=""><span class="rate-ok">53.0%</span></td><td class=""><span class="rate-ok">49.3%</span></td><td class=""><span class="rate-ok">49.7%</span></td><td class=""><span class="rate-ok">49.8%</span></td><td class=""><span class="rate-ok">53.5%</span></td><td class=""><span class="rate-ok">48.4%</span></td><td class=""><span class="rate-ok">47.4%</span></td><td class=""><span class="rate-ok">47.9%</span></td><td class=""><span class="rate-ok">45.9%</span></td><td class=""><span class="rate-ok">46.7%</span></td><td class=""><span class="rate-ok">50.4%</span></td><td class="td-total "><span class="rate-ok">49.4%</span></td></tr><tr class=""><td class="td-label ">60歳以上</td><td class="">209</td><td class="">202</td><td class="">186</td><td class="">183</td><td class="">203</td><td class="">159</td><td class="">183</td><td class="">114</td><td class="">169</td><td class="">128</td><td class="">157</td><td class="">46</td><td class="td-total ">1939</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">27.2%</span></td><td class=""><span class="rate-ok">31.4%</span></td><td class=""><span class="rate-ok">30.0%</span></td><td class=""><span class="rate-ok">35.5%</span></td><td class=""><span class="rate-ok">33.8%</span></td><td class=""><span class="rate-ok">28.6%</span></td><td class=""><span class="rate-ok">33.7%</span></td><td class=""><span class="rate-ok">27.9%</span></td><td class=""><span class="rate-ok">29.0%</span></td><td class=""><span class="rate-ok">29.0%</span></td><td class=""><span class="rate-ok">32.3%</span></td><td class=""><span class="rate-ok">33.6%</span></td><td class="td-total "><span class="rate-ok">30.8%</span></td></tr><tr class="highlight"><td class="td-label ">★60歳未満</td><td class="">559</td><td class="">441</td><td class="">435</td><td class="">332</td><td class="">398</td><td class="">396</td><td class="">360</td><td class="">295</td><td class="">414</td><td class="">314</td><td class="">329</td><td class="">91</td><td class="td-total ">4364</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">72.8%</span></td><td class=""><span class="rate-ok">68.6%</span></td><td class=""><span class="rate-ok">70.0%</span></td><td class=""><span class="rate-ok">64.5%</span></td><td class=""><span class="rate-ok">66.2%</span></td><td class=""><span class="rate-ok">71.4%</span></td><td class=""><span class="rate-ok">66.3%</span></td><td class=""><span class="rate-ok">72.1%</span></td><td class=""><span class="rate-ok">71.0%</span></td><td class=""><span class="rate-ok">71.0%</span></td><td class=""><span class="rate-ok">67.7%</span></td><td class=""><span class="rate-ok">66.4%</span></td><td class="td-total "><span class="rate-ok">69.2%</span></td></tr><tr class=""><td class="td-label ">夜勤専従希望</td><td class="">227</td><td class="">186</td><td class="">214</td><td class="">156</td><td class="">162</td><td class="">185</td><td class="">169</td><td class="">139</td><td class="">202</td><td class="">171</td><td class="">168</td><td class="">37</td><td class="td-total ">2016</td></tr><tr class=""><td class="td-label ">（割合）</td><td class=""><span class="rate-ok">29.6%</span></td><td class=""><span class="rate-ok">28.9%</span></td><td class=""><span class="rate-ok">34.5%</span></td><td class=""><span class="rate-ok">30.3%</span></td><td class=""><span class="rate-ok">27.0%</span></td><td class=""><span class="rate-ok">33.3%</span></td><td class=""><span class="rate-ok">31.1%</span></td><td class=""><span class="rate-ok">34.0%</span></td><td class=""><span class="rate-ok">34.6%</span></td><td class=""><span class="rate-ok">38.7%</span></td><td class=""><span class="rate-ok">34.6%</span></td><td class=""><span class="rate-ok">27.0%</span></td><td class="td-total "><span class="rate-ok">32.0%</span></td></tr><tr class="sec-funnel"><td colspan="14">🎯 人選・ファネル</td></tr><tr class=""><td class="td-label ">人選対象数</td><td class="">705</td><td class="">586</td><td class="">571</td><td class="">469</td><td class="">550</td><td class="">512</td><td class="">480</td><td class="">375</td><td class="">520</td><td class="">409</td><td class="">445</td><td class="">110</td><td class="td-total ">5732</td></tr><tr class=""><td class="td-label ">（有効応募からの割合）</td><td class=""><span class="rate-ok">91.8%</span></td><td class=""><span class="rate-ok">91.1%</span></td><td class=""><span class="rate-ok">91.9%</span></td><td class=""><span class="rate-ok">91.1%</span></td><td class=""><span class="rate-ok">91.5%</span></td><td class=""><span class="rate-ok">92.3%</span></td><td class=""><span class="rate-ok">88.4%</span></td><td class=""><span class="rate-ok">91.7%</span></td><td class=""><span class="rate-ok">89.2%</span></td><td class=""><span class="rate-ok">92.5%</span></td><td class=""><span class="rate-ok">91.6%</span></td><td class=""><span class="rate-ok">80.3%</span></td><td class="td-total "><span class="rate-ok">90.9%</span></td></tr><tr class="rank-row"><td class="td-sub ">★★★★</td><td class="">174</td><td class="">138</td><td class="">153</td><td class="">104</td><td class="">132</td><td class="">122</td><td class="">121</td><td class="">111</td><td class="">153</td><td class="">106</td><td class="">114</td><td class="">31</td><td class="td-total ">1459</td></tr><tr class="rank-row"><td class="td-sub ">★★★☆</td><td class="">248</td><td class="">180</td><td class="">180</td><td class="">143</td><td class="">155</td><td class="">145</td><td class="">152</td><td class="">106</td><td class="">150</td><td class="">132</td><td class="">143</td><td class="">35</td><td class="td-total ">1769</td></tr><tr class="rank-row"><td class="td-sub ">★★☆☆</td><td class="">150</td><td class="">132</td><td class="">119</td><td class="">106</td><td class="">138</td><td class="">117</td><td class="">103</td><td class="">68</td><td class="">84</td><td class="">80</td><td class="">84</td><td class="">23</td><td class="td-total ">1204</td></tr><tr class="highlight"><td class="td-label ">設定数</td><td class="">98</td><td class="">72</td><td class="">104</td><td class="">69</td><td class="">81</td><td class="">83</td><td class="">66</td><td class="">63</td><td class="">78</td><td class="">76</td><td class="">92</td><td class="">22</td><td class="td-total ">904</td></tr><tr class=""><td class="td-label ">（設定率 / 有効応募比）</td><td class=""><span class="rate-ok">12.8%</span></td><td class=""><span class="rate-ok">11.2%</span></td><td class=""><span class="rate-ok">16.7%</span></td><td class=""><span class="rate-ok">13.4%</span></td><td class=""><span class="rate-ok">13.5%</span></td><td class=""><span class="rate-ok">15.0%</span></td><td class=""><span class="rate-ok">12.2%</span></td><td class=""><span class="rate-ok">15.4%</span></td><td class=""><span class="rate-ok">13.4%</span></td><td class=""><span class="rate-ok">17.2%</span></td><td class=""><span class="rate-ok">18.9%</span></td><td class=""><span class="rate-ok">16.1%</span></td><td class="td-total "><span class="rate-ok">14.3%</span></td></tr><tr class="rank-row"><td class="td-sub ">★★★★</td><td class="">39</td><td class="">33</td><td class="">41</td><td class="">24</td><td class="">38</td><td class="">44</td><td class="">35</td><td class="">30</td><td class="">42</td><td class="">34</td><td class="">44</td><td class="">10</td><td class="td-total ">414</td></tr><tr class="rank-row"><td class="td-sub ">★★★☆</td><td class="">38</td><td class="">25</td><td class="">34</td><td class="">29</td><td class="">26</td><td class="">25</td><td class="">19</td><td class="">21</td><td class="">27</td><td class="">27</td><td class="">38</td><td class="">7</td><td class="td-total ">316</td></tr><tr class="rank-row"><td class="td-sub ">★★☆☆</td><td class="">16</td><td class="">8</td><td class="">23</td><td class="">14</td><td class="">14</td><td class="">13</td><td class="">7</td><td class="">7</td><td class="">9</td><td class="">13</td><td class="">5</td><td class="">2</td><td class="td-total ">131</td></tr><tr class=""><td class="td-label ">実施数</td><td class="">82</td><td class="">58</td><td class="">93</td><td class="">52</td><td class="">66</td><td class="">70</td><td class="">55</td><td class="">60</td><td class="">57</td><td class="">61</td><td class="">75</td><td class="">21</td><td class="td-total ">750</td></tr><tr class=""><td class="td-label ">（実施率 / 設定比）</td><td class=""><span class="rate-ok">83.7%</span></td><td class=""><span class="rate-ok">80.6%</span></td><td class=""><span class="rate-ok">89.4%</span></td><td class=""><span class="rate-ok">75.4%</span></td><td class=""><span class="rate-ok">81.5%</span></td><td class=""><span class="rate-ok">84.3%</span></td><td class=""><span class="rate-ok">83.3%</span></td><td class=""><span class="rate-ok">95.2%</span></td><td class=""><span class="rate-ok">73.1%</span></td><td class=""><span class="rate-ok">80.3%</span></td><td class=""><span class="rate-ok">81.5%</span></td><td class=""><span class="rate-ok">95.5%</span></td><td class="td-total "><span class="rate-ok">83.0%</span></td></tr><tr class="rank-row"><td class="td-sub ">★★★★</td><td class="">33</td><td class="">26</td><td class="">38</td><td class="">19</td><td class="">32</td><td class="">37</td><td class="">28</td><td class="">29</td><td class="">35</td><td class="">26</td><td class="">39</td><td class="">9</td><td class="td-total ">351</td></tr><tr class="rank-row"><td class="td-sub ">★★★☆</td><td class="">30</td><td class="">20</td><td class="">28</td><td class="">22</td><td class="">21</td><td class="">19</td><td class="">16</td><td class="">20</td><td class="">16</td><td class="">25</td><td class="">28</td><td class="">7</td><td class="td-total ">252</td></tr><tr class="rank-row"><td class="td-sub ">★★☆☆</td><td class="">15</td><td class="">7</td><td class="">21</td><td class="">10</td><td class="">11</td><td class="">13</td><td class="">7</td><td class="">7</td><td class="">6</td><td class="">10</td><td class="">4</td><td class="">2</td><td class="td-total ">113</td></tr><tr class=""><td class="td-label ">決定数</td><td class="">53</td><td class="">40</td><td class="">65</td><td class="">36</td><td class="">41</td><td class="">49</td><td class="">35</td><td class="">38</td><td class="">40</td><td class="">44</td><td class="">54</td><td class="">5</td><td class="td-total ">500</td></tr><tr class=""><td class="td-label ">（決定率 / 実施比）</td><td class=""><span class="rate-ok">64.6%</span></td><td class=""><span class="rate-ok">69.0%</span></td><td class=""><span class="rate-ok">69.9%</span></td><td class=""><span class="rate-ok">69.2%</span></td><td class=""><span class="rate-ok">62.1%</span></td><td class=""><span class="rate-ok">70.0%</span></td><td class=""><span class="rate-ok">63.6%</span></td><td class=""><span class="rate-ok">63.3%</span></td><td class=""><span class="rate-ok">70.2%</span></td><td class=""><span class="rate-ok">72.1%</span></td><td class=""><span class="rate-ok">72.0%</span></td><td class=""><span class="rate-ok">23.8%</span></td><td class="td-total "><span class="rate-ok">66.7%</span></td></tr><tr class="rank-row"><td class="td-sub ">★★★★</td><td class="">22</td><td class="">18</td><td class="">24</td><td class="">17</td><td class="">20</td><td class="">28</td><td class="">21</td><td class="">14</td><td class="">23</td><td class="">23</td><td class="">31</td><td class="">3</td><td class="td-total ">244</td></tr><tr class="rank-row"><td class="td-sub ">★★★☆</td><td class="">16</td><td class="">13</td><td class="">20</td><td class="">12</td><td class="">15</td><td class="">12</td><td class="">9</td><td class="">15</td><td class="">12</td><td class="">16</td><td class="">16</td><td class="">1</td><td class="td-total ">157</td></tr><tr class="rank-row"><td class="td-sub ">★★☆☆</td><td class="">12</td><td class="">5</td><td class="">16</td><td class="">7</td><td class="">6</td><td class="">9</td><td class="">3</td><td class="">6</td><td class="">5</td><td class="">5</td><td class="">3</td><td class="">0</td><td class="td-total ">77</td></tr><tr class="highlight"><td class="td-label ">開始数</td><td class="">24</td><td class="">20</td><td class="">28</td><td class="">12</td><td class="">22</td><td class="">21</td><td class="">23</td><td class="">21</td><td class="">25</td><td class="">23</td><td class="">29</td><td class="">4</td><td class="td-total ">252</td></tr><tr class=""><td class="td-label ">（開始率 / 人選対象比）</td><td class=""><span class="rate-ok">3.4%</span></td><td class=""><span class="rate-ok">3.4%</span></td><td class=""><span class="rate-ok">4.9%</span></td><td class=""><span class="rate-ok">2.6%</span></td><td class=""><span class="rate-ok">4.0%</span></td><td class=""><span class="rate-ok">4.1%</span></td><td class=""><span class="rate-ok">4.8%</span></td><td class=""><span class="rate-ok">5.6%</span></td><td class=""><span class="rate-ok">4.8%</span></td><td class=""><span class="rate-ok">5.6%</span></td><td class=""><span class="rate-ok">6.5%</span></td><td class=""><span class="rate-ok">3.6%</span></td><td class="td-total "><span class="rate-ok">4.4%</span></td></tr><tr class="rank-row"><td class="td-sub ">★★★★</td><td class="">11</td><td class="">9</td><td class="">11</td><td class="">8</td><td class="">13</td><td class="">10</td><td class="">16</td><td class="">9</td><td class="">14</td><td class="">12</td><td class="">18</td><td class="">2</td><td class="td-total ">133</td></tr><tr class="rank-row"><td class="td-sub ">★★★☆</td><td class="">12</td><td class="">6</td><td class="">12</td><td class="">2</td><td class="">7</td><td class="">6</td><td class="">4</td><td class="">8</td><td class="">8</td><td class="">8</td><td class="">6</td><td class="">1</td><td class="td-total ">80</td></tr><tr class="rank-row"><td class="td-sub ">★★☆☆</td><td class="">0</td><td class="">5</td><td class="">5</td><td class="">2</td><td class="">2</td><td class="">5</td><td class="">1</td><td class="">2</td><td class="">3</td><td class="">3</td><td class="">2</td><td class="">0</td><td class="td-total ">30</td></tr><tr class="sec-unit"><td colspan="14">💰 単価一覧（集客費用÷件数）</td></tr><tr class=""><td class="td-label ">総応募 単価</td><td class="">¥4,144</td><td class="">¥4,631</td><td class="">¥6,473</td><td class="">¥4,606</td><td class="">¥6,344</td><td class="">¥5,379</td><td class="">¥5,138</td><td class="">¥4,816</td><td class="">¥4,335</td><td class="">¥5,931</td><td class="">¥6,572</td><td class="">¥32,957</td><td class="td-total ">¥5,717</td></tr><tr class=""><td class="td-label ">有効応募 単価</td><td class="">¥9,351</td><td class="">¥10,861</td><td class="">¥12,175</td><td class="">¥10,000</td><td class="">¥12,044</td><td class="">¥10,467</td><td class="">¥10,163</td><td class="">¥9,880</td><td class="">¥7,942</td><td class="">¥11,043</td><td class="">¥12,874</td><td class="">¥55,089</td><td class="td-total ">¥11,550</td></tr><tr class=""><td class="td-label ">人選対象 単価</td><td class="">¥10,187</td><td class="">¥11,918</td><td class="">¥13,241</td><td class="">¥10,981</td><td class="">¥13,160</td><td class="">¥11,346</td><td class="">¥11,497</td><td class="">¥10,776</td><td class="">¥8,904</td><td class="">¥11,934</td><td class="">¥14,060</td><td class="">¥68,610</td><td class="td-total ">¥12,700</td></tr><tr class=""><td class="td-label ">設定 単価</td><td class="">¥73,282</td><td class="">¥96,997</td><td class="">¥72,700</td><td class="">¥74,636</td><td class="">¥89,361</td><td class="">¥69,988</td><td class="">¥83,614</td><td class="">¥64,141</td><td class="">¥59,359</td><td class="">¥64,225</td><td class="">¥68,008</td><td class="">¥343,051</td><td class="td-total ">¥80,528</td></tr><tr class=""><td class="td-label ">実施 単価</td><td class="">¥87,581</td><td class="">¥120,410</td><td class="">¥81,298</td><td class="">¥99,036</td><td class="">¥109,670</td><td class="">¥82,986</td><td class="">¥100,337</td><td class="">¥67,348</td><td class="">¥81,228</td><td class="">¥80,018</td><td class="">¥83,424</td><td class="">¥359,387</td><td class="td-total ">¥97,064</td></tr><tr class=""><td class="td-label ">決定 単価</td><td class="">¥135,503</td><td class="">¥174,595</td><td class="">¥116,319</td><td class="">¥143,052</td><td class="">¥176,542</td><td class="">¥118,551</td><td class="">¥157,673</td><td class="">¥106,339</td><td class="">¥115,749</td><td class="">¥110,934</td><td class="">¥115,866</td><td class="">¥1,509,426</td><td class="td-total ">¥145,595</td></tr><tr class="highlight"><td class="td-label ">開始 単価</td><td class="">¥299,235</td><td class="">¥349,190</td><td class="">¥270,027</td><td class="">¥429,155</td><td class="">¥329,010</td><td class="">¥276,619</td><td class="">¥239,937</td><td class="">¥192,423</td><td class="">¥185,199</td><td class="">¥212,222</td><td class="">¥215,751</td><td class="">¥1,886,783</td><td class="td-total ">¥288,880</td></tr></tbody></table></div></div>
+        <div id="missing-office-wrap"></div>
+      </div>
+
+      <!-- 全オフィス通期 -->
+      <div id="view-all" style="display:none">
+        <div class="period-bar">
+          <strong>3期通期 合計</strong>　2025年5月〜2026年4月（12ヶ月）　各オフィス×通期の集計です
+        </div>
+        <div id="cost-all-wrap"></div>
+        <div id="tbl-all-wrap"></div>
+      </div>
+    </div>
+
+    <!-- 集客DB（簡易） -->
+    <div id="page-shukyaku" class="page">
+      <div class="empty-state">
+        <div class="icon">📊</div>
+        <p>集客DBは人材DBタブでCSVを読み込むと自動反映されます</p>
+        <small>媒体別集計は今後対応予定</small>
+      </div>
+    </div>
+
+    <!-- CPA -->
+    <div id="page-cpa" class="page">
+      <div id="tbl-cpa-wrap"></div>
+    </div>
+
+    <!-- リードタイム -->
+    <div id="page-leadtime" class="page">
+      <div id="tbl-lt-wrap"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════
+   CONSTANTS
+═══════════════════════════════ */
+const FISCAL_MONTHS = [
+  {year:2025,month:5,label:'5月'},{year:2025,month:6,label:'6月'},
+  {year:2025,month:7,label:'7月'},{year:2025,month:8,label:'8月'},
+  {year:2025,month:9,label:'9月'},{year:2025,month:10,label:'10月'},
+  {year:2025,month:11,label:'11月'},{year:2025,month:12,label:'12月'},
+  {year:2026,month:1,label:'1月'},{year:2026,month:2,label:'2月'},
+  {year:2026,month:3,label:'3月'},{year:2026,month:4,label:'4月'},
+];
+
+const OFFICES = ['青森','盛岡','仙台','千葉','横浜','新宿','新潟','金沢','名古屋','京都','梅田','神戸','福岡','鹿児島'];
+
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+let integratedRows = [];
+let mcgRows = [];
+let mcgByPhone = new Map();
+let costData = {}; // key: "office_YYYY-MM" -> number
+
+let currentOffice = '全オフィス';
+let currentView = 'office';
+
+/* ═══════════════════════════════
+   ENCODING & CSV PARSE
+═══════════════════════════════ */
+function detectAndDecode(buf) {
+  const bytes = new Uint8Array(buf);
+  // Check for UTF-8 BOM
+  const hasBOM = bytes[0]===0xEF && bytes[1]===0xBB && bytes[2]===0xBF;
+  if(hasBOM) {
+    return new TextDecoder('utf-8').decode(buf.slice(3));
+  }
+  // Try UTF-8 strict
+  try {
+    const text = new TextDecoder('utf-8', {fatal:true}).decode(buf);
+    return text;
+  } catch(e) {}
+  // Fall back to Shift-JIS
+  try {
+    return new TextDecoder('shift_jis').decode(buf);
+  } catch(e) {}
+  return new TextDecoder('utf-8', {fatal:false}).decode(buf);
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let i = 0;
+  const n = text.length;
+  while(i < n) {
+    const row = [];
+    while(i < n) {
+      let field = '';
+      if(text[i] === '"') {
+        i++;
+        while(i < n) {
+          if(text[i] === '"') {
+            i++;
+            if(text[i] === '"') { field += '"'; i++; }
+            else break;
+          } else {
+            field += text[i++];
+          }
+        }
+      } else {
+        while(i < n && text[i] !== ',' && text[i] !== '\n' && text[i] !== '\r') {
+          field += text[i++];
+        }
+      }
+      row.push(field.trim());
+      if(i < n && text[i] === ',') { i++; continue; }
+      break;
+    }
+    if(i < n && text[i] === '\r') i++;
+    if(i < n && text[i] === '\n') i++;
+    if(row.length > 0 && !(row.length === 1 && row[0] === '')) rows.push(row);
+  }
+  return rows;
+}
+
+function csvToObjects(text) {
+  const rows = parseCSV(text);
+  if(rows.length < 2) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h,i) => { obj[h] = r[i] || ''; });
+    return obj;
+  });
+}
+
+/* ═══════════════════════════════
+   UPLOAD HANDLERS
+═══════════════════════════════ */
+function triggerUpload(type) {
+  document.getElementById('inp-' + type).click();
+}
+
+function loadCSV(type, input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = detectAndDecode(e.target.result);
+    const objs = csvToObjects(text);
+    if(type === 'integrated') {
+      integratedRows = objs;
+      detectIntegratedCols(objs);  // ← 列名を自動検出
+      const btn = document.getElementById('btn-integrated');
+      btn.textContent = `✅ 統合ツール (${objs.length}行)`;
+      btn.classList.add('loaded');
+      document.getElementById('info-integrated').textContent = `統合ツール: ${objs.length}行`;
+      document.getElementById('info-integrated').className = 'ok';
+    } else {
+      mcgRows = objs;
+      buildMCGIndex();
+      const btn = document.getElementById('btn-mcg');
+      btn.textContent = `✅ MCG (${objs.length}行)`;
+      btn.classList.add('loaded');
+      document.getElementById('info-mcg').textContent = `MCG: ${objs.length}行`;
+      document.getElementById('info-mcg').className = 'ok';
+    }
+    if(integratedRows.length && mcgRows.length) {
+      const matched = integratedRows.filter(r => {
+        const p = normalizePhone(r['連絡先TEL'] || r['電話番号'] || '');
+        return p && mcgByPhone.has(p);
+      }).length;
+      const info = document.getElementById('info-match');
+      info.style.display = '';
+      info.textContent = `マッチ: ${matched}/${integratedRows.length}`;
+      info.className = matched > integratedRows.length * 0.7 ? 'ok' : 'warn';
+    }
+    render();
+    input.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ═══════════════════════════════
+   COLUMN NAME DETECTION
+═══════════════════════════════ */
+// 統合ツールCSVの実際の列名を格納
+let COL = {
+  date: '応募日',
+  name: '氏名（漢字）',
+  tel: '連絡先TEL',
+  office: '対応オフィス',
+};
+
+function detectIntegratedCols(rows) {
+  if(!rows.length) return;
+  const headers = Object.keys(rows[0]);
+
+  // 応募日：カッコ付きにも対応
+  const dateCol = headers.find(h => h.includes('応募日')) || headers[0];
+  // TEL
+  const telCol = headers.find(h => /連絡先TEL|電話番号|tel/i.test(h)) || '';
+  // オフィス：拠点・対応オフィス・所属など
+  const offCol = headers.find(h => /拠点|対応オフィス|所属|オフィス/.test(h)) || '';
+
+  COL.date = dateCol;
+  COL.tel = telCol;
+  COL.office = offCol;
+
+  console.log('[統合ツール] 検出列:', {date:dateCol, tel:telCol, office:offCol});
+  console.log('[統合ツール] サンプル応募日:', rows.slice(0,3).map(r=>r[dateCol]));
+  console.log('[統合ツール] サンプル拠点:', rows.slice(0,3).map(r=>r[offCol]));
+}
+
+// 拠点名正規化：「名古屋オフィス」→「名古屋」
+function normalizeOffice(s) {
+  return String(s||'').replace(/オフィス$/, '').trim();
+}
+
+function normalizePhone(p) {
+  return String(p||'').replace(/[^0-9]/g,'').replace(/^0+/,'');
+}
+
+function buildMCGIndex() {
+  mcgByPhone.clear();
+  // MCGの電話番号列を柔軟検出
+  const headers = mcgRows.length ? Object.keys(mcgRows[0]) : [];
+  const telCol = headers.find(h => /電話番号|tel|phone/i.test(h)) || '電話番号';
+  for(const row of mcgRows) {
+    const p = normalizePhone(row[telCol] || row['電話番号'] || '');
+    if(!p) continue;
+    if(!mcgByPhone.has(p)) mcgByPhone.set(p,[]);
+    mcgByPhone.get(p).push(row);
+  }
+}
+
+function parseYM(s) {
+  if(!s) return null;
+  const str = String(s).trim().replace(/^\uFEFF/,'');
+  // 対応: 2025/5/1, 2025-05-01, 2025年5月, 2025/05/01 10:00, 2025.05.01
+  const m = str.match(/(\d{4})[\/\-\.年](\d{1,2})/);
+  if(!m) return null;
+  return {year:+m[1], month:+m[2]};
+}
+
+function isInFY3(s) {
+  const ym = parseYM(s);
+  if(!ym) return false;
+  return (ym.year===2025 && ym.month>=5) || (ym.year===2026 && ym.month<=4);
+}
+
+function ymKey(y,m) { return `${y}-${String(m).padStart(2,'0')}`; }
+
+function pct(a,b) {
+  if(!b) return '－';
+  return (a/b*100).toFixed(1)+'%';
+}
+
+function yen(v) {
+  if(!v || isNaN(v) || v<=0) return '－';
+  return '¥' + Math.round(v).toLocaleString();
+}
+
+function rankLabel(rank) {
+  const r = String(rank||'').trim().toUpperCase();
+  if(r === 'A') return 'A';
+  if(r === 'B') return 'B';
+  if(r === 'C') return 'C';
+  // 旧フォーマット対応
+  if(r.startsWith('A') || r.includes('★★★★')) return 'A';
+  if(r.startsWith('B') || r.includes('★★★')) return 'B';
+  if(r.startsWith('C') || r.includes('★★')) return 'C';
+  return '';
+}
+
+/* ═══════════════════════════════
+   COST DATA
+═══════════════════════════════ */
+function costKey(office, ym) { return `${office}__${ym.year}-${String(ym.month).padStart(2,'0')}`; }
+
+function getCost(office, ym) {
+  const k = costKey(office, ym);
+  const v = parseFloat((costData[k]||'').toString().replace(/,/g,''));
+  return isNaN(v) ? 0 : v;
+}
+
+function setCost(office, ym, val) {
+  const k = costKey(office, ym);
+  costData[k] = val;
+  try { localStorage.setItem('hop3ki_cost', JSON.stringify(costData)); } catch(e){}
+}
+
+function loadCostFromStorage() {
+  try {
+    const s = localStorage.getItem('hop3ki_cost');
+    if(s) costData = JSON.parse(s);
+  } catch(e){}
+}
+
+/* ═══════════════════════════════
+   STATS COMPUTATION
+   月次版と同じロジック：
+   - 総応募のみ統合ツールCSV由来
+   - 有効応募以降はMCGを「応募日（2列目=応募日.1）」で月フィルタして直接集計
+   - CSVパーサーが同名列を後勝ちで上書きするため
+     mcg['接触ステータス']=数値版, mcg['福祉資格']=数値版, mcg['介護経験']=数値版
+═══════════════════════════════ */
+
+function flag1(val) {
+  return parseFloat(String(val ?? '').trim()) === 1;
+}
+
+// MCGを年月・オフィスでフィルタして集計
+function computeStatsMCG(year, month, office) {
+  // 総応募は統合ツールから別途計算
+  const s = emptyStats();
+
+  const seenDedup = new Set(); // office|||phone でユニーク化
+
+  for(const mcg of mcgRows) {
+    // 応募日フィルタ（MCGの応募日 = CSV内で後ろの「応募日」列）
+    const dateRaw = mcg['応募日'] || '';
+    const ym = parseYM(String(dateRaw));
+    if(!ym) continue;
+    if(year !== null && ym.year !== year) continue;
+    if(month !== null && ym.month !== month) continue;
+
+    // オフィスフィルタ
+    const off = String(mcg['所属'] || '').trim();
+    if(office && office !== '全オフィス' && off !== office) continue;
+    if(!OFFICES.includes(off)) continue;
+
+    // 有効応募フラグ
+    if(!flag1(mcg['有効応募'])) continue;
+
+    // 電話番号×オフィスでユニーク化
+    const phone = normalizePhone(String(mcg['電話番号'] || ''));
+    const dedupKey = off + '|||' + phone;
+    if(phone) {
+      if(seenDedup.has(dedupKey)) continue;
+      seenDedup.add(dedupKey);
+    }
+
+    s.valid++;
+
+    // 各フラグ（後勝ちの同名列 = 数値0/1）
+    const isContacted = flag1(mcg['接触ステータス']);
+    const qual        = flag1(mcg['福祉資格']);
+    const exp         = flag1(mcg['介護経験']);
+    const is3days     = flag1(mcg['3日以上']);
+    const is60under   = flag1(mcg['60判定']);
+    const hasNight    = String(mcg['夜勤専従'] ?? '').includes('YA');
+
+    if(isContacted) s.contacted++;
+    if(qual) s.qualified++;
+    if(exp) s.experienced++;
+    if(!qual && !exp) s.neither++;
+    if(is3days) s.lt++;
+    if(is60under) s.under60++;
+    if(hasNight) s.nightShift++;
+
+    // 人選
+    if(isContacted) {
+      s.selected++;
+      const rk = rankLabel(mcg['人選']);
+      if(rk==='A') s.rankA++;
+      else if(rk==='B') s.rankB++;
+      else if(rk==='C') s.rankC++;
+    }
+
+    // ファネル：応募月と同じ月の日付のみカウント（当月応募→当月完了）
+    const rank = rankLabel(mcg['人選']);
+    function addFunnel(dateField, nKey, aKey, bKey, cKey) {
+      const d = String(mcg[dateField] ?? '').trim();
+      if(!d || d === 'nan') return;
+      // 応募月と同じ年月かチェック
+      const dym = parseYM(d);
+      if(!dym || dym.year !== ym.year || dym.month !== ym.month) return;
+      s[nKey]++;
+      if(rank==='A') s[aKey]++;
+      else if(rank==='B') s[bKey]++;
+      else if(rank==='C') s[cKey]++;
+    }
+    addFunnel('設定日','setN','setA','setB','setC');
+    addFunnel('実施日','implN','implA','implB','implC');
+    addFunnel('決定日','decidedN','decidedA','decidedB','decidedC');
+    addFunnel('開始日','startedN','startedA','startedB','startedC');
+  }
+
+  return s;
+}
+
+function emptyStats() {
+  return {
+    total:0, valid:0, contacted:0,
+    qualified:0, experienced:0, neither:0,
+    lt:0, under60:0, nightShift:0,
+    selected:0, rankA:0, rankB:0, rankC:0,
+    setN:0, setA:0, setB:0, setC:0,
+    implN:0, implA:0, implB:0, implC:0,
+    decidedN:0, decidedA:0, decidedB:0, decidedC:0,
+    startedN:0, startedA:0, startedB:0, startedC:0,
+    cost:0,
+  };
+}
+
+// 総応募を統合ツールから計算
+function countTotal(year, month, office) {
+  return integratedRows.filter(r => {
+    const dateVal = r[COL.date] || r['応募日'] || r['（応募内容）応募日'] || '';
+    const ym = parseYM(String(dateVal));
+    if(!ym) return false;
+    if(year !== null && ym.year !== year) return false;
+    if(month !== null && ym.month !== month) return false;
+    const off = normalizeOffice(r[COL.office] || r['拠点'] || r['対応オフィス'] || '');
+    if(office && office !== '全オフィス') return off === office;
+    return OFFICES.includes(off);
+  }).length;
+}
+
+/* ═══════════════════════════════
+   GET ROWS for office × month
+═══════════════════════════════ */
+function getRows(office, ym) {
+  return integratedRows.filter(r => {
+    const dateVal = r[COL.date] || r['応募日'] || '';
+    if(!isInFY3(dateVal)) return false;
+    if(ym) {
+      const d = parseYM(dateVal);
+      if(!d || d.year!==ym.year || d.month!==ym.month) return false;
+    }
+    const off = normalizeOffice(r[COL.office] || r['対応オフィス'] || r['所属'] || '');
+    if(office && office !== '全オフィス') {
+      return off === office;
+    }
+    return true;
+  });
+}
+
+/* ═══════════════════════════════
+   BUILD STATS MATRIX: office × months
+═══════════════════════════════ */
+function buildOfficeMonthMatrix(office) {
+  const monthStats = FISCAL_MONTHS.map(ym => {
+    const s = computeStatsMCG(ym.year, ym.month, office);
+    s.total = countTotal(ym.year, ym.month, office);
+    s.cost = (office === '全オフィス')
+      ? OFFICES.reduce((acc,o)=>acc+getCost(o,ym),0)
+      : getCost(office, ym);
+    return s;
+  });
+
+  const total = sumStats(monthStats);
+  total.cost = (office === '全オフィス')
+    ? OFFICES.reduce((acc,o)=>acc+FISCAL_MONTHS.reduce((a,ym)=>a+getCost(o,ym),0),0)
+    : FISCAL_MONTHS.reduce((acc,ym)=>acc+getCost(office,ym),0);
+
+  return {monthStats, total};
+}
+
+function sumStats(arr) {
+  const s = emptyStats();
+  for(const x of arr) {
+    for(const k of Object.keys(s)) {
+      s[k] = (s[k]||0) + (x[k]||0);
+    }
+  }
+  return s;
+}
+
+/* ═══════════════════════════════
+   BUILD ALL-OFFICE MATRIX (通期合計 per office)
+═══════════════════════════════ */
+function buildAllOfficeMatrix() {
+  return OFFICES.map(off => {
+    const s = computeStatsMCG(null, null, off);
+    s.total = countTotal(null, null, off);
+    s.cost = FISCAL_MONTHS.reduce((acc,ym)=>acc+getCost(off,ym),0);
+    return {office:off, stats:s};
+  });
+}
+
+/* ═══════════════════════════════
+   RENDER TABLE: office×months
+═══════════════════════════════ */
+function renderOfficeTable(office) {
+  if(!integratedRows.length || !mcgRows.length) {
+    return `<div class="empty-state"><div class="icon">📂</div><p>統合ツールCSVとMCG CSVを読み込んでください</p></div>`;
+  }
+
+  const {monthStats, total} = buildOfficeMonthMatrix(office);
+  const cols = FISCAL_MONTHS;
+
+  let h = `<div class="tbl-wrap"><table class="dtbl"><thead><tr>`;
+  h += `<th class="th-label" style="min-width:150px">${office}（2025年5月〜2026年4月）</th>`;
+  cols.forEach(c=>{ h += `<th>${c.label}</th>`; });
+  h += `<th class="th-total">通期合計</th></tr></thead><tbody>`;
+
+  function row(cls, label, vals, totalVal, extraClass='') {
+    let r = `<tr class="${cls}">`;
+    const isSec = cls.includes('sec-');
+    if(isSec) {
+      r += `<td colspan="${cols.length+2}">${label}</td>`;
+    } else {
+      const labelCls = cls.includes('sub')||cls.includes('rank') ? 'td-sub' : 'td-label';
+      r += `<td class="${labelCls} ${extraClass}">${label}</td>`;
+      vals.forEach((v,i) => {
+        r += `<td class="${extraClass}">${v===null||v===undefined?'<span class="empty">－</span>':v}</td>`;
+      });
+      r += `<td class="td-total ${extraClass}">${totalVal===null||totalVal===undefined?'<span class="empty">－</span>':totalVal}</td>`;
+    }
+    r += `</tr>`;
+    return r;
+  }
+
+  function numRow(cls, label, fn, hl='') {
+    return row(cls, label, monthStats.map(s=>fn(s)||'0'), fn(total)||'0', hl);
+  }
+
+  function rateRow(cls, label, numFn, denFn, threshold=0, goodBelow=true) {
+    const cells = monthStats.map(s => {
+      const n=numFn(s), d=denFn(s);
+      if(!d) return '<span class="empty">－</span>';
+      const p = n/d*100;
+      const bad = goodBelow ? p < threshold : p > threshold;
+      return `<span class="${bad?'rate-bad':'rate-ok'}">${p.toFixed(1)}%</span>`;
+    });
+    const tn=numFn(total),td=denFn(total);
+    const tp = td ? (tn/td*100).toFixed(1)+'%' : '－';
+    const tbad = td && goodBelow ? tn/td*100 < threshold : false;
+    return row(cls, label, cells, `<span class="${tbad?'rate-bad':'rate-ok'}">${tp}</span>`);
+  }
+
+  function yenRow(cls, label, costFn, cntFn) {
+    const cells = monthStats.map(s => {
+      const cost=costFn(s), cnt=cntFn(s);
+      return (cost>0&&cnt>0) ? '¥'+Math.round(cost/cnt).toLocaleString() : '<span class="empty">－</span>';
+    });
+    const tc=costFn(total),tn=cntFn(total);
+    return row(cls, label, cells, (tc>0&&tn>0)?'¥'+Math.round(tc/tn).toLocaleString():'－');
+  }
+
+  // ── Section: 集客・応募
+  h += row('sec-main','',null,null);
+
+  h += numRow('','集客費用', s => s.cost>0?'¥'+s.cost.toLocaleString():'－');
+  h += numRow('','総応募', s => s.total);
+  h += numRow('highlight','有効応募', s => s.valid);
+  h += rateRow('','（有効率）70%未満↓', s=>s.valid, s=>s.total, 70, true);
+  h += numRow('','接触数', s => s.contacted);
+  h += rateRow('','（接触率）90%未満↓', s=>s.contacted, s=>s.valid, 90, true);
+
+  // ── Section: 属性
+  h += row('sec-attr','📋 有効応募 属性内訳',null,null);
+  h += numRow('highlight','★資格アリ', s=>s.qualified);
+  h += rateRow('','（割合）', s=>s.qualified, s=>s.valid);
+  h += numRow('highlight','★経験アリ', s=>s.experienced);
+  h += rateRow('','（割合）', s=>s.experienced, s=>s.valid);
+  h += numRow('','なしなし', s=>s.neither);
+  h += rateRow('','（割合）', s=>s.neither, s=>s.valid);
+  h += numRow('highlight','★週3日以上 (LT)', s=>s.lt);
+  h += rateRow('','（割合）', s=>s.lt, s=>s.valid);
+  h += numRow('','週2日以下', s=>s.valid-s.lt);
+  h += rateRow('','（割合）', s=>s.valid-s.lt, s=>s.valid);
+  h += numRow('','60歳以上', s=>s.valid-s.under60);
+  h += rateRow('','（割合）', s=>s.valid-s.under60, s=>s.valid);
+  h += numRow('highlight','★60歳未満', s=>s.under60);
+  h += rateRow('','（割合）', s=>s.under60, s=>s.valid);
+  h += numRow('','夜勤専従希望', s=>s.nightShift);
+  h += rateRow('','（割合）', s=>s.nightShift, s=>s.valid);
+
+  // ── Section: ファネル
+  h += row('sec-funnel','🎯 人選・ファネル',null,null);
+  h += numRow('','人選対象数', s=>s.selected);
+  h += rateRow('','（有効応募からの割合）', s=>s.selected, s=>s.valid);
+  h += numRow('rank-row','★★★★', s=>s.rankA);
+  h += numRow('rank-row','★★★☆', s=>s.rankB);
+  h += numRow('rank-row','★★☆☆', s=>s.rankC);
+
+  h += numRow('highlight','設定数', s=>s.setN);
+  h += rateRow('','（設定率 / 有効応募比）', s=>s.setN, s=>s.valid);
+  h += numRow('rank-row','★★★★', s=>s.setA);
+  h += numRow('rank-row','★★★☆', s=>s.setB);
+  h += numRow('rank-row','★★☆☆', s=>s.setC);
+
+  h += numRow('','実施数', s=>s.implN);
+  h += rateRow('','（実施率 / 設定比）', s=>s.implN, s=>s.setN);
+  h += numRow('rank-row','★★★★', s=>s.implA);
+  h += numRow('rank-row','★★★☆', s=>s.implB);
+  h += numRow('rank-row','★★☆☆', s=>s.implC);
+
+  h += numRow('','決定数', s=>s.decidedN);
+  h += rateRow('','（決定率 / 実施比）', s=>s.decidedN, s=>s.implN);
+  h += numRow('rank-row','★★★★', s=>s.decidedA);
+  h += numRow('rank-row','★★★☆', s=>s.decidedB);
+  h += numRow('rank-row','★★☆☆', s=>s.decidedC);
+
+  h += numRow('highlight','開始数', s=>s.startedN);
+  h += rateRow('','（開始率 / 人選対象比）', s=>s.startedN, s=>s.selected);
+  h += numRow('rank-row','★★★★', s=>s.startedA);
+  h += numRow('rank-row','★★★☆', s=>s.startedB);
+  h += numRow('rank-row','★★☆☆', s=>s.startedC);
+
+  // ── Section: 単価
+  h += row('sec-unit','💰 単価一覧（集客費用÷件数）',null,null);
+  h += yenRow('','総応募 単価', s=>s.cost, s=>s.total);
+  h += yenRow('','有効応募 単価', s=>s.cost, s=>s.valid);
+  h += yenRow('','人選対象 単価', s=>s.cost, s=>s.selected);
+  h += yenRow('','設定 単価', s=>s.cost, s=>s.setN);
+  h += yenRow('','実施 単価', s=>s.cost, s=>s.implN);
+  h += yenRow('','決定 単価', s=>s.cost, s=>s.decidedN);
+  h += yenRow('highlight','開始 単価', s=>s.cost, s=>s.startedN);
+
+  h += `</tbody></table></div>`;
+
+  return h;
+}
+
+/* ═══════════════════════════════
+   RENDER TABLE: all offices × 通期
+═══════════════════════════════ */
+function renderAllOfficeTable() {
+  if(!integratedRows.length || !mcgRows.length) {
+    return `<div class="empty-state"><div class="icon">📂</div><p>統合ツールCSVとMCG CSVを読み込んでください</p></div>`;
+  }
+
+  const data = buildAllOfficeMatrix();
+  const allTotal = sumStats(data.map(d=>d.stats));
+  allTotal.cost = OFFICES.reduce((acc,off)=>acc+FISCAL_MONTHS.reduce((a,ym)=>a+getCost(off,ym),0),0);
+
+  let h = `<div class="tbl-wrap"><table class="dtbl"><thead><tr>`;
+  h += `<th class="th-label" style="min-width:150px">3期通期（全12ヶ月）</th>`;
+  data.forEach(d=>{ h += `<th>${d.office}</th>`; });
+  h += `<th class="th-total">合計</th></tr></thead><tbody>`;
+
+  function row(cls, label, vals, totalVal) {
+    let r = `<tr class="${cls}">`;
+    const isSec = cls.includes('sec-');
+    if(isSec) {
+      r += `<td colspan="${data.length+2}">${label}</td>`;
+    } else {
+      const lc = cls.includes('rank') ? 'td-sub' : 'td-label';
+      r += `<td class="${lc}">${label}</td>`;
+      vals.forEach(v => {
+        r += `<td>${v===null||v===undefined?'<span class="empty">－</span>':v}</td>`;
+      });
+      r += `<td class="td-total">${totalVal===null||totalVal===undefined?'<span class="empty">－</span>':totalVal}</td>`;
+    }
+    r += `</tr>`;
+    return r;
+  }
+
+  function numRow(cls, label, fn) {
+    return row(cls, label, data.map(d=>fn(d.stats)), fn(allTotal));
+  }
+
+  function rateRow(cls, label, nFn, dFn, threshold=0, goodBelow=true) {
+    const cells = data.map(d => {
+      const n=nFn(d.stats), dn=dFn(d.stats);
+      if(!dn) return '<span class="empty">－</span>';
+      const p=n/dn*100;
+      const bad = goodBelow ? p<threshold : false;
+      return `<span class="${bad?'rate-bad':'rate-ok'}">${p.toFixed(1)}%</span>`;
+    });
+    const tn=nFn(allTotal),td=dFn(allTotal);
+    const tp=td?(tn/td*100).toFixed(1)+'%':'－';
+    return row(cls, label, cells, tp);
+  }
+
+  function yenRow(cls, label, costFn, cntFn) {
+    const cells = data.map(d => {
+      const c=costFn(d.stats),n=cntFn(d.stats);
+      return (c>0&&n>0)?'¥'+Math.round(c/n).toLocaleString():'<span class="empty">－</span>';
+    });
+    const tc=costFn(allTotal),tn=cntFn(allTotal);
+    return row(cls, label, cells, (tc>0&&tn>0)?'¥'+Math.round(tc/tn).toLocaleString():'－');
+  }
+
+  h += row('sec-main','',null,null);
+  h += numRow('','集客費用', s=>s.cost>0?'¥'+s.cost.toLocaleString():'－');
+  h += numRow('','総応募', s=>s.total);
+  h += numRow('highlight','有効応募', s=>s.valid);
+  h += rateRow('','（有効率）70%未満↓', s=>s.valid, s=>s.total, 70, true);
+  h += numRow('','接触数', s=>s.contacted);
+  h += rateRow('','（接触率）90%未満↓', s=>s.contacted, s=>s.valid, 90, true);
+
+  h += row('sec-attr','📋 有効応募 属性内訳',null,null);
+  h += numRow('highlight','★資格アリ', s=>s.qualified);
+  h += rateRow('','（割合）', s=>s.qualified, s=>s.valid);
+  h += numRow('highlight','★経験アリ', s=>s.experienced);
+  h += rateRow('','（割合）', s=>s.experienced, s=>s.valid);
+  h += numRow('','なしなし', s=>s.neither);
+  h += rateRow('','（割合）', s=>s.neither, s=>s.valid);
+  h += numRow('highlight','★週3日以上 (LT)', s=>s.lt);
+  h += rateRow('','（割合）', s=>s.lt, s=>s.valid);
+  h += numRow('','週2日以下', s=>s.valid-s.lt);
+  h += rateRow('','（割合）', s=>s.valid-s.lt, s=>s.valid);
+  h += numRow('','60歳以上', s=>s.valid-s.under60);
+  h += rateRow('','（割合）', s=>s.valid-s.under60, s=>s.valid);
+  h += numRow('highlight','★60歳未満', s=>s.under60);
+  h += rateRow('','（割合）', s=>s.under60, s=>s.valid);
+  h += numRow('','夜勤専従希望', s=>s.nightShift);
+  h += rateRow('','（割合）', s=>s.nightShift, s=>s.valid);
+
+  h += row('sec-funnel','🎯 人選・ファネル',null,null);
+  h += numRow('','人選対象数', s=>s.selected);
+  h += rateRow('','（有効応募からの割合）', s=>s.selected, s=>s.valid);
+  h += numRow('rank-row','★★★★', s=>s.rankA);
+  h += numRow('rank-row','★★★☆', s=>s.rankB);
+  h += numRow('rank-row','★★☆☆', s=>s.rankC);
+  h += numRow('highlight','設定数', s=>s.setN);
+  h += rateRow('','（設定率 / 有効応募比）', s=>s.setN, s=>s.valid);
+  h += numRow('rank-row','★★★★', s=>s.setA);
+  h += numRow('rank-row','★★★☆', s=>s.setB);
+  h += numRow('rank-row','★★☆☆', s=>s.setC);
+  h += numRow('','実施数', s=>s.implN);
+  h += rateRow('','（実施率 / 設定比）', s=>s.implN, s=>s.setN);
+  h += numRow('','決定数', s=>s.decidedN);
+  h += rateRow('','（決定率 / 実施比）', s=>s.decidedN, s=>s.implN);
+  h += numRow('highlight','開始数', s=>s.startedN);
+  h += rateRow('','（開始率 / 人選対象比）', s=>s.startedN, s=>s.selected);
+
+  h += row('sec-unit','💰 単価一覧',null,null);
+  h += yenRow('','総応募 単価', s=>s.cost, s=>s.total);
+  h += yenRow('','有効応募 単価', s=>s.cost, s=>s.valid);
+  h += yenRow('','設定 単価', s=>s.cost, s=>s.setN);
+  h += yenRow('highlight','開始 単価', s=>s.cost, s=>s.startedN);
+
+  h += `</tbody></table></div>`;
+  return h;
+}
+
+/* ═══════════════════════════════
+   COST INPUT TABLE
+═══════════════════════════════ */
+function renderCostInput(office) {
+  let h = `<div class="cost-box">`;
+  h += `<div class="cost-toggle" id="cost-toggle-${office}" onclick="toggleCost('${office}')">▶ 集客費用を入力する（クリックで展開）</div>`;
+  h += `<div class="cost-body" id="cost-body-${office}">`;
+  h += `<div class="cost-tbl-wrap"><table class="cost-tbl">`;
+  h += `<tr><th>オフィス / 月</th>`;
+  FISCAL_MONTHS.forEach(ym=>{ h+=`<th>${ym.label}</th>`; });
+  h += `<th>計</th></tr>`;
+
+  const offices = office==='全オフィス' ? OFFICES : [office];
+  for(const off of offices) {
+    h += `<tr><td>${off}</td>`;
+    let rowTotal = 0;
+    FISCAL_MONTHS.forEach(ym=>{
+      const k = costKey(off, ym);
+      const v = costData[k] || '';
+      rowTotal += parseFloat(String(v).replace(/,/g,'')) || 0;
+      h += `<td><input type="text" inputmode="numeric" value="${v}" placeholder="0"
+        data-office="${off}" data-year="${ym.year}" data-month="${ym.month}"
+        oninput="onCostInput(this)" onfocus="this.select()"></td>`;
+    });
+    h += `<td id="cost-rowtotal-${off}" style="text-align:right;font-weight:600;padding:3px 8px;min-width:80px">${rowTotal>0?'¥'+Math.round(rowTotal).toLocaleString():'－'}</td>`;
+    h += `</tr>`;
+  }
+  h += `</table></div></div></div>`;
+  return h;
+}
+
+function toggleCost(office) {
+  const toggle = document.getElementById(`cost-toggle-${office}`);
+  const body = document.getElementById(`cost-body-${office}`);
+  if(!toggle||!body) return;
+  const isOpen = body.classList.toggle('open');
+  toggle.textContent = (isOpen?'▼':'▶') + ' 集客費用を入力する（クリックで展開）';
+  toggle.classList.toggle('open', isOpen);
+}
+
+let _costRenderTimer = null;
+function onCostInput(el) {
+  const off = el.dataset.office;
+  const ym = {year:+el.dataset.year, month:+el.dataset.month};
+  const val = parseFloat(el.value.replace(/,/g,''));
+  setCost(off, ym, isNaN(val)?'':val);
+  // 行合計を即時更新
+  updateCostRowTotal(off);
+  // データテーブルは400ms後に遅延更新（フォームは再生成しない）
+  clearTimeout(_costRenderTimer);
+  _costRenderTimer = setTimeout(() => {
+    if(currentView==='office') {
+      document.getElementById('tbl-office-wrap').innerHTML = renderOfficeTable(currentOffice);
+    } else {
+      document.getElementById('tbl-all-wrap').innerHTML = renderAllOfficeTable();
+    }
+  }, 400);
+}
+
+function updateCostRowTotal(office) {
+  const offices = office==='全オフィス' ? OFFICES : [office];
+  for(const off of offices) {
+    let rowTotal = 0;
+    FISCAL_MONTHS.forEach(ym => {
+      const v = costData[costKey(off, ym)];
+      rowTotal += parseFloat(String(v||'').replace(/,/g,'')) || 0;
+    });
+    const el = document.getElementById(`cost-rowtotal-${off}`);
+    if(el) el.textContent = rowTotal > 0 ? '¥'+Math.round(rowTotal).toLocaleString() : '－';
+  }
+}
+
+/* ═══════════════════════════════
+   NAV & VIEW SWITCHING
+═══════════════════════════════ */
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if(nav) nav.classList.add('active');
+}
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('view-office').style.display = view==='office'?'':'none';
+  document.getElementById('view-all').style.display = view==='all'?'':'none';
+  document.getElementById('vbtn-office').classList.toggle('active', view==='office');
+  document.getElementById('vbtn-all').classList.toggle('active', view==='all');
+  render();
+}
+
+function switchOffice(off) {
+  currentOffice = off;
+  document.querySelectorAll('.office-tab').forEach(t=>t.classList.toggle('active', t.dataset.office===off));
+  renderOfficeView();
+}
+
+/* ═══════════════════════════════
+   OFFICE TABS BUILD
+═══════════════════════════════ */
+function buildOfficeTabs() {
+  const container = document.getElementById('office-tabs');
+  if(!container) return;
+  const all = ['全オフィス',...OFFICES];
+  container.innerHTML = all.map(off =>
+    `<button class="office-tab${off===currentOffice?' active':''}" data-office="${off}" onclick="switchOffice('${off}')">${off}</button>`
+  ).join('');
+}
+
+/* ═══════════════════════════════
+   RENDER
+═══════════════════════════════ */
+function renderOfficeView() {
+  document.getElementById('cost-office-wrap').innerHTML = renderCostInput(currentOffice);
+  document.getElementById('tbl-office-wrap').innerHTML = renderOfficeTable(currentOffice);
+}
+
+function renderAllView() {
+  document.getElementById('cost-all-wrap').innerHTML = renderCostInput('全オフィス');
+  document.getElementById('tbl-all-wrap').innerHTML = renderAllOfficeTable();
+}
+
+function render() {
+  buildOfficeTabs();
+  if(currentView==='office') renderOfficeView();
+  else renderAllView();
+}
+
+/* ═══════════════════════════════
+   共有HTML出力
+═══════════════════════════════ */
+function exportSharedHtml() {
+  if(!integratedRows.length || !mcgRows.length) {
+    alert('CSVを読み込んでから出力してください');
+    return;
+  }
+
+  const btn = document.getElementById('btn-export');
+  btn.textContent = '⏳ 集計中...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    try {
+      // 全オフィス×全月の集計済みデータを生成
+      const statsMatrix = {};
+      OFFICES.forEach(off => {
+        statsMatrix[off] = {};
+        FISCAL_MONTHS.forEach(ym => {
+          const s = computeStatsMCG(ym.year, ym.month, off);
+          s.total = countTotal(ym.year, ym.month, off);
+          s.cost = getCost(off, ym);
+          statsMatrix[off][`${ym.year}-${ym.month}`] = s;
+        });
+      });
+
+      // 更新日（昨日）
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const updatedDate = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} OFF分`;
+
+      const embedData = {
+        version: '3ki',
+        updatedDate,
+        totalRows: integratedRows.length,
+        mcgRows: mcgRows.length,
+        costData,
+        statsMatrix,
+      };
+
+      // 現在のHTMLにデータを埋め込む
+      const currentHtml = document.documentElement.outerHTML;
+
+      const embedScript = `<script>window._EMBEDDED_DATA = ${JSON.stringify(embedData)};<\/script>`;
+
+      // </head>の直前に埋め込む
+      const sharedHtml = currentHtml.replace('</head>', embedScript + '</head>');
+
+      // ダウンロード
+      const blob = new Blob([sharedHtml], {type:'text/html;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hop_dashboard_3ki_shared.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      btn.textContent = '✅ 出力完了！';
+      btn.style.background = '#f0fdf4';
+      btn.style.borderColor = '#16a34a';
+      btn.style.color = '#15803d';
+      setTimeout(() => {
+        btn.textContent = '📤 共有HTML出力';
+        btn.style.background = '#1c2135';
+        btn.style.borderColor = '#1c2135';
+        btn.style.color = '#fff';
+        btn.disabled = false;
+      }, 2500);
+    } catch(e) {
+      alert('出力エラー: ' + e.message);
+      btn.textContent = '📤 共有HTML出力';
+      btn.disabled = false;
+    }
+  }, 50);
+}
+
+/* ═══════════════════════════════
+   埋め込みデータ読込（共有HTML用）
+═══════════════════════════════ */
+function loadEmbeddedData() {
+  const d = window._EMBEDDED_DATA;
+  if(!d || d.version !== '3ki') return false;
+
+  // CSVアップロードボタンを非表示
+  ['btn-integrated','btn-mcg','btn-export','inp-integrated','inp-mcg'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+
+  // ヘッダー情報を表示
+  const infoEl = document.getElementById('info-integrated');
+  if(infoEl) { infoEl.textContent = `統合ツール: ${(d.totalRows||0).toLocaleString()}行`; infoEl.className = 'ok'; }
+  const infoMcg = document.getElementById('info-mcg');
+  if(infoMcg) { infoMcg.textContent = `MCG: ${(d.mcgRows||0).toLocaleString()}行`; infoMcg.className = 'ok'; }
+  const infoMatch = document.getElementById('info-match');
+  if(infoMatch) { infoMatch.style.display = ''; infoMatch.textContent = `更新日: ${d.updatedDate||''}`; infoMatch.className = 'ok'; }
+
+  // 集客費を復元
+  if(d.costData) Object.assign(costData, d.costData);
+
+  // computeStatsMCGをpre-computedデータを返す関数に差し替え
+  window._statsMatrix = d.statsMatrix;
+  window.computeStatsMCG = function(year, month, office) {
+    const s = emptyStats();
+    const matrix = window._statsMatrix;
+    if(!matrix) return s;
+
+    const offices = (office && office !== '全オフィス') ? [office] : OFFICES;
+    offices.forEach(off => {
+      if(!matrix[off]) return;
+      const months = (year !== null && month !== null)
+        ? [`${year}-${month}`]
+        : FISCAL_MONTHS.map(ym => `${ym.year}-${ym.month}`);
+
+      months.forEach(key => {
+        const ms = matrix[off][key];
+        if(!ms) return;
+        for(const k of Object.keys(s)) {
+          if(k === 'cost') continue;
+          s[k] = (s[k]||0) + (ms[k]||0);
+        }
+      });
+    });
+    return s;
+  };
+
+  window.countTotal = function(year, month, office) {
+    const matrix = window._statsMatrix;
+    if(!matrix) return 0;
+    const offices = (office && office !== '全オフィス') ? [office] : OFFICES;
+    let total = 0;
+    offices.forEach(off => {
+      if(!matrix[off]) return;
+      const months = (year !== null && month !== null)
+        ? [`${year}-${month}`]
+        : FISCAL_MONTHS.map(ym => `${ym.year}-${ym.month}`);
+      months.forEach(key => {
+        total += (matrix[off][key]||{}).total || 0;
+      });
+    });
+    return total;
+  };
+
+  return true;
+}
+
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => switchPage(el.dataset.page));
+});
+
+loadCostFromStorage();
+
+const isEmbedded = loadEmbeddedData();
+buildOfficeTabs();
+
+if(isEmbedded) {
+  // 埋め込みデータがあればそのまま描画
+  render();
+} else {
+  // 通常モード：CSV待機
+  document.getElementById('tbl-office-wrap').innerHTML =
+    `<div class="empty-state"><div class="icon">📂</div><p>統合ツールCSVとMCG CSVを読み込んでください</p><small>右上のボタンからCSVをアップロード</small></div>`;
+}
+</script>
+
+
+</body></html>
