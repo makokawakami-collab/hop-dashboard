@@ -229,8 +229,8 @@ th, td { border: 1px solid var(--border); padding: 3px 7px; text-align: right; m
 
   <div class="divider"></div>
   <div class="stat-chip" id="stat-med">統合ツール: <span>13,085行</span></div>
-  <div class="stat-chip" id="stat-mcg">MCG: <span>18,170行</span></div>
-  <div class="stat-chip" id="stat-updated" style="">更新日: <span>2026/04/16 OFF分</span></div>
+  <div class="stat-chip" id="stat-mcg">MCG: <span>30,267行</span></div>
+  <div class="stat-chip" id="stat-updated" style="">更新日: <span>2026/04/18 OFF分</span></div>
 
   <div class="divider"></div>
   <button onclick="exportSharedHtml()" style="
@@ -291,35 +291,30 @@ th, td { border: 1px solid var(--border); padding: 3px 7px; text-align: right; m
 <!-- Debug Panel -->
 <div id="debug-panel" style="display:none; background:#fff3cd; border:1px solid #ffc107; margin:10px 20px; padding:12px; border-radius:6px; font-size:11px; font-family:monospace;">
   <strong>🔍 デバッグ情報（確認後は非表示にできます）</strong>
-  <div id="debug-content" style="margin-top:8px; white-space:pre-wrap; max-height:250px; overflow-y:auto; line-height:1.6;">MCG CSV 行数: 18170
+  <div id="debug-content" style="margin-top:8px; white-space:pre-wrap; max-height:250px; overflow-y:auto; line-height:1.6;">MCG CSV 行数: 30267
 MCG 列名 (35列): 応募日 |  | フリガナ | 電話番号 | 年齢 | 性別 | 都道府県 | 住所 | 応募媒体 | 接触ステータス | 登録日 | 登録ステータス | 案件番号 | 人材番号 | 所属 | 自社人材担当者 | 福祉資格 | 介護経験 | ★ホップ就業ステータス | 勤務日数 | 夜勤専従 | 設定日 | 実施日 | 決定日 | 開始日 | 人選ｽﾃｰﾀｽ | 更新日 | 有効応募 | 無し無し | 3日以上 | 決定 | 媒体一覧からの媒体 | 人選 | 60判定 | 市区町村
 電話番号候補列: 電話番号
 登録関連列: 接触ステータス, 登録日, 登録ステータス, ★ホップ就業ステータス
-登録ステータス の値一覧: 登録済 / 呼込み中（仮登録） / Z（約外終了） / 登録辞退 / 対象外 / Z（その他） / 未対応
-勤務日数 の値サンプル: LT / LT
+登録ステータス の値一覧: 登録済 / 呼込み中（仮登録） / Z（その他） / Z（約外終了） / 登録辞退 / 対象外 / 未対応
+勤務日数 の値サンプル: LT / 週2日
+週1日 / 週2日 / LT
+LT / 夜勤 週1（月1~4回） / 週2日
+LT / 週1日 / LT
+週2日 / 夜勤 週1（月1~4回）
 LT / LT
-週2日 / 週2日 / LT
-LT
-LT / 週1日 / 週2日
-週1日 / LT
 週2日
-週1日 / LT
 LT
-週2日
-週1日 / LT
-LT
-週2日
 夜勤専従 の値サンプル: YA / YA
 YA / YA
 YA
 YA
-最初の行サンプル: {"応募日":"2023/2/16","":"","フリガナ":"ヤマモト　ナオキ","電話番号":"8012574417","年齢":"35","性別":"","都道府県":"","住所":"渋谷区本町1-25-9","応募媒体":"不明","接触ステータス":"0","登録日":"2023/2/16","登録ステータス":"登録済","案件番号":"","人材番号":"1","所属":"不明","自社人材担当者":"山本　直生","福祉資格":"0","介護経験":"1","★ホップ就業ステータス":"","勤務日数":"LT","夜勤専従":"","設定日":"","実施日":"","決
+最初の行サンプル: {"応募日":"2025/9/30","":"池田　隆","フリガナ":"イケダ　タカシ","電話番号":"9088171499","年齢":"48","性別":"男性","都道府県":"東京都","住所":"葛飾区柴又1-17-11ライオンズマンション高砂107号室","応募媒体":"e介護転職","接触ステータス":"1","登録日":"2023/3/25","登録ステータス":"登録済","案件番号":"1817685","人材番号":"35","所属":"新宿","自社人材担当者":"浮田　翔大","福祉資格":"1","介護経験":"1","★ホップ就業ステータス":"0","勤務日
 
 統合ツール対象行数: 509
-MCG電話番号登録数: 17368
-電話番号マッチ数: 471 / 509
+MCG電話番号登録数: 6812
+電話番号マッチ数: 428 / 509
 統合TELサンプル: "8066723692" → normalize:"8066723692", "8066723692" → normalize:"8066723692", "7056618785" → normalize:"7056618785"
-MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
+MCG TELサンプル(正規化済): 9088171499, 8011046151, 8056064663
 
 有効応募件数(再計算): 331 / 509
 オフィス名サンプル: 新宿, 梅田, 盛岡, 神戸, 横浜</div>
@@ -335,7 +330,7 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
   <th class="th-total">合計</th>
 </tr>
 </thead>
-<tbody><tr class="cost-row"><td class="lbl-cell lbl-main" style="background:#fff3d4">集客費用</td><td class="val-main">¥221,548</td><td class="val-main">¥391,939</td><td class="val-main">¥659,884</td><td class="val-main">¥425,708</td><td class="val-main">¥598,524</td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥496,866</td><td class="val-main">¥718,623</td><td class="val-main">¥453,834</td><td class="val-main">¥889,050</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥452,347</td><td class="val-total">¥7,547,130</td></tr><tr><td class="lbl-cell lbl-main">総応募</td><td class="val-main">20</td><td class="val-main">20</td><td class="val-main">41</td><td class="val-main">16</td><td class="val-main">26</td><td class="val-main">86</td><td class="val-main">18</td><td class="val-main">18</td><td class="val-main">62</td><td class="val-main">14</td><td class="val-main">67</td><td class="val-main">53</td><td class="val-main">45</td><td class="val-main">23</td><td class="val-total">509</td></tr><tr><td class="lbl-cell lbl-main lbl-star">有効応募</td><td class="val-main">15</td><td class="val-main">8</td><td class="val-main">25</td><td class="val-main">15</td><td class="val-main">15</td><td class="val-main">32</td><td class="val-main">6</td><td class="val-main">6</td><td class="val-main">31</td><td class="val-main">7</td><td class="val-main">34</td><td class="val-main">25</td><td class="val-main">25</td><td class="val-main">16</td><td class="val-total">260</td></tr><tr><td class="lbl-cell lbl-sub">（有効率）70%未満↓</td><td class="val-sub">75.0%</td><td class="val-sub warn-red">40.0%</td><td class="val-sub warn-red">61.0%</td><td class="val-sub">93.8%</td><td class="val-sub warn-red">57.7%</td><td class="val-sub warn-red">37.2%</td><td class="val-sub warn-red">33.3%</td><td class="val-sub warn-red">33.3%</td><td class="val-sub warn-red">50.0%</td><td class="val-sub warn-red">50.0%</td><td class="val-sub warn-red">50.7%</td><td class="val-sub warn-red">47.2%</td><td class="val-sub warn-red">55.6%</td><td class="val-sub warn-red">69.6%</td><td class="val-total-sub warn-red">51.1%</td></tr><tr><td class="lbl-cell lbl-main">接触数</td><td class="val-main">14</td><td class="val-main">8</td><td class="val-main">23</td><td class="val-main">15</td><td class="val-main">13</td><td class="val-main">27</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">23</td><td class="val-main">6</td><td class="val-main">30</td><td class="val-main">23</td><td class="val-main">17</td><td class="val-main">15</td><td class="val-total">225</td></tr><tr><td class="lbl-cell lbl-sub">（接触率）90%未満↓</td><td class="val-sub">93.3%</td><td class="val-sub">100.0%</td><td class="val-sub">92.0%</td><td class="val-sub">100.0%</td><td class="val-sub warn-red">86.7%</td><td class="val-sub warn-red">84.4%</td><td class="val-sub">100.0%</td><td class="val-sub warn-red">83.3%</td><td class="val-sub warn-red">74.2%</td><td class="val-sub warn-red">85.7%</td><td class="val-sub warn-red">88.2%</td><td class="val-sub">92.0%</td><td class="val-sub warn-red">68.0%</td><td class="val-sub">93.8%</td><td class="val-total-sub warn-red">86.5%</td></tr><tr class="sec-header"><td class="lbl-cell">📋 有効応募 属性内訳</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-star">★資格アリ</td><td class="val-main">10</td><td class="val-main">3</td><td class="val-main">13</td><td class="val-main">10</td><td class="val-main">11</td><td class="val-main">19</td><td class="val-main">5</td><td class="val-main">4</td><td class="val-main">19</td><td class="val-main">5</td><td class="val-main">22</td><td class="val-main">14</td><td class="val-main">13</td><td class="val-main">11</td><td class="val-total">159</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">66.7%</td><td class="val-sub">37.5%</td><td class="val-sub">52.0%</td><td class="val-sub">66.7%</td><td class="val-sub">73.3%</td><td class="val-sub">59.4%</td><td class="val-sub">83.3%</td><td class="val-sub">66.7%</td><td class="val-sub">61.3%</td><td class="val-sub">71.4%</td><td class="val-sub">64.7%</td><td class="val-sub">56.0%</td><td class="val-sub">52.0%</td><td class="val-sub">68.8%</td><td class="val-total-sub">61.2%</td></tr><tr><td class="lbl-cell lbl-star">★経験アリ</td><td class="val-main">10</td><td class="val-main">5</td><td class="val-main">10</td><td class="val-main">12</td><td class="val-main">9</td><td class="val-main">17</td><td class="val-main">2</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">5</td><td class="val-main">21</td><td class="val-main">14</td><td class="val-main">14</td><td class="val-main">12</td><td class="val-total">153</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">66.7%</td><td class="val-sub">62.5%</td><td class="val-sub">40.0%</td><td class="val-sub">80.0%</td><td class="val-sub">60.0%</td><td class="val-sub">53.1%</td><td class="val-sub">33.3%</td><td class="val-sub">83.3%</td><td class="val-sub">54.8%</td><td class="val-sub">71.4%</td><td class="val-sub">61.8%</td><td class="val-sub">56.0%</td><td class="val-sub">56.0%</td><td class="val-sub">75.0%</td><td class="val-total-sub">58.8%</td></tr><tr><td class="lbl-cell lbl-sub">なしなし</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">10</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">8</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">11</td><td class="val-main">1</td><td class="val-main">11</td><td class="val-main">10</td><td class="val-main">10</td><td class="val-main">3</td><td class="val-total">78</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">26.7%</td><td class="val-sub">37.5%</td><td class="val-sub">40.0%</td><td class="val-sub">13.3%</td><td class="val-sub">20.0%</td><td class="val-sub">25.0%</td><td class="val-sub">16.7%</td><td class="val-sub">16.7%</td><td class="val-sub">35.5%</td><td class="val-sub">14.3%</td><td class="val-sub">32.4%</td><td class="val-sub">40.0%</td><td class="val-sub">40.0%</td><td class="val-sub">18.8%</td><td class="val-total-sub">30.0%</td></tr><tr><td class="lbl-cell lbl-star">★週3日以上 (LT)</td><td class="val-main">12</td><td class="val-main">5</td><td class="val-main">12</td><td class="val-main">10</td><td class="val-main">6</td><td class="val-main">14</td><td class="val-main">0</td><td class="val-main">5</td><td class="val-main">15</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">10</td><td class="val-main">10</td><td class="val-main">10</td><td class="val-total">131</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">80.0%</td><td class="val-sub">62.5%</td><td class="val-sub">48.0%</td><td class="val-sub">66.7%</td><td class="val-sub">40.0%</td><td class="val-sub">43.8%</td><td class="val-sub">0.0%</td><td class="val-sub">83.3%</td><td class="val-sub">48.4%</td><td class="val-sub">71.4%</td><td class="val-sub">50.0%</td><td class="val-sub">40.0%</td><td class="val-sub">40.0%</td><td class="val-sub">62.5%</td><td class="val-total-sub">50.4%</td></tr><tr><td class="lbl-cell lbl-sub">週2日以下</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">13</td><td class="val-main">5</td><td class="val-main">9</td><td class="val-main">18</td><td class="val-main">6</td><td class="val-main">1</td><td class="val-main">16</td><td class="val-main">2</td><td class="val-main">17</td><td class="val-main">15</td><td class="val-main">15</td><td class="val-main">6</td><td class="val-total">129</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">20.0%</td><td class="val-sub">37.5%</td><td class="val-sub">52.0%</td><td class="val-sub">33.3%</td><td class="val-sub">60.0%</td><td class="val-sub">56.3%</td><td class="val-sub">100.0%</td><td class="val-sub">16.7%</td><td class="val-sub">51.6%</td><td class="val-sub">28.6%</td><td class="val-sub">50.0%</td><td class="val-sub">60.0%</td><td class="val-sub">60.0%</td><td class="val-sub">37.5%</td><td class="val-total-sub">49.6%</td></tr><tr><td class="lbl-cell lbl-sub">60歳以上</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">8</td><td class="val-main">7</td><td class="val-main">5</td><td class="val-main">9</td><td class="val-main">3</td><td class="val-main">2</td><td class="val-main">12</td><td class="val-main">3</td><td class="val-main">10</td><td class="val-main">11</td><td class="val-main">7</td><td class="val-main">4</td><td class="val-total">87</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">20.0%</td><td class="val-sub">37.5%</td><td class="val-sub">32.0%</td><td class="val-sub">46.7%</td><td class="val-sub">33.3%</td><td class="val-sub">28.1%</td><td class="val-sub">50.0%</td><td class="val-sub">33.3%</td><td class="val-sub">38.7%</td><td class="val-sub">42.9%</td><td class="val-sub">29.4%</td><td class="val-sub">44.0%</td><td class="val-sub">28.0%</td><td class="val-sub">25.0%</td><td class="val-total-sub">33.5%</td></tr><tr><td class="lbl-cell lbl-star">★60歳未満</td><td class="val-main">12</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">8</td><td class="val-main">10</td><td class="val-main">23</td><td class="val-main">3</td><td class="val-main">4</td><td class="val-main">19</td><td class="val-main">4</td><td class="val-main">24</td><td class="val-main">14</td><td class="val-main">18</td><td class="val-main">12</td><td class="val-total">173</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">80.0%</td><td class="val-sub">62.5%</td><td class="val-sub">68.0%</td><td class="val-sub">53.3%</td><td class="val-sub">66.7%</td><td class="val-sub">71.9%</td><td class="val-sub">50.0%</td><td class="val-sub">66.7%</td><td class="val-sub">61.3%</td><td class="val-sub">57.1%</td><td class="val-sub">70.6%</td><td class="val-sub">56.0%</td><td class="val-sub">72.0%</td><td class="val-sub">75.0%</td><td class="val-total-sub">66.5%</td></tr><tr><td class="lbl-cell lbl-sub">夜勤専従希望</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">6</td><td class="val-main">6</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">16</td><td class="val-main">9</td><td class="val-main">6</td><td class="val-main">9</td><td class="val-total">76</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">26.7%</td><td class="val-sub">0.0%</td><td class="val-sub">20.0%</td><td class="val-sub">33.3%</td><td class="val-sub">40.0%</td><td class="val-sub">18.8%</td><td class="val-sub">33.3%</td><td class="val-sub">66.7%</td><td class="val-sub">12.9%</td><td class="val-sub">0.0%</td><td class="val-sub">47.1%</td><td class="val-sub">36.0%</td><td class="val-sub">24.0%</td><td class="val-sub">56.3%</td><td class="val-total-sub">29.2%</td></tr><tr class="sec-header"><td class="lbl-cell">🎯 人選・ファネル</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-main lbl-star">人選対象数</td><td class="val-main">14</td><td class="val-main">8</td><td class="val-main">23</td><td class="val-main">15</td><td class="val-main">13</td><td class="val-main">27</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">23</td><td class="val-main">6</td><td class="val-main">30</td><td class="val-main">23</td><td class="val-main">17</td><td class="val-main">15</td><td class="val-total">225</td></tr><tr><td class="lbl-cell lbl-sub">（有効応募からの割合）</td><td class="val-sub">93.3%</td><td class="val-sub">100.0%</td><td class="val-sub">92.0%</td><td class="val-sub">100.0%</td><td class="val-sub">86.7%</td><td class="val-sub">84.4%</td><td class="val-sub">100.0%</td><td class="val-sub">83.3%</td><td class="val-sub">74.2%</td><td class="val-sub">85.7%</td><td class="val-sub">88.2%</td><td class="val-sub">92.0%</td><td class="val-sub">68.0%</td><td class="val-sub">93.8%</td><td class="val-total-sub">86.5%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">7</td><td class="val-sub2">1</td><td class="val-sub2">4</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">6</td><td class="val-sub2">0</td><td class="val-sub2">4</td><td class="val-sub2">9</td><td class="val-sub2">2</td><td class="val-sub2">9</td><td class="val-sub2">4</td><td class="val-sub2">8</td><td class="val-sub2">5</td><td class="val-total-sub2">65</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">8</td><td class="val-sub2">5</td><td class="val-sub2">6</td><td class="val-sub2">9</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">7</td><td class="val-sub2">2</td><td class="val-sub2">10</td><td class="val-sub2">9</td><td class="val-sub2">4</td><td class="val-sub2">6</td><td class="val-total-sub2">74</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">4</td><td class="val-sub2">7</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">5</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-total-sub2">40</td></tr><tr><td class="lbl-cell lbl-main">設定数</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">4</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">45</td></tr><tr><td class="lbl-cell lbl-sub">（設定率 / 有効応募比）</td><td class="val-sub">33.3%</td><td class="val-sub">12.5%</td><td class="val-sub">16.0%</td><td class="val-sub">33.3%</td><td class="val-sub">13.3%</td><td class="val-sub">12.5%</td><td class="val-sub">16.7%</td><td class="val-sub">33.3%</td><td class="val-sub">12.9%</td><td class="val-sub">42.9%</td><td class="val-sub">17.6%</td><td class="val-sub">20.0%</td><td class="val-sub">4.0%</td><td class="val-sub">12.5%</td><td class="val-total-sub">17.3%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">25</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">13</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">3</td></tr><tr><td class="lbl-cell lbl-main">実施数</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">4</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">45</td></tr><tr><td class="lbl-cell lbl-sub">（実施率 / 設定比）</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">100.0%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">25</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">13</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">3</td></tr><tr><td class="lbl-cell lbl-main">決定数</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">21</td></tr><tr><td class="lbl-cell lbl-sub">（決定率 / 実施比）</td><td class="val-sub">40.0%</td><td class="val-sub">0.0%</td><td class="val-sub">75.0%</td><td class="val-sub">40.0%</td><td class="val-sub">0.0%</td><td class="val-sub">25.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">75.0%</td><td class="val-sub">33.3%</td><td class="val-sub">33.3%</td><td class="val-sub">20.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">46.7%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">12</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">5</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">2</td></tr><tr><td class="lbl-cell lbl-main">開始数</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">20</td></tr><tr><td class="lbl-cell lbl-sub">（開始率 / 決定比）</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">50.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">95.2%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">11</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">5</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">2</td></tr><tr class="sec-header"><td class="lbl-cell">💰 単価一覧（集客費用/件数）</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-sub">総応募/単価</td><td class="val-main">¥11,077</td><td class="val-main">¥19,597</td><td class="val-main">¥16,095</td><td class="val-main">¥26,607</td><td class="val-main">¥23,020</td><td class="val-main">¥9,994</td><td class="val-main">¥20,829</td><td class="val-main">¥27,604</td><td class="val-main">¥11,591</td><td class="val-main">¥32,417</td><td class="val-main">¥13,269</td><td class="val-main">¥8,581</td><td class="val-main">¥12,214</td><td class="val-main">¥19,667</td><td class="val-total">¥14,827</td></tr><tr><td class="lbl-cell lbl-sub">有効応募/単価</td><td class="val-main">¥14,770</td><td class="val-main">¥48,992</td><td class="val-main">¥26,395</td><td class="val-main">¥28,381</td><td class="val-main">¥39,902</td><td class="val-main">¥26,859</td><td class="val-main">¥62,488</td><td class="val-main">¥82,811</td><td class="val-main">¥23,181</td><td class="val-main">¥64,833</td><td class="val-main">¥26,149</td><td class="val-main">¥18,192</td><td class="val-main">¥21,984</td><td class="val-main">¥28,272</td><td class="val-total">¥29,027</td></tr><tr><td class="lbl-cell lbl-sub">人選対象/単価</td><td class="val-main">¥15,825</td><td class="val-main">¥48,992</td><td class="val-main">¥28,691</td><td class="val-main">¥28,381</td><td class="val-main">¥46,040</td><td class="val-main">¥31,833</td><td class="val-main">¥62,488</td><td class="val-main">¥99,373</td><td class="val-main">¥31,244</td><td class="val-main">¥75,639</td><td class="val-main">¥29,635</td><td class="val-main">¥19,773</td><td class="val-main">¥32,330</td><td class="val-main">¥30,156</td><td class="val-total">¥33,543</td></tr><tr><td class="lbl-cell lbl-sub">設定/単価</td><td class="val-main">¥44,310</td><td class="val-main">¥391,939</td><td class="val-main">¥164,971</td><td class="val-main">¥85,142</td><td class="val-main">¥299,262</td><td class="val-main">¥214,870</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥179,656</td><td class="val-main">¥151,278</td><td class="val-main">¥148,175</td><td class="val-main">¥90,958</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥167,714</td></tr><tr><td class="lbl-cell lbl-sub">実施/単価</td><td class="val-main">¥44,310</td><td class="val-main">¥391,939</td><td class="val-main">¥164,971</td><td class="val-main">¥85,142</td><td class="val-main">¥299,262</td><td class="val-main">¥214,870</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥179,656</td><td class="val-main">¥151,278</td><td class="val-main">¥148,175</td><td class="val-main">¥90,958</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥167,714</td></tr><tr><td class="lbl-cell lbl-sub">決定/単価</td><td class="val-main">¥110,774</td><td class="val-main"></td><td class="val-main">¥219,961</td><td class="val-main">¥212,854</td><td class="val-main"></td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥239,541</td><td class="val-main">¥453,834</td><td class="val-main">¥444,525</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥359,387</td></tr><tr><td class="lbl-cell lbl-sub">開始/単価</td><td class="val-main">¥110,774</td><td class="val-main"></td><td class="val-main">¥219,961</td><td class="val-main">¥212,854</td><td class="val-main"></td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥239,541</td><td class="val-main">¥453,834</td><td class="val-main">¥889,050</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥377,357</td></tr></tbody></table></div>
+<tbody><tr class="cost-row"><td class="lbl-cell lbl-main" style="background:#fff3d4">集客費用</td><td class="val-main">¥221,548</td><td class="val-main">¥391,939</td><td class="val-main">¥659,884</td><td class="val-main">¥425,708</td><td class="val-main">¥598,524</td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥496,866</td><td class="val-main">¥718,623</td><td class="val-main">¥453,834</td><td class="val-main">¥889,050</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥452,347</td><td class="val-total">¥7,547,130</td></tr><tr><td class="lbl-cell lbl-main">総応募</td><td class="val-main">20</td><td class="val-main">20</td><td class="val-main">41</td><td class="val-main">16</td><td class="val-main">26</td><td class="val-main">86</td><td class="val-main">18</td><td class="val-main">18</td><td class="val-main">62</td><td class="val-main">14</td><td class="val-main">67</td><td class="val-main">53</td><td class="val-main">45</td><td class="val-main">23</td><td class="val-total">509</td></tr><tr><td class="lbl-cell lbl-main lbl-star">有効応募</td><td class="val-main">15</td><td class="val-main">8</td><td class="val-main">26</td><td class="val-main">17</td><td class="val-main">15</td><td class="val-main">34</td><td class="val-main">7</td><td class="val-main">8</td><td class="val-main">32</td><td class="val-main">9</td><td class="val-main">36</td><td class="val-main">29</td><td class="val-main">26</td><td class="val-main">18</td><td class="val-total">280</td></tr><tr><td class="lbl-cell lbl-sub">（有効率）70%未満↓</td><td class="val-sub">75.0%</td><td class="val-sub warn-red">40.0%</td><td class="val-sub warn-red">63.4%</td><td class="val-sub">106.3%</td><td class="val-sub warn-red">57.7%</td><td class="val-sub warn-red">39.5%</td><td class="val-sub warn-red">38.9%</td><td class="val-sub warn-red">44.4%</td><td class="val-sub warn-red">51.6%</td><td class="val-sub warn-red">64.3%</td><td class="val-sub warn-red">53.7%</td><td class="val-sub warn-red">54.7%</td><td class="val-sub warn-red">57.8%</td><td class="val-sub">78.3%</td><td class="val-total-sub warn-red">55.0%</td></tr><tr><td class="lbl-cell lbl-main">接触数</td><td class="val-main">14</td><td class="val-main">8</td><td class="val-main">23</td><td class="val-main">16</td><td class="val-main">13</td><td class="val-main">29</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">23</td><td class="val-main">8</td><td class="val-main">31</td><td class="val-main">24</td><td class="val-main">18</td><td class="val-main">15</td><td class="val-total">233</td></tr><tr><td class="lbl-cell lbl-sub">（接触率）90%未満↓</td><td class="val-sub">93.3%</td><td class="val-sub">100.0%</td><td class="val-sub warn-red">88.5%</td><td class="val-sub">94.1%</td><td class="val-sub warn-red">86.7%</td><td class="val-sub warn-red">85.3%</td><td class="val-sub warn-red">85.7%</td><td class="val-sub warn-red">62.5%</td><td class="val-sub warn-red">71.9%</td><td class="val-sub warn-red">88.9%</td><td class="val-sub warn-red">86.1%</td><td class="val-sub warn-red">82.8%</td><td class="val-sub warn-red">69.2%</td><td class="val-sub warn-red">83.3%</td><td class="val-total-sub warn-red">83.2%</td></tr><tr class="sec-header"><td class="lbl-cell">📋 有効応募 属性内訳</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-star">★資格アリ</td><td class="val-main">10</td><td class="val-main">3</td><td class="val-main">15</td><td class="val-main">11</td><td class="val-main">11</td><td class="val-main">21</td><td class="val-main">5</td><td class="val-main">5</td><td class="val-main">19</td><td class="val-main">5</td><td class="val-main">23</td><td class="val-main">14</td><td class="val-main">14</td><td class="val-main">11</td><td class="val-total">167</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">66.7%</td><td class="val-sub">37.5%</td><td class="val-sub">57.7%</td><td class="val-sub">64.7%</td><td class="val-sub">73.3%</td><td class="val-sub">61.8%</td><td class="val-sub">71.4%</td><td class="val-sub">62.5%</td><td class="val-sub">59.4%</td><td class="val-sub">55.6%</td><td class="val-sub">63.9%</td><td class="val-sub">48.3%</td><td class="val-sub">53.8%</td><td class="val-sub">61.1%</td><td class="val-total-sub">59.6%</td></tr><tr><td class="lbl-cell lbl-star">★経験アリ</td><td class="val-main">10</td><td class="val-main">5</td><td class="val-main">11</td><td class="val-main">13</td><td class="val-main">9</td><td class="val-main">19</td><td class="val-main">2</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">6</td><td class="val-main">22</td><td class="val-main">14</td><td class="val-main">15</td><td class="val-main">12</td><td class="val-total">160</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">66.7%</td><td class="val-sub">62.5%</td><td class="val-sub">42.3%</td><td class="val-sub">76.5%</td><td class="val-sub">60.0%</td><td class="val-sub">55.9%</td><td class="val-sub">28.6%</td><td class="val-sub">62.5%</td><td class="val-sub">53.1%</td><td class="val-sub">66.7%</td><td class="val-sub">61.1%</td><td class="val-sub">48.3%</td><td class="val-sub">57.7%</td><td class="val-sub">66.7%</td><td class="val-total-sub">57.1%</td></tr><tr><td class="lbl-cell lbl-sub">なしなし</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">9</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">8</td><td class="val-main">2</td><td class="val-main">2</td><td class="val-main">12</td><td class="val-main">2</td><td class="val-main">12</td><td class="val-main">14</td><td class="val-main">10</td><td class="val-main">5</td><td class="val-total">89</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">26.7%</td><td class="val-sub">37.5%</td><td class="val-sub">34.6%</td><td class="val-sub">17.6%</td><td class="val-sub">20.0%</td><td class="val-sub">23.5%</td><td class="val-sub">28.6%</td><td class="val-sub">25.0%</td><td class="val-sub">37.5%</td><td class="val-sub">22.2%</td><td class="val-sub">33.3%</td><td class="val-sub">48.3%</td><td class="val-sub">38.5%</td><td class="val-sub">27.8%</td><td class="val-total-sub">31.8%</td></tr><tr><td class="lbl-cell lbl-star">★週3日以上 (LT)</td><td class="val-main">12</td><td class="val-main">5</td><td class="val-main">13</td><td class="val-main">11</td><td class="val-main">6</td><td class="val-main">17</td><td class="val-main">0</td><td class="val-main">5</td><td class="val-main">15</td><td class="val-main">7</td><td class="val-main">17</td><td class="val-main">10</td><td class="val-main">11</td><td class="val-main">10</td><td class="val-total">139</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">80.0%</td><td class="val-sub">62.5%</td><td class="val-sub">50.0%</td><td class="val-sub">64.7%</td><td class="val-sub">40.0%</td><td class="val-sub">50.0%</td><td class="val-sub">0.0%</td><td class="val-sub">62.5%</td><td class="val-sub">46.9%</td><td class="val-sub">77.8%</td><td class="val-sub">47.2%</td><td class="val-sub">34.5%</td><td class="val-sub">42.3%</td><td class="val-sub">55.6%</td><td class="val-total-sub">49.6%</td></tr><tr><td class="lbl-cell lbl-sub">週2日以下</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">13</td><td class="val-main">6</td><td class="val-main">9</td><td class="val-main">17</td><td class="val-main">7</td><td class="val-main">3</td><td class="val-main">17</td><td class="val-main">2</td><td class="val-main">19</td><td class="val-main">19</td><td class="val-main">15</td><td class="val-main">8</td><td class="val-total">141</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">20.0%</td><td class="val-sub">37.5%</td><td class="val-sub">50.0%</td><td class="val-sub">35.3%</td><td class="val-sub">60.0%</td><td class="val-sub">50.0%</td><td class="val-sub">100.0%</td><td class="val-sub">37.5%</td><td class="val-sub">53.1%</td><td class="val-sub">22.2%</td><td class="val-sub">52.8%</td><td class="val-sub">65.5%</td><td class="val-sub">57.7%</td><td class="val-sub">44.4%</td><td class="val-total-sub">50.4%</td></tr><tr><td class="lbl-cell lbl-sub">60歳以上</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">9</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-main">9</td><td class="val-main">3</td><td class="val-main">2</td><td class="val-main">12</td><td class="val-main">3</td><td class="val-main">10</td><td class="val-main">14</td><td class="val-main">7</td><td class="val-main">5</td><td class="val-total">93</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">20.0%</td><td class="val-sub">37.5%</td><td class="val-sub">34.6%</td><td class="val-sub">47.1%</td><td class="val-sub">33.3%</td><td class="val-sub">26.5%</td><td class="val-sub">42.9%</td><td class="val-sub">25.0%</td><td class="val-sub">37.5%</td><td class="val-sub">33.3%</td><td class="val-sub">27.8%</td><td class="val-sub">48.3%</td><td class="val-sub">26.9%</td><td class="val-sub">27.8%</td><td class="val-total-sub">33.2%</td></tr><tr><td class="lbl-cell lbl-star">★60歳未満</td><td class="val-main">12</td><td class="val-main">5</td><td class="val-main">17</td><td class="val-main">9</td><td class="val-main">10</td><td class="val-main">25</td><td class="val-main">4</td><td class="val-main">6</td><td class="val-main">20</td><td class="val-main">6</td><td class="val-main">26</td><td class="val-main">15</td><td class="val-main">19</td><td class="val-main">13</td><td class="val-total">187</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">80.0%</td><td class="val-sub">62.5%</td><td class="val-sub">65.4%</td><td class="val-sub">52.9%</td><td class="val-sub">66.7%</td><td class="val-sub">73.5%</td><td class="val-sub">57.1%</td><td class="val-sub">75.0%</td><td class="val-sub">62.5%</td><td class="val-sub">66.7%</td><td class="val-sub">72.2%</td><td class="val-sub">51.7%</td><td class="val-sub">73.1%</td><td class="val-sub">72.2%</td><td class="val-total-sub">66.8%</td></tr><tr><td class="lbl-cell lbl-sub">夜勤専従希望</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">6</td><td class="val-main">6</td><td class="val-main">6</td><td class="val-main">8</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">4</td><td class="val-main">0</td><td class="val-main">17</td><td class="val-main">9</td><td class="val-main">7</td><td class="val-main">9</td><td class="val-total">82</td></tr><tr><td class="lbl-cell lbl-sub">（割合）</td><td class="val-sub">26.7%</td><td class="val-sub">0.0%</td><td class="val-sub">23.1%</td><td class="val-sub">35.3%</td><td class="val-sub">40.0%</td><td class="val-sub">23.5%</td><td class="val-sub">28.6%</td><td class="val-sub">50.0%</td><td class="val-sub">12.5%</td><td class="val-sub">0.0%</td><td class="val-sub">47.2%</td><td class="val-sub">31.0%</td><td class="val-sub">26.9%</td><td class="val-sub">50.0%</td><td class="val-total-sub">29.3%</td></tr><tr class="sec-header"><td class="lbl-cell">🎯 人選・ファネル</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-main lbl-star">人選対象数</td><td class="val-main">14</td><td class="val-main">8</td><td class="val-main">23</td><td class="val-main">16</td><td class="val-main">13</td><td class="val-main">29</td><td class="val-main">6</td><td class="val-main">5</td><td class="val-main">23</td><td class="val-main">8</td><td class="val-main">31</td><td class="val-main">24</td><td class="val-main">18</td><td class="val-main">15</td><td class="val-total">233</td></tr><tr><td class="lbl-cell lbl-sub">（有効応募からの割合）</td><td class="val-sub">93.3%</td><td class="val-sub">100.0%</td><td class="val-sub">88.5%</td><td class="val-sub">94.1%</td><td class="val-sub">86.7%</td><td class="val-sub">85.3%</td><td class="val-sub">85.7%</td><td class="val-sub">62.5%</td><td class="val-sub">71.9%</td><td class="val-sub">88.9%</td><td class="val-sub">86.1%</td><td class="val-sub">82.8%</td><td class="val-sub">69.2%</td><td class="val-sub">83.3%</td><td class="val-total-sub">83.2%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">7</td><td class="val-sub2">1</td><td class="val-sub2">5</td><td class="val-sub2">5</td><td class="val-sub2">2</td><td class="val-sub2">8</td><td class="val-sub2">0</td><td class="val-sub2">4</td><td class="val-sub2">9</td><td class="val-sub2">2</td><td class="val-sub2">9</td><td class="val-sub2">4</td><td class="val-sub2">9</td><td class="val-sub2">5</td><td class="val-total-sub2">70</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">4</td><td class="val-sub2">2</td><td class="val-sub2">8</td><td class="val-sub2">5</td><td class="val-sub2">6</td><td class="val-sub2">10</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">7</td><td class="val-sub2">3</td><td class="val-sub2">11</td><td class="val-sub2">9</td><td class="val-sub2">4</td><td class="val-sub2">6</td><td class="val-total-sub2">77</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">4</td><td class="val-sub2">6</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">3</td><td class="val-sub2">5</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-total-sub2">41</td></tr><tr><td class="lbl-cell lbl-main">設定数</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">4</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-total">49</td></tr><tr><td class="lbl-cell lbl-sub">（設定率 / 有効応募比）</td><td class="val-sub">33.3%</td><td class="val-sub">12.5%</td><td class="val-sub">15.4%</td><td class="val-sub">29.4%</td><td class="val-sub">13.3%</td><td class="val-sub">11.8%</td><td class="val-sub">14.3%</td><td class="val-sub">25.0%</td><td class="val-sub">12.5%</td><td class="val-sub">33.3%</td><td class="val-sub">22.2%</td><td class="val-sub">17.2%</td><td class="val-sub">7.7%</td><td class="val-sub">16.7%</td><td class="val-total-sub">17.5%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-total-sub2">28</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">4</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">14</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">3</td></tr><tr><td class="lbl-cell lbl-main">実施数</td><td class="val-main">5</td><td class="val-main">1</td><td class="val-main">4</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">4</td><td class="val-main">3</td><td class="val-main">8</td><td class="val-main">5</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-total">49</td></tr><tr><td class="lbl-cell lbl-sub">（実施率 / 設定比）</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">100.0%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">2</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">3</td><td class="val-sub2">2</td><td class="val-sub2">4</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">2</td><td class="val-total-sub2">28</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">4</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">14</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">3</td></tr><tr><td class="lbl-cell lbl-main">決定数</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">0</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">1</td><td class="val-main">3</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">23</td></tr><tr><td class="lbl-cell lbl-sub">（決定率 / 実施比）</td><td class="val-sub">40.0%</td><td class="val-sub">0.0%</td><td class="val-sub">75.0%</td><td class="val-sub">60.0%</td><td class="val-sub">0.0%</td><td class="val-sub">25.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">75.0%</td><td class="val-sub">33.3%</td><td class="val-sub">37.5%</td><td class="val-sub">20.0%</td><td class="val-sub">50.0%</td><td class="val-sub">66.7%</td><td class="val-total-sub">46.9%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">3</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">14</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">5</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">2</td></tr><tr><td class="lbl-cell lbl-main">開始数</td><td class="val-main">2</td><td class="val-main">0</td><td class="val-main">3</td><td class="val-main">3</td><td class="val-main">0</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">3</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-main">1</td><td class="val-main">1</td><td class="val-main">2</td><td class="val-total">22</td></tr><tr><td class="lbl-cell lbl-sub">（開始率 / 決定比）</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub"></td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">66.7%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-sub">100.0%</td><td class="val-total-sub">95.7%</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★★</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">2</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">13</td></tr><tr><td class="lbl-cell lbl-sub2">　★★★☆</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-total-sub2">5</td></tr><tr><td class="lbl-cell lbl-sub2">　★★☆☆</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">1</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-sub2">0</td><td class="val-total-sub2">2</td></tr><tr class="sec-header"><td class="lbl-cell">💰 単価一覧（集客費用/件数）</td><td>青森</td><td>盛岡</td><td>仙台</td><td>千葉</td><td>横浜</td><td>新宿</td><td>新潟</td><td>金沢</td><td>名古屋</td><td>京都</td><td>梅田</td><td>神戸</td><td>福岡</td><td>鹿児島</td><td>合計</td></tr><tr><td class="lbl-cell lbl-sub">総応募/単価</td><td class="val-main">¥11,077</td><td class="val-main">¥19,597</td><td class="val-main">¥16,095</td><td class="val-main">¥26,607</td><td class="val-main">¥23,020</td><td class="val-main">¥9,994</td><td class="val-main">¥20,829</td><td class="val-main">¥27,604</td><td class="val-main">¥11,591</td><td class="val-main">¥32,417</td><td class="val-main">¥13,269</td><td class="val-main">¥8,581</td><td class="val-main">¥12,214</td><td class="val-main">¥19,667</td><td class="val-total">¥14,827</td></tr><tr><td class="lbl-cell lbl-sub">有効応募/単価</td><td class="val-main">¥14,770</td><td class="val-main">¥48,992</td><td class="val-main">¥25,380</td><td class="val-main">¥25,042</td><td class="val-main">¥39,902</td><td class="val-main">¥25,279</td><td class="val-main">¥53,561</td><td class="val-main">¥62,108</td><td class="val-main">¥22,457</td><td class="val-main">¥50,426</td><td class="val-main">¥24,696</td><td class="val-main">¥15,682</td><td class="val-main">¥21,139</td><td class="val-main">¥25,130</td><td class="val-total">¥26,954</td></tr><tr><td class="lbl-cell lbl-sub">人選対象/単価</td><td class="val-main">¥15,825</td><td class="val-main">¥48,992</td><td class="val-main">¥28,691</td><td class="val-main">¥26,607</td><td class="val-main">¥46,040</td><td class="val-main">¥29,637</td><td class="val-main">¥62,488</td><td class="val-main">¥99,373</td><td class="val-main">¥31,244</td><td class="val-main">¥56,729</td><td class="val-main">¥28,679</td><td class="val-main">¥18,950</td><td class="val-main">¥30,534</td><td class="val-main">¥30,156</td><td class="val-total">¥32,391</td></tr><tr><td class="lbl-cell lbl-sub">設定/単価</td><td class="val-main">¥44,310</td><td class="val-main">¥391,939</td><td class="val-main">¥164,971</td><td class="val-main">¥85,142</td><td class="val-main">¥299,262</td><td class="val-main">¥214,870</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥179,656</td><td class="val-main">¥151,278</td><td class="val-main">¥111,131</td><td class="val-main">¥90,958</td><td class="val-main">¥274,805</td><td class="val-main">¥150,782</td><td class="val-total">¥154,023</td></tr><tr><td class="lbl-cell lbl-sub">実施/単価</td><td class="val-main">¥44,310</td><td class="val-main">¥391,939</td><td class="val-main">¥164,971</td><td class="val-main">¥85,142</td><td class="val-main">¥299,262</td><td class="val-main">¥214,870</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥179,656</td><td class="val-main">¥151,278</td><td class="val-main">¥111,131</td><td class="val-main">¥90,958</td><td class="val-main">¥274,805</td><td class="val-main">¥150,782</td><td class="val-total">¥154,023</td></tr><tr><td class="lbl-cell lbl-sub">決定/単価</td><td class="val-main">¥110,774</td><td class="val-main"></td><td class="val-main">¥219,961</td><td class="val-main">¥141,903</td><td class="val-main"></td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥239,541</td><td class="val-main">¥453,834</td><td class="val-main">¥296,350</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥328,136</td></tr><tr><td class="lbl-cell lbl-sub">開始/単価</td><td class="val-main">¥110,774</td><td class="val-main"></td><td class="val-main">¥219,961</td><td class="val-main">¥141,903</td><td class="val-main"></td><td class="val-main">¥859,481</td><td class="val-main">¥374,926</td><td class="val-main">¥248,433</td><td class="val-main">¥239,541</td><td class="val-main">¥453,834</td><td class="val-main">¥444,525</td><td class="val-main">¥454,790</td><td class="val-main">¥549,610</td><td class="val-main">¥226,174</td><td class="val-total">¥343,051</td></tr></tbody></table></div>
 </div>
 <div class="note" id="bottom-note">※ 有効応募・接触・属性・ファネルはMCGデータを基に集計。総応募は統合ツールCSVベース。MCG未入力＝統合ツールに応募記録があるがMCGに電話番号が見つからない人。</div>
 
@@ -369,17 +364,41 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">**********</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/1</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">宇賀神大</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8056995609</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">谷田　江身子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9068081000</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">谷田　江身子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9068081000</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西田　沙織</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">805035507</td>
-    </tr><tr style="background:#fdf8f8;">
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ふぁびあん　あいりんらみろ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">8048426887</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">尼田裕美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">バイトル</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9038710226</td>
     </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/2</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">吉元裕和</td>
@@ -430,22 +449,34 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">**********</td>
     </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">谷田　江身子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9068081000</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">小林　拓也</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">7066627642</td>
-    </tr><tr style="background:#fdf8f8;">
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">仁科　俊彦</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9024338745</td>
-    </tr><tr style="background:#fff;">
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">齋藤文代</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">8020439201</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">坂口 雅人</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8038389256</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">増田和則</td>
@@ -453,11 +484,59 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">金沢</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9077433910</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松井泰寛</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8087113069</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松井泰寛</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8087113069</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/3</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松井泰寛</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8087113069</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/5</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">山﨑　友理佳</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新潟</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">7064555797</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">阪上由香里</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9080222322</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">小野和人</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8044400982</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/5</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">大岳美代子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8090507347</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">村上　摩佐子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7036300802</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">鈴木　寬克</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8069793012</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">城戸健</td>
@@ -465,65 +544,125 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9058189172</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">沢部一久</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8044351919</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">沢部一久</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">横浜</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8044351919</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">戸﨑　剛伸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">エン派遣</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9085424366</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/6</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西田　左紀子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">エン派遣</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9038644264</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/7</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松本ミドリ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9042399175</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/7</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">田中 清美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8053319225</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/7</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">森田ゆかり</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9099583146</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/7</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">石田敬一</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">8069901165</td>
-    </tr><tr style="background:#fdf8f8;">
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/7</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">増田和則</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">金沢</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9077433910</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/8</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">髙山めぐみ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8083843287</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/8</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">山口　奈諸美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">鹿児島</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9047717644</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/8</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">朝原 美紀</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">90188398001</td>
-    </tr><tr style="background:#fdf8f8;">
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/8</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">石野正人</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9073557402</td>
-    </tr><tr style="background:#fff;">
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/8</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ｘｘ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">9073557402</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/9</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">平賀　章世</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9073197920</td>
     </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/9</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">佐藤　芳充</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8082029827</td>
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/9</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">石田敬一</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">8069901165</td>
-    </tr><tr style="background:#fff;">
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">田中 清美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8053319225</td>
     </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">長谷川 由美子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7014229122</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">川口悦子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8064448732</td>
     </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">青木　武俊</td>
@@ -543,35 +682,131 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">青森</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">7055107185</td>
     </tr><tr style="background:#fdf8f8;">
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">太田　希望</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">仙台</td>
-      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9044792896</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西井大地</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7023189232</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/10</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西井大地</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7023189232</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">三島佐規子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8024171638</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松尾素映子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">新宿</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9092457944</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">酒木　宏望</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">070-8481-1118</td>
-    </tr><tr style="background:#fdf8f8;">
+    </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">酒木　宏望</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">070-8481-1118</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/11</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">黒岩由紀子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">鹿児島</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8052075512</td>
     </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">嶋村みゆき</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">バイトル</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">福岡</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8046994482</td>
+    </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/12</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松井泰寛</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">バイトル</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">神戸</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">8088099101</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">伊藤　裕美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9048646458</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">伊藤裕美</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9048646458</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/12</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西井大地</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">京都</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7023189232</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/13</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ＳＰ電話応募</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">千葉</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/13</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">吉野　利江子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">自社（会員登録）</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9014442187</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/14</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">藤生　和宏</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9023522183</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/14</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">松村　愛</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">梅田</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9012004470</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/14</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">梅村百合香</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8015938390</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/15</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">安田美紀子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">求人ボックス</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9056356692</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/15</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">長坂治</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7083277502</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/15</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">浜田大輔</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">千葉</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7050242731</td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/15</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">西尾沙織</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">金沢</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9083640911</td>
     </tr><tr style="background:#fff;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/16</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">福井　真一</td>
@@ -580,10 +815,28 @@ MCG TELサンプル(正規化済): 8012574417, 8041525632, 9097819276
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">7036095906</td>
     </tr><tr style="background:#fdf8f8;">
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/16</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">鈴木　寬克</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">キューメイト</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">8069793012</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/16</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">ＰＣ電話応募</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;">千葉</td>
       <td style="padding:5px 12px; border:1px solid #f5c6c2;"></td>
+    </tr><tr style="background:#fdf8f8;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/16</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">安田美紀子</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">マイナビ</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">9056356692</td>
+    </tr><tr style="background:#fff;">
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">2026/4/16</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2; font-weight:700;">長坂治</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">e介護転職</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">名古屋</td>
+      <td style="padding:5px 12px; border:1px solid #f5c6c2;">7083277502</td>
     </tr></tbody>
     </table>
   </div>
